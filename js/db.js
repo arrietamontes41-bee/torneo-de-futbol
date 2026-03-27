@@ -9,6 +9,18 @@
 // Cliente Supabase (cargado desde CDN en los HTML)
 let _supabase = null;
 
+// ================================================================
+// HASH DE CONTRASEÑA (SHA-256 via Web Crypto API — nativa del navegador)
+// ================================================================
+const hashPassword = async (plain) => {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(plain);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+};
+
 const DB = (() => {
 
   // ---- Inicialización ----
@@ -40,16 +52,19 @@ const DB = (() => {
   // ----------------------------------------------------------------
   const login = async (email, password) => {
     try {
+      const hashed = await hashPassword(password);
       const { data, error } = await sb()
         .from('usuarios')
         .select('*')
         .eq('email', email.toLowerCase().trim())
-        .eq('password', password)
+        .eq('password', hashed)
         .single();
 
       if (error || !data) return { ok: false, error: 'Correo o contraseña incorrectos.' };
-      setSession(data);
-      return { ok: true, user: data };
+      // No guardar la contraseña en sesión
+      const { password: _pwd, ...safeUser } = data;
+      setSession(safeUser);
+      return { ok: true, user: safeUser };
     } catch (e) {
       return { ok: false, error: 'Error de conexión. Revisa tu internet.' };
     }
@@ -79,10 +94,11 @@ const DB = (() => {
       const { data: existingUser } = await sb().from('usuarios').select('id').eq('email', email.toLowerCase()).single();
       if (existingUser) return { ok: false, error: 'Ya existe una cuenta con ese correo.' };
 
-      // 3. Crear usuario
+      // 3. Crear usuario (contraseña hasheada)
+      const hashed = await hashPassword(password);
       const { data: user, error: userErr } = await sb().from('usuarios').insert([{
         email: email.toLowerCase().trim(),
-        password,
+        password: hashed,
         nombre: name.trim(),
         rol: 'equipo'
       }]).select().single();

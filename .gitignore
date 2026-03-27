@@ -6,9 +6,12 @@ desktop.ini
 # Logs
 *.log
 
-# Variables de entorno (si en el futuro las usas)
+# Variables de entorno
 .env
 .env.local
+
+# Credenciales Supabase — NO subir al repositorio
+js/config.js
 
 # Editor
 .vscode/settings.json
