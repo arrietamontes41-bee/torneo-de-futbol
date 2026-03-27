@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ---- Auth Guard ----
   const session = DB.getSession();
-  if (!session) { window.location.href = 'index.html'; return; }
+  if (!session)              { window.location.href = 'index.html';    return; }
+  if (session.rol !== 'admin') { window.location.href = 'team-panel.html'; return; }
 
   // ---- DOM refs ----
   const userRoleBadge  = document.getElementById('userRoleBadge');

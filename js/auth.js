@@ -1,11 +1,15 @@
 /**
  * auth.js — Login page logic (async con Supabase)
+ * Redirección por rol: admin → dashboard.html | equipo → team-panel.html
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Si ya hay sesión activa, redirigir al dashboard
+  // Si ya hay sesión activa, redirigir según el rol
   const session = DB.getSession();
-  if (session) { window.location.href = 'dashboard.html'; return; }
+  if (session) {
+    window.location.href = session.rol === 'admin' ? 'dashboard.html' : 'team-panel.html';
+    return;
+  }
 
   const form      = document.getElementById('loginForm');
   const emailInput= document.getElementById('loginEmail');
@@ -34,7 +38,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const result = await DB.login(email, password);
 
     if (result.ok) {
-      window.location.href = 'dashboard.html';
+      // Redirigir según rol
+      const destino = result.user.rol === 'admin' ? 'dashboard.html' : 'team-panel.html';
+      window.location.href = destino;
     } else {
       showError(result.error);
       btnLogin.disabled = false;
