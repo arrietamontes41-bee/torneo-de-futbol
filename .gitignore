@@ -1,0 +1,14 @@
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+
+# Variables de entorno (si en el futuro las usas)
+.env
+.env.local
+
+# Editor
+.vscode/settings.json
