@@ -1,0 +1,68 @@
+-- ============================================================
+-- ESQUEMA DE BASE DE DATOS
+-- Torneo de Fútbol – Montería, Córdoba
+-- Ejecuta este SQL en: Supabase → SQL Editor → New Query
+-- ============================================================
+
+-- 1. USUARIOS (administradores y equipos)
+CREATE TABLE IF NOT EXISTS usuarios (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email       TEXT UNIQUE NOT NULL,
+  password    TEXT NOT NULL,
+  nombre      TEXT NOT NULL,
+  rol         TEXT NOT NULL DEFAULT 'equipo'  CHECK (rol IN ('admin','equipo')),
+  created_at  TIMESTAMPTZ DEFAULT now()
+);
+
+-- 2. EQUIPOS
+CREATE TABLE IF NOT EXISTS equipos (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  nombre      TEXT UNIQUE NOT NULL,
+  email       TEXT UNIQUE NOT NULL,
+  municipio   TEXT NOT NULL DEFAULT 'Montería',
+  usuario_id  UUID REFERENCES usuarios(id) ON DELETE SET NULL,
+  created_at  TIMESTAMPTZ DEFAULT now()
+);
+
+-- 3. PARTIDOS
+CREATE TABLE IF NOT EXISTS partidos (
+  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  equipo_local_id  UUID NOT NULL REFERENCES equipos(id) ON DELETE CASCADE,
+  equipo_visit_id  UUID NOT NULL REFERENCES equipos(id) ON DELETE CASCADE,
+  fecha            DATE NOT NULL,
+  hora             TIME NOT NULL,
+  goles_local      INT,
+  goles_visit      INT,
+  estado           TEXT NOT NULL DEFAULT 'pendiente' CHECK (estado IN ('pendiente','finalizado')),
+  created_at       TIMESTAMPTZ DEFAULT now(),
+  CONSTRAINT equipos_distintos CHECK (equipo_local_id <> equipo_visit_id)
+);
+
+-- ============================================================
+-- ADMINISTRADOR POR DEFECTO
+-- (cambia el password si deseas)
+-- ============================================================
+INSERT INTO usuarios (email, password, nombre, rol)
+VALUES ('admin@torneo.com', 'admin123', 'Administrador', 'admin')
+ON CONFLICT (email) DO NOTHING;
+
+-- ============================================================
+-- SEGURIDAD: Row Level Security (RLS)
+-- Permite acceso público para leer y que el front maneje auth
+-- ============================================================
+ALTER TABLE usuarios   ENABLE ROW LEVEL SECURITY;
+ALTER TABLE equipos    ENABLE ROW LEVEL SECURITY;
+ALTER TABLE partidos   ENABLE ROW LEVEL SECURITY;
+
+-- Políticas: lectura y escritura pública (el frontend controla la auth)
+CREATE POLICY "public_read_users"    ON usuarios  FOR SELECT USING (true);
+CREATE POLICY "public_insert_users"  ON usuarios  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "public_read_equipos"  ON equipos   FOR SELECT USING (true);
+CREATE POLICY "public_insert_equipos"ON equipos   FOR INSERT WITH CHECK (true);
+CREATE POLICY "public_delete_equipos"ON equipos   FOR DELETE USING (true);
+
+CREATE POLICY "public_read_partidos" ON partidos  FOR SELECT USING (true);
+CREATE POLICY "public_insert_partidos" ON partidos FOR INSERT WITH CHECK (true);
+CREATE POLICY "public_update_partidos" ON partidos FOR UPDATE USING (true);
+CREATE POLICY "public_delete_partidos" ON partidos FOR DELETE USING (true);

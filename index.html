@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Torneo de Fútbol – Montería, Córdoba</title>
+  <meta name="description" content="Plataforma de gestión de torneos de fútbol de Montería, Córdoba y sus alrededores." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="auth-body">
+
+  <div class="auth-bg">
+    <div class="auth-blob blob-1"></div>
+    <div class="auth-blob blob-2"></div>
+    <div class="auth-blob blob-3"></div>
+  </div>
+
+  <div class="auth-card" id="loginCard">
+    <div class="auth-logo">
+      <div class="logo-circle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+          <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+          <path d="M4 22h16"/>
+          <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+          <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+          <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+        </svg>
+      </div>
+    </div>
+    <h1 class="auth-title">Torneo de Fútbol</h1>
+    <p class="auth-subtitle">Inicia sesión para continuar</p>
+
+    <form id="loginForm" class="auth-form" novalidate>
+      <div class="form-field">
+        <label for="loginEmail">Correo electrónico</label>
+        <div class="input-wrap">
+          <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
+          <input type="email" id="loginEmail" name="email" placeholder="correo@ejemplo.com" autocomplete="email" required />
+        </div>
+      </div>
+      <div class="form-field">
+        <label for="loginPassword">Contraseña</label>
+        <div class="input-wrap">
+          <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
+          <input type="password" id="loginPassword" name="password" placeholder="••••••••" autocomplete="current-password" required />
+        </div>
+      </div>
+      <div class="form-error" id="loginError"></div>
+      <button type="submit" class="btn-auth" id="btnLogin">
+        <svg viewBox="0 0 20 20" fill="currentColor" width="18"><path fill-rule="evenodd" d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/></svg>
+        Iniciar sesión
+      </button>
+    </form>
+
+    <p class="auth-switch">¿No tienes cuenta? <a href="register.html" id="goToRegister">Registra tu equipo</a></p>
+
+    <div class="demo-hint">
+      <strong>Cuenta de administrador:</strong><br/>
+      Email: admin@torneo.com<br/>
+      Contraseña: admin123
+    </div>
+  </div>
+
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>
