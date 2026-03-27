@@ -1,4 +1,12 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://arrietamontes41-bee.github.io/torneo-de-futbol/sitemap.xml
+# Bloquear acceso a archivos internos
+Disallow: /js/
+Disallow: /css/
+Disallow: /assets/
+Disallow: /*.sql$
+Disallow: /*.md$
+
+# Sitemap (activar cuando tengas dominio real)
+# Sitemap: https://tudominio.com/sitemap.xml

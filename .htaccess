@@ -1,46 +1,31 @@
-# ============================================================
-#  Seguridad HTTP — Torneo de Fútbol Montería
-#  Corrige alertas OWASP ZAP
-# ============================================================
+# =============================================
+# .htaccess - Configuración de seguridad básica
+# Torneo de Fútbol - Montería
+# =============================================
 
-# ------------------------------------------------------------
-# 1. Content Security Policy (CSP)
-#    Permite: self, Google Fonts, Supabase CDN de supabase-js
-# ------------------------------------------------------------
-Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co; img-src 'self' data:;"
+# --- Bloquear acceso a archivos sensibles ---
+<FilesMatch "\.(sql|md|git|env|json|log)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
 
-# ------------------------------------------------------------
-# 2. Anti-Clickjacking
-# ------------------------------------------------------------
-Header always set X-Frame-Options "SAMEORIGIN"
+# --- Deshabilitar listado de directorios ---
+Options -Indexes
 
-# ------------------------------------------------------------
-# 3. X-Content-Type-Options
-# ------------------------------------------------------------
-Header always set X-Content-Type-Options "nosniff"
+# --- Cabeceras de seguridad ---
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
 
-# ------------------------------------------------------------
-# 4. X-XSS-Protection (protección extra en navegadores viejos)
-# ------------------------------------------------------------
-Header always set X-XSS-Protection "1; mode=block"
+# --- Redirigir a HTTPS (activar cuando tengas SSL) ---
+# <IfModule mod_rewrite.c>
+#     RewriteEngine On
+#     RewriteCond %{HTTPS} off
+#     RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# </IfModule>
 
-# ------------------------------------------------------------
-# 5. Referrer-Policy
-# ------------------------------------------------------------
-Header always set Referrer-Policy "strict-origin-when-cross-origin"
-
-# ------------------------------------------------------------
-# 6. Permissions-Policy (deshabilitar APIs no usadas)
-# ------------------------------------------------------------
-Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
-
-# ------------------------------------------------------------
-# 7. Ocultar versión del servidor (fuga de información)
-# ------------------------------------------------------------
-ServerTokens Prod
-ServerSignature Off
-
-# ------------------------------------------------------------
-# 8. Subresource Integrity ya está en los <script>/<link> del HTML
-#    (ver notas abajo para agregar atributos integrity/crossorigin)
-# ------------------------------------------------------------
+# --- Caracteres UTF-8 por defecto ---
+AddDefaultCharset UTF-8
