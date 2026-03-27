@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://arrietamontes41-bee.github.io/torneo-de-futbol/sitemap.xml

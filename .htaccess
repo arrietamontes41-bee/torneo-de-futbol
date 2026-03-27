@@ -1,0 +1,46 @@
+# ============================================================
+#  Seguridad HTTP — Torneo de Fútbol Montería
+#  Corrige alertas OWASP ZAP
+# ============================================================
+
+# ------------------------------------------------------------
+# 1. Content Security Policy (CSP)
+#    Permite: self, Google Fonts, Supabase CDN de supabase-js
+# ------------------------------------------------------------
+Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co; img-src 'self' data:;"
+
+# ------------------------------------------------------------
+# 2. Anti-Clickjacking
+# ------------------------------------------------------------
+Header always set X-Frame-Options "SAMEORIGIN"
+
+# ------------------------------------------------------------
+# 3. X-Content-Type-Options
+# ------------------------------------------------------------
+Header always set X-Content-Type-Options "nosniff"
+
+# ------------------------------------------------------------
+# 4. X-XSS-Protection (protección extra en navegadores viejos)
+# ------------------------------------------------------------
+Header always set X-XSS-Protection "1; mode=block"
+
+# ------------------------------------------------------------
+# 5. Referrer-Policy
+# ------------------------------------------------------------
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+# ------------------------------------------------------------
+# 6. Permissions-Policy (deshabilitar APIs no usadas)
+# ------------------------------------------------------------
+Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+
+# ------------------------------------------------------------
+# 7. Ocultar versión del servidor (fuga de información)
+# ------------------------------------------------------------
+ServerTokens Prod
+ServerSignature Off
+
+# ------------------------------------------------------------
+# 8. Subresource Integrity ya está en los <script>/<link> del HTML
+#    (ver notas abajo para agregar atributos integrity/crossorigin)
+# ------------------------------------------------------------

@@ -1,0 +1,193 @@
+/* ============================================================
+   register.css — Estilos del formulario de registro (wizard)
+   Torneo de Fútbol Montería
+   ============================================================ */
+
+/* ── Wizard steps ── */
+.wizard-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 28px;
+}
+.wizard-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+.step-circle {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .8rem; font-weight: 700;
+  border: 2px solid rgba(255,255,255,.2);
+  color: rgba(255,255,255,.4);
+  background: transparent;
+  flex-shrink: 0;
+  transition: all .3s;
+}
+.step-circle.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  box-shadow: 0 0 0 4px rgba(99,102,241,.25);
+}
+.step-circle.done {
+  background: var(--success, #22c55e);
+  border-color: var(--success, #22c55e);
+  color: #fff;
+}
+.step-label {
+  font-size: .75rem;
+  font-weight: 500;
+  color: rgba(255,255,255,.4);
+  white-space: nowrap;
+  transition: color .3s;
+}
+.wizard-step.active .step-label { color: rgba(255,255,255,.9); }
+.wizard-step.done  .step-label { color: rgba(255,255,255,.6); }
+.step-line {
+  flex: 1; height: 2px;
+  background: rgba(255,255,255,.1);
+  margin: 0 8px;
+  border-radius: 2px;
+}
+
+/* ── Step panels ── */
+.wizard-panel { display: none; }
+.wizard-panel.active { display: block; }
+
+/* ── Players section ── */
+.players-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.players-header h3 {
+  font-size: .9rem;
+  font-weight: 600;
+  color: rgba(255,255,255,.85);
+  margin: 0;
+}
+.players-count-badge {
+  font-size: .72rem;
+  background: rgba(99,102,241,.2);
+  color: var(--primary-light, #a5b4fc);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-weight: 600;
+}
+.player-row {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 10px;
+  position: relative;
+  animation: slideIn .25s ease;
+}
+@keyframes slideIn {
+  from { opacity:0; transform: translateY(-8px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+.player-row-title {
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--primary-light, #a5b4fc);
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.btn-remove-player {
+  background: rgba(239,68,68,.15);
+  border: none;
+  color: #f87171;
+  width: 24px; height: 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: .85rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .2s;
+}
+.btn-remove-player:hover { background: rgba(239,68,68,.3); }
+
+.player-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.player-grid .form-field { margin-bottom: 0; }
+.player-grid .form-field label {
+  font-size: .72rem;
+  margin-bottom: 4px;
+  display: block;
+  color: rgba(255,255,255,.55);
+}
+.player-grid input,
+.player-grid select {
+  padding: 8px 10px;
+  font-size: .82rem;
+  height: auto;
+}
+.player-grid .full-col { grid-column: 1 / -1; }
+
+.btn-add-player {
+  width: 100%;
+  padding: 11px;
+  background: rgba(99,102,241,.1);
+  border: 1.5px dashed rgba(99,102,241,.4);
+  border-radius: 10px;
+  color: var(--primary-light, #a5b4fc);
+  font-size: .83rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+  margin-top: 4px;
+}
+.btn-add-player:hover {
+  background: rgba(99,102,241,.18);
+  border-color: rgba(99,102,241,.7);
+}
+
+.players-empty {
+  text-align: center;
+  padding: 20px;
+  color: rgba(255,255,255,.3);
+  font-size: .82rem;
+}
+
+.wizard-footer {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+.btn-back {
+  flex: 0 0 auto;
+  padding: 13px 20px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 12px;
+  color: rgba(255,255,255,.7);
+  font-size: .9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s;
+}
+.btn-back:hover { background: rgba(255,255,255,.12); }
+
+.register-card-wide {
+  max-width: 580px;
+}
+
+/* Scrollable players list */
+.players-list {
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.players-list::-webkit-scrollbar { width:4px; }
+.players-list::-webkit-scrollbar-track { background: transparent; }
+.players-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius:2px; }
