@@ -274,6 +274,35 @@ const DB = (() => {
     return { ok: true };
   };
 
+  // ================================================================
+  // EVENTOS DE PARTIDO (goles y tarjetas por jugador)
+  // ================================================================
+  const getMatchEvents = async (matchId) => {
+    const { data, error } = await sb()
+      .from('eventos_partido')
+      .select('*')
+      .eq('partido_id', matchId);
+    if (error) { console.error(error); return []; }
+    return data || [];
+  };
+
+  const saveMatchEvents = async (matchId, events) => {
+    await sb().from('eventos_partido').delete().eq('partido_id', matchId);
+    const rows = (events || []).filter(e => e.cantidad > 0);
+    if (!rows.length) return { ok: true };
+    const { error } = await sb().from('eventos_partido').insert(
+      rows.map(e => ({
+        partido_id: matchId,
+        jugador_id: e.jugador_id,
+        equipo_id:  e.equipo_id,
+        tipo:       e.tipo,
+        cantidad:   e.cantidad
+      }))
+    );
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
+  };
+
   // Init inmediato
   init();
 
@@ -286,6 +315,8 @@ const DB = (() => {
     getPlayersByTeam, addPlayers, deletePlayer,
     // Partidos
     getMatches, getMatchById, addMatch, updateMatch, setMatchResult, deleteMatch,
+    // Eventos
+    getMatchEvents, saveMatchEvents,
     // Computed
     getStandings, getStats,
   };

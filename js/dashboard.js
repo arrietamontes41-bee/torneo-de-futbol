@@ -36,17 +36,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   const matchesContainer  = document.getElementById('matchesContainer');
   const standingsContainer= document.getElementById('standingsContainer');
 
-  const resultModal        = document.getElementById('resultModal');
-  const resultTeamsDisplay = document.getElementById('resultTeamsDisplay');
-  const homeGoalsInput     = document.getElementById('homeGoals');
-  const awayGoalsInput     = document.getElementById('awayGoals');
-  const homeGoalsLabel     = document.getElementById('homeGoalsLabel');
-  const awayGoalsLabel     = document.getElementById('awayGoalsLabel');
-  const resultMatchId      = document.getElementById('resultMatchId');
-  const resultFormError    = document.getElementById('resultFormError');
-  const btnSaveResult      = document.getElementById('btnSaveResult');
-  const btnCancelResult    = document.getElementById('btnCancelResult');
-  const closeResultModal   = document.getElementById('closeResultModal');
+  // Acta Modal
+  const actaModal    = document.getElementById('actaModal');
+  const actaMatchId  = document.getElementById('actaMatchId');
+  const actaMeta     = document.getElementById('actaMeta');
+  const actaHomeName = document.getElementById('actaHomeName');
+  const actaAwayName = document.getElementById('actaAwayName');
+  const actaHomeBody = document.getElementById('actaHomeBody');
+  const actaAwayBody = document.getElementById('actaAwayBody');
+  const actaHomeTotal= document.getElementById('actaHomeTotal');
+  const actaAwayTotal= document.getElementById('actaAwayTotal');
+  const actaError    = document.getElementById('actaError');
+  const btnSaveActa  = document.getElementById('btnSaveActa');
+  const btnCancelActa= document.getElementById('btnCancelActa');
+  const closeActaBtn = document.getElementById('closeActaModal');
 
   // Roster modal
   const rosterModal       = document.getElementById('rosterModal');
@@ -182,7 +185,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     matchesContainer.innerHTML = `<div class="matches-list">${sorted.map(matchCard).join('')}</div>`;
 
     matchesContainer.querySelectorAll('.btn-result').forEach(btn => {
-      btn.addEventListener('click', () => openResultModal(btn.dataset.id, matches));
+      btn.addEventListener('click', () => openActa(btn.dataset.id, matches));
     });
     matchesContainer.querySelectorAll('.btn-edit-match').forEach(btn => {
       btn.addEventListener('click', () => openEditMatch(btn.dataset.id, matches));
@@ -310,26 +313,93 @@ document.addEventListener('DOMContentLoaded', async () => {
     matchFormWrapper.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   };
 
-  // Modal resultado
-  const openResultModal = (id, matches) => {
-    const m = matches.find(x => x.id === id);
+  // ── ACTA DE PARTIDO ────────────────────────────────────────────
+  const closeActa = () => actaModal.classList.add('hidden');
+  [btnCancelActa, closeActaBtn].forEach(b => b?.addEventListener('click', closeActa));
+  actaModal.addEventListener('click', e => { if (e.target === actaModal) closeActa(); });
+
+  const openActa = async (matchId, allMatches) => {
+    const m = allMatches.find(x => x.id === matchId);
     if (!m) return;
-    const home = m.equipo_local;
-    const away = m.equipo_visit;
-    resultMatchId.value        = id;
-    resultTeamsDisplay.textContent = `${home?.nombre || '?'} vs ${away?.nombre || '?'}`;
-    homeGoalsLabel.textContent = `Goles ${home?.nombre || 'Local'}`;
-    awayGoalsLabel.textContent = `Goles ${away?.nombre || 'Visitante'}`;
-    homeGoalsInput.value = m.goles_local !== null ? m.goles_local : 0;
-    awayGoalsInput.value = m.goles_visit !== null ? m.goles_visit : 0;
-    resultFormError.textContent = '';
-    resultModal.classList.remove('hidden');
+    actaMatchId.value      = matchId;
+    actaHomeName.textContent = m.equipo_local?.nombre  || 'Local';
+    actaAwayName.textContent = m.equipo_visit?.nombre || 'Visitante';
+    actaMeta.textContent     = `📅 ${m.fecha ? formatDate(m.fecha) : '—'}  ·  ⏰ ${m.hora ? m.hora.slice(0,5) : '—'}`;
+    actaError.textContent    = '';
+    actaModal.classList.remove('hidden');
+    actaHomeBody.innerHTML = loadingRow();
+    actaAwayBody.innerHTML = loadingRow();
+
+    const [homePlayers, awayPlayers, events] = await Promise.all([
+      DB.getPlayersByTeam(m.equipo_local_id),
+      DB.getPlayersByTeam(m.equipo_visit_id),
+      DB.getMatchEvents(matchId)
+    ]);
+    renderActaTeam(actaHomeBody, actaHomeTotal, homePlayers, events);
+    renderActaTeam(actaAwayBody, actaAwayTotal, awayPlayers, events);
   };
 
-  const closeModal = () => resultModal.classList.add('hidden');
-  closeResultModal.addEventListener('click', closeModal);
-  btnCancelResult.addEventListener('click',  closeModal);
-  resultModal.addEventListener('click', e => { if (e.target === resultModal) closeModal(); });
+  const loadingRow = () =>
+    `<tr><td colspan="5" style="text-align:center;padding:16px;color:rgba(255,255,255,.3);font-size:.78rem;">Cargando jugadores...</td></tr>`;
+
+  const renderActaTeam = (tbody, totalEl, players, events) => {
+    if (!players.length) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:14px;color:rgba(255,255,255,.3);font-size:.78rem;">Sin jugadores registrados</td></tr>`;
+      totalEl.textContent = 0; return;
+    }
+    const getEv = (jId, tipo) => { const e = events.find(x => x.jugador_id === jId && x.tipo === tipo); return e ? e.cantidad : 0; };
+
+    tbody.innerHTML = players.map(p => {
+      const g = getEv(p.id,'gol'), ta = getEv(p.id,'amarilla'), tr = getEv(p.id,'roja');
+      return `<tr>
+        <td><span class="dors-sm">${p.dorsal}</span></td>
+        <td>${escHtml(p.nombre)}</td>
+        <td><button class="card-btn ${ta?'on-yellow':''}" data-player="${p.id}" data-equipo="${p.equipo_id}" data-tipo="amarilla">🟡</button></td>
+        <td><button class="card-btn ${tr?'on-red':''}"    data-player="${p.id}" data-equipo="${p.equipo_id}" data-tipo="roja">🔴</button></td>
+        <td><input class="goles-inp" type="number" min="0" max="20" value="${g}" data-player="${p.id}" data-equipo="${p.equipo_id}" /></td>
+      </tr>`;
+    }).join('');
+
+    const recalc = () => {
+      const tot = [...tbody.querySelectorAll('.goles-inp')].reduce((s,i) => s+(parseInt(i.value)||0), 0);
+      totalEl.textContent = tot;
+    };
+    tbody.querySelectorAll('.goles-inp').forEach(i => i.addEventListener('input', recalc));
+    tbody.querySelectorAll('.card-btn').forEach(b => b.addEventListener('click', () => {
+      if (b.dataset.tipo==='amarilla') b.classList.toggle('on-yellow');
+      if (b.dataset.tipo==='roja')     b.classList.toggle('on-red');
+    }));
+    recalc();
+  };
+
+  btnSaveActa.addEventListener('click', async () => {
+    const matchId = actaMatchId.value;
+    actaError.textContent = '';
+    const events = [];
+    const collect = (container) => {
+      container.querySelectorAll('.goles-inp').forEach(inp => {
+        const g = parseInt(inp.value)||0;
+        if (g>0) events.push({jugador_id:inp.dataset.player, equipo_id:inp.dataset.equipo, tipo:'gol', cantidad:g});
+      });
+      container.querySelectorAll('.card-btn.on-yellow').forEach(b =>
+        events.push({jugador_id:b.dataset.player, equipo_id:b.dataset.equipo, tipo:'amarilla', cantidad:1}));
+      container.querySelectorAll('.card-btn.on-red').forEach(b =>
+        events.push({jugador_id:b.dataset.player, equipo_id:b.dataset.equipo, tipo:'roja', cantidad:1}));
+    };
+    collect(actaHomeBody); collect(actaAwayBody);
+    const homeGoals = parseInt(actaHomeTotal.textContent)||0;
+    const awayGoals = parseInt(actaAwayTotal.textContent)||0;
+    btnSaveActa.disabled = true; btnSaveActa.textContent = 'Guardando...';
+    const [evRes, mRes] = await Promise.all([
+      DB.saveMatchEvents(matchId, events),
+      DB.setMatchResult(matchId, homeGoals, awayGoals)
+    ]);
+    btnSaveActa.disabled = false;
+    btnSaveActa.innerHTML = `<svg viewBox="0 0 20 20" fill="currentColor" width="16"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Guardar Resultado`;
+    if (!evRes.ok)  { actaError.textContent = 'Error: ' + evRes.error;  return; }
+    if (!mRes.ok)   { actaError.textContent = 'Error: ' + mRes.error;   return; }
+    closeActa(); await refresh();
+  });
 
   // ---- ROSTER MODAL ----
   const openRosterModal = async (teamId, teamName, teamCity) => {
@@ -398,29 +468,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   btnCloseRoster.addEventListener('click',   closeRoster);
   rosterModal.addEventListener('click', e => { if (e.target === rosterModal) closeRoster(); });
 
-  btnSaveResult.addEventListener('click', async () => {
-    const id = resultMatchId.value;
-    const hg = parseInt(homeGoalsInput.value);
-    const ag = parseInt(awayGoalsInput.value);
+  // (resultado ahora se guarda desde el acta de partido - btnSaveActa)
 
-    if (isNaN(hg) || isNaN(ag) || hg < 0 || ag < 0) {
-      resultFormError.textContent = 'Ingresa goles válidos (número ≥ 0).';
-      return;
-    }
-
-    setLoading(true);
-    const result = await DB.setMatchResult(id, hg, ag);
-    if (result.ok) {
-      closeModal();
-      await refresh();
-      if (document.getElementById('tabContentStandings').classList.contains('active')) {
-        await renderStandings();
-      }
-    } else {
-      resultFormError.textContent = result.error;
-      setLoading(false);
-    }
-  });
 
   // ---- STANDINGS ----
   const renderStandings = async () => {

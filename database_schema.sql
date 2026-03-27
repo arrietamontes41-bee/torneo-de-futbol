@@ -86,3 +86,20 @@ ALTER TABLE jugadores ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "public_read_jugadores"   ON jugadores FOR SELECT USING (true);
 CREATE POLICY "public_insert_jugadores" ON jugadores FOR INSERT WITH CHECK (true);
 CREATE POLICY "public_delete_jugadores" ON jugadores FOR DELETE USING (true);
+
+-- 5. EVENTOS DE PARTIDO (goles y tarjetas por jugador)
+CREATE TABLE IF NOT EXISTS eventos_partido (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  partido_id  UUID NOT NULL REFERENCES partidos(id) ON DELETE CASCADE,
+  jugador_id  UUID NOT NULL REFERENCES jugadores(id) ON DELETE CASCADE,
+  equipo_id   UUID NOT NULL REFERENCES equipos(id)  ON DELETE CASCADE,
+  tipo        TEXT NOT NULL CHECK (tipo IN ('gol','amarilla','roja')),
+  cantidad    INT  NOT NULL DEFAULT 1 CHECK (cantidad >= 0),
+  created_at  TIMESTAMPTZ DEFAULT now(),
+  UNIQUE (partido_id, jugador_id, tipo)
+);
+ALTER TABLE eventos_partido ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "public_all_eventos" ON eventos_partido FOR ALL USING (true) WITH CHECK (true);
+
+-- Columna foto (ejecutar si la tabla jugadores ya existe)
+ALTER TABLE jugadores ADD COLUMN IF NOT EXISTS foto TEXT;
