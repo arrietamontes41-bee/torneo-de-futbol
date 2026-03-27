@@ -260,7 +260,8 @@ const DB = (() => {
       documento:  p.documento.trim(),
       posicion:   p.posicion,
       dorsal:     parseInt(p.dorsal),
-      fecha_nac:  p.fecha_nac || null
+      fecha_nac:  p.fecha_nac || null,
+      foto:       p.foto || null
     }));
     const { error } = await sb().from('jugadores').insert(rows);
     if (error) return { ok: false, error: error.message };

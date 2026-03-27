@@ -1,433 +1,377 @@
 /**
- * team-panel.js — Panel de gestión para equipos (rol: 'equipo')
- * Torneo de Fútbol – Montería, Córdoba
+ * team-panel.js — Panel de Equipo
+ * Solo para rol 'equipo'. Gestión de jugadores con foto.
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
 
-  // ── Protección de ruta ──────────────────────────────────────────
+  // ── Auth Guard ────────────────────────────────────────────────
   const session = DB.getSession();
-  if (!session)              { window.location.href = 'index.html'; return; }
-  if (session.rol !== 'equipo') { window.location.href = 'dashboard.html'; return; }
+  if (!session)               { window.location.href = 'index.html';   return; }
+  if (session.rol === 'admin') { window.location.href = 'dashboard.html'; return; }
 
-  // ── Estado global ───────────────────────────────────────────────
-  let myTeam        = null;
-  let myPlayers     = [];
-  let allMatches    = [];
-  let standings     = [];
-  let pendingDelete = null;   // id del jugador a eliminar
+  // ── Estado ───────────────────────────────────────────────────
+  let myTeam    = null;
+  let players   = [];
+  let matches   = [];
+  let standings = [];
+  let pendingDelId = null;
+  let photoBase64  = null;   // foto del jugador a agregar
 
-  // ── Referencias DOM ─────────────────────────────────────────────
-  const teamNameHeader      = document.getElementById('teamNameHeader');
-  const dashUserName        = document.getElementById('dashUserName');
-  const btnLogout           = document.getElementById('btnLogout');
+  // ── DOM ──────────────────────────────────────────────────────
+  const $ = id => document.getElementById(id);
 
-  // Header equipo
-  const heroTeamName  = document.getElementById('heroTeamName');
-  const heroCity      = document.getElementById('heroCity');
-  const heroEmail     = document.getElementById('heroEmail');
+  const headerTeamName = $('headerTeamName');
+  const teamNameBig    = $('teamNameBig');
+  const teamCity       = $('teamCity');
+  const teamEmail      = $('teamEmail');
+  const teamShield     = $('teamShield');
+  const userAvatar     = $('userAvatar');
+  const userName       = $('userName');
+  const btnLogout      = $('btnLogout');
 
-  // Stats
-  const statPlayers   = document.getElementById('statPlayers');
-  const statPJ        = document.getElementById('statPJ');
-  const statPTS       = document.getElementById('statPTS');
-  const statPos       = document.getElementById('statPos');
+  const sPlayers = $('sPlayers');
+  const sPJ      = $('sPJ');
+  const sPTS     = $('sPTS');
+  const sPOS     = $('sPOS');
 
-  // Tabs
-  const tabBtns       = document.querySelectorAll('.tab-btn');
-  const tabContents   = document.querySelectorAll('.tab-content');
+  const addPlayerForm = $('addPlayerForm');
+  const btnShowForm   = $('btnShowForm');
+  const btnCancelPlayer = $('btnCancelPlayer');
+  const btnSavePlayer   = $('btnSavePlayer');
+  const photoInput      = $('photoInput');
+  const photoPreview    = $('photoPreview');
+  const playerErr       = $('playerErr');
+  const pName    = $('pName');
+  const pDoc     = $('pDoc');
+  const pDorsal  = $('pDorsal');
+  const pPos     = $('pPos');
+  const pDob     = $('pDob');
+  const playerCount = $('playerCount');
+  const playersGrid = $('playersGrid');
 
-  // Jugadores
-  const btnShowAddPlayer = document.getElementById('btnShowAddPlayer');
-  const addPlayerForm    = document.getElementById('addPlayerForm');
-  const btnSavePlayer    = document.getElementById('btnSavePlayer');
-  const btnCancelPlayer  = document.getElementById('btnCancelPlayer');
-  const playerName       = document.getElementById('playerName');
-  const playerDoc        = document.getElementById('playerDoc');
-  const playerDorsal     = document.getElementById('playerDorsal');
-  const playerPos        = document.getElementById('playerPos');
-  const playerDob        = document.getElementById('playerDob');
-  const playerFormError  = document.getElementById('playerFormError');
-  const rosterContainer  = document.getElementById('rosterContainer');
+  const homeMatchesEl  = $('homeMatches');
+  const matchListEl    = $('matchList');
+  const standingsWrap  = $('standingsWrap');
 
-  // Partidos
-  const homeMatchesContainer = document.getElementById('homeMatchesContainer');
-  const matchesContainer     = document.getElementById('matchesContainer');
+  const deleteModal = $('deleteModal');
+  const delName     = $('delName');
+  const confirmDel  = $('confirmDel');
+  const cancelDel   = $('cancelDel');
 
-  // Standings
-  const standingsContainer = document.getElementById('standingsContainer');
+  // ── Header usuario ───────────────────────────────────────────
+  const initials = (session.nombre || session.email || '?').charAt(0).toUpperCase();
+  userAvatar.textContent = initials;
+  userName.textContent   = session.nombre || session.email;
 
-  // Modal eliminar
-  const deletePlayerModal      = document.getElementById('deletePlayerModal');
-  const deletePlayerName       = document.getElementById('deletePlayerName');
-  const btnConfirmDeletePlayer = document.getElementById('btnConfirmDeletePlayer');
-  const btnCancelDeletePlayer  = document.getElementById('btnCancelDeletePlayer');
-  const closeDeletePlayerModal = document.getElementById('closeDeletePlayerModal');
-
-  // ════════════════════════════════════════════════════════════════
-  // INICIALIZACIÓN
-  // ════════════════════════════════════════════════════════════════
-  dashUserName.textContent = session.nombre || session.email;
   btnLogout.addEventListener('click', () => {
     DB.clearSession();
     window.location.href = 'index.html';
   });
 
-  await loadAll();
-
-  // ── Tabs ────────────────────────────────────────────────────────
-  tabBtns.forEach(btn => {
+  // ── Tabs ─────────────────────────────────────────────────────
+  document.querySelectorAll('.panel-tab').forEach(btn => {
     btn.addEventListener('click', () => {
-      const target = btn.dataset.tab;
-      tabBtns.forEach(b => b.classList.toggle('active', b === btn));
-      tabContents.forEach(c => c.classList.toggle('active', c.id === `tabContent${capitalize(target)}`));
-
-      if (target === 'matches')   renderMatchesTab();
-      if (target === 'standings') renderStandings();
+      document.querySelectorAll('.panel-tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.panel-section').forEach(s => s.classList.remove('active'));
+      btn.classList.add('active');
+      const sec = 'sec-' + btn.dataset.sec;
+      document.getElementById(sec).classList.add('active');
+      if (btn.dataset.sec === 'partidos')   renderMatchList();
+      if (btn.dataset.sec === 'posiciones') renderStandings();
     });
   });
 
-  // ════════════════════════════════════════════════════════════════
-  // CARGA PRINCIPAL
-  // ════════════════════════════════════════════════════════════════
-  async function loadAll() {
-    // Buscar el equipo del usuario actual
-    const teams = await DB.getTeams();
-    myTeam = teams.find(t => t.usuario_id === session.id) || null;
-
-    if (!myTeam) {
-      heroTeamName.textContent = 'Sin equipo';
-      teamNameHeader.textContent = 'Sin equipo asignado';
+  // ── Foto preview ─────────────────────────────────────────────
+  photoInput.addEventListener('change', () => {
+    const file = photoInput.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      alert('La imagen debe pesar menos de 2MB.');
+      photoInput.value = '';
       return;
     }
-
-    teamNameHeader.textContent = myTeam.nombre;
-
-    // Datos en paralelo
-    [myPlayers, allMatches, standings] = await Promise.all([
-      DB.getPlayersByTeam(myTeam.id),
-      DB.getMatches(),
-      DB.getStandings()
-    ]);
-
-    renderHero();
-    renderStats();
-    renderHomeMatches();
-    renderRoster();
-  }
-
-  // ════════════════════════════════════════════════════════════════
-  // HERO DEL EQUIPO
-  // ════════════════════════════════════════════════════════════════
-  function renderHero() {
-    heroTeamName.textContent = myTeam.nombre;
-    heroCity.textContent     = myTeam.municipio || '—';
-    heroEmail.textContent    = myTeam.email || '—';
-  }
-
-  // ════════════════════════════════════════════════════════════════
-  // ESTADÍSTICAS
-  // ════════════════════════════════════════════════════════════════
-  function renderStats() {
-    statPlayers.textContent = myPlayers.length;
-
-    const myRow = standings.find(s => s.team.id === myTeam.id);
-    if (myRow) {
-      statPJ.textContent  = myRow.pj;
-      statPTS.textContent = myRow.pts;
-      const pos = standings.indexOf(myRow) + 1;
-      statPos.textContent = pos + (pos === 1 ? '°🥇' : pos === 2 ? '°🥈' : pos === 3 ? '°🥉' : '°');
-    } else {
-      statPJ.textContent = '0';
-      statPTS.textContent = '0';
-      statPos.textContent = '—';
-    }
-  }
-
-  // ════════════════════════════════════════════════════════════════
-  // PARTIDOS EN HOME
-  // ════════════════════════════════════════════════════════════════
-  function renderHomeMatches() {
-    const myMatches = allMatches.filter(m =>
-      m.equipo_local_id === myTeam.id || m.equipo_visit_id === myTeam.id
-    );
-
-    if (!myMatches.length) {
-      homeMatchesContainer.innerHTML = `<div class="empty-state"><div class="empty-icon">📅</div><p>Aún no tienes partidos programados.</p></div>`;
-      return;
-    }
-
-    homeMatchesContainer.innerHTML = `<div class="next-matches-list">${myMatches.map(m => matchItemHTML(m)).join('')}</div>`;
-  }
-
-  function matchItemHTML(m) {
-    const localName = m.equipo_local?.nombre || '—';
-    const visitName = m.equipo_visit?.nombre || '—';
-    const isLocal   = m.equipo_local_id === myTeam.id;
-
-    const localTag  = isLocal ? `<span class="my-team-name">${localName}</span>` : localName;
-    const visitTag  = !isLocal ? `<span class="my-team-name">${visitName}</span>` : visitName;
-
-    const fechaStr = m.fecha ? new Date(m.fecha + 'T00:00:00').toLocaleDateString('es-CO', { day:'2-digit', month:'short', year:'numeric' }) : '—';
-    const horaStr  = m.hora ? m.hora.slice(0,5) : '';
-
-    const statusPill = m.estado === 'finalizado'
-      ? `<span class="match-status-pill pill-done">Finalizado</span>`
-      : `<span class="match-status-pill pill-pending">Pendiente</span>`;
-
-    const result = m.estado === 'finalizado'
-      ? `<span class="match-result">${m.goles_local} – ${m.goles_visit}</span>`
-      : '';
-
-    return `
-      <div class="next-match-item">
-        <div>
-          <div class="next-match-teams">${localTag} <span class="vs">VS</span> ${visitTag}</div>
-          <div class="next-match-date">📅 ${fechaStr}${horaStr ? ` &nbsp;⏰ ${horaStr}` : ''}</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          ${result}
-          ${statusPill}
-        </div>
-      </div>`;
-  }
-
-  // ════════════════════════════════════════════════════════════════
-  // ROSTER (TAB JUGADORES)
-  // ════════════════════════════════════════════════════════════════
-  function renderRoster() {
-    if (!myPlayers.length) {
-      rosterContainer.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon">🦺</div>
-          <p>No hay jugadores en tu plantilla todavía.<br/>Haz clic en <strong>Agregar Jugador</strong> para comenzar.</p>
-        </div>`;
-      return;
-    }
-
-    rosterContainer.innerHTML = `
-      <table class="roster-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Nombre</th>
-            <th>Documento</th>
-            <th>Posición</th>
-            <th>Fecha Nac.</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          ${myPlayers.map(p => `
-            <tr>
-              <td><span class="dorsal-badge">${p.dorsal}</span></td>
-              <td>${escapeHTML(p.nombre)}</td>
-              <td style="color:var(--gray-400);font-size:.8rem;">${escapeHTML(p.documento)}</td>
-              <td><span class="pos-badge pos-${p.posicion}">${p.posicion}</span></td>
-              <td style="color:var(--gray-400);font-size:.8rem;">${p.fecha_nac ? new Date(p.fecha_nac+'T00:00:00').toLocaleDateString('es-CO') : '—'}</td>
-              <td>
-                <button class="btn-delete-player" data-id="${p.id}" data-name="${escapeHTML(p.nombre)}">
-                  🗑 Eliminar
-                </button>
-              </td>
-            </tr>`).join('')}
-        </tbody>
-      </table>`;
-
-    // Eventos de eliminar
-    rosterContainer.querySelectorAll('.btn-delete-player').forEach(btn => {
-      btn.addEventListener('click', () => {
-        pendingDelete = btn.dataset.id;
-        deletePlayerName.textContent = btn.dataset.name;
-        deletePlayerModal.classList.remove('hidden');
-      });
-    });
-  }
-
-  // ── Mostrar/ocultar formulario ──────────────────────────────────
-  btnShowAddPlayer.addEventListener('click', () => {
-    addPlayerForm.classList.remove('hidden');
-    btnShowAddPlayer.disabled = true;
-    playerName.focus();
+    const reader = new FileReader();
+    reader.onload = e => {
+      photoBase64 = e.target.result;
+      photoPreview.innerHTML = `<img src="${photoBase64}" alt="foto" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
+    };
+    reader.readAsDataURL(file);
   });
 
-  btnCancelPlayer.addEventListener('click', () => {
-    resetPlayerForm();
+  // ── Formulario jugador ───────────────────────────────────────
+  btnShowForm.addEventListener('click', () => {
+    addPlayerForm.style.display = 'block';
+    btnShowForm.style.display = 'none';
+    pName.focus();
   });
 
-  // ── Guardar jugador ─────────────────────────────────────────────
+  btnCancelPlayer.addEventListener('click', resetForm);
+
   btnSavePlayer.addEventListener('click', async () => {
-    playerFormError.textContent = '';
+    playerErr.textContent = '';
+    const nombre   = pName.value.trim();
+    const doc      = pDoc.value.trim();
+    const dorsal   = parseInt(pDorsal.value);
+    const posicion = pPos.value;
+    const dob      = pDob.value || null;
 
-    const nombre   = playerName.value.trim();
-    const doc      = playerDoc.value.trim();
-    const dorsal   = parseInt(playerDorsal.value);
-    const posicion = playerPos.value;
-    const dob      = playerDob.value || null;
-
-    if (!nombre)              return showFormError('El nombre es obligatorio.');
-    if (!doc)                 return showFormError('El documento es obligatorio.');
-    if (!dorsal || dorsal < 1 || dorsal > 99)
-                              return showFormError('El dorsal debe ser entre 1 y 99.');
-    if (!posicion)            return showFormError('Selecciona una posición.');
-    if (myPlayers.length >= 25) return showFormError('Máximo 25 jugadores por equipo.');
+    if (!nombre)   return showErr('El nombre es obligatorio.');
+    if (!doc)      return showErr('El documento es obligatorio.');
+    if (!dorsal || dorsal < 1 || dorsal > 99) return showErr('El dorsal debe ser entre 1 y 99.');
+    if (!posicion) return showErr('Selecciona una posición.');
+    if (players.length >= 25) return showErr('Máximo 25 jugadores por equipo.');
 
     btnSavePlayer.disabled = true;
     btnSavePlayer.textContent = 'Guardando...';
 
     const result = await DB.addPlayers(myTeam.id, [{
-      nombre, documento: doc, posicion, dorsal, fecha_nac: dob
+      nombre, documento: doc, posicion, dorsal,
+      fecha_nac: dob,
+      foto: photoBase64 || null
     }]);
 
-    if (!result.ok) {
-      showFormError(result.error || 'Error al guardar jugador.');
-      btnSavePlayer.disabled = false;
-      btnSavePlayer.innerHTML = `<svg viewBox="0 0 20 20" fill="currentColor" width="16"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Guardar`;
+    btnSavePlayer.disabled = false;
+    btnSavePlayer.innerHTML = `<svg viewBox="0 0 20 20" fill="currentColor" width="15"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Guardar Jugador`;
+
+    if (!result.ok) return showErr(result.error || 'Error al guardar.');
+
+    players = await DB.getPlayersByTeam(myTeam.id);
+    sPlayers.textContent = players.length;
+    renderPlayers();
+    resetForm();
+  });
+
+  // ── Modal eliminar ───────────────────────────────────────────
+  cancelDel.addEventListener('click', () => { deleteModal.classList.add('hidden'); pendingDelId = null; });
+  deleteModal.addEventListener('click', e => { if (e.target === deleteModal) { deleteModal.classList.add('hidden'); pendingDelId = null; } });
+
+  confirmDel.addEventListener('click', async () => {
+    if (!pendingDelId) return;
+    confirmDel.disabled = true;
+    confirmDel.textContent = 'Eliminando...';
+
+    const res = await DB.deletePlayer(pendingDelId);
+
+    confirmDel.disabled = false;
+    confirmDel.textContent = 'Sí, eliminar';
+
+    if (!res.ok) { alert('Error: ' + (res.error || '')); return; }
+
+    players = await DB.getPlayersByTeam(myTeam.id);
+    sPlayers.textContent = players.length;
+    renderPlayers();
+    deleteModal.classList.add('hidden');
+    pendingDelId = null;
+  });
+
+  // ════════════════════════════════════════════════════════════
+  // CARGA INICIAL
+  // ════════════════════════════════════════════════════════════
+  async function loadAll() {
+    const allTeams = await DB.getTeams();
+    myTeam = allTeams.find(t => t.usuario_id === session.id) || null;
+
+    if (!myTeam) {
+      teamNameBig.textContent    = 'Equipo no encontrado';
+      headerTeamName.textContent = 'Mi Equipo';
+      homeMatchesEl.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div>No se encontró tu equipo. Contacta al administrador.</div>`;
       return;
     }
 
-    // Recargar jugadores
-    myPlayers = await DB.getPlayersByTeam(myTeam.id);
-    statPlayers.textContent = myPlayers.length;
-    renderRoster();
-    resetPlayerForm();
-  });
+    // Nombre en header
+    headerTeamName.textContent = myTeam.nombre;
+    teamNameBig.textContent    = myTeam.nombre;
+    teamCity.textContent       = myTeam.municipio || '—';
+    teamEmail.textContent      = myTeam.email || '—';
 
-  // ── Modal eliminar jugador ──────────────────────────────────────
-  [btnCancelDeletePlayer, closeDeletePlayerModal].forEach(el => {
-    el.addEventListener('click', () => {
-      deletePlayerModal.classList.add('hidden');
-      pendingDelete = null;
-    });
-  });
+    // Escudo con iniciales
+    const ini = myTeam.nombre.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+    teamShield.textContent = '';
+    teamShield.style.fontSize = '1.3rem';
+    teamShield.style.fontWeight = '800';
+    teamShield.style.color = '#fff';
+    teamShield.textContent = ini;
 
-  btnConfirmDeletePlayer.addEventListener('click', async () => {
-    if (!pendingDelete) return;
-    btnConfirmDeletePlayer.disabled = true;
-    btnConfirmDeletePlayer.textContent = 'Eliminando...';
+    [players, matches, standings] = await Promise.all([
+      DB.getPlayersByTeam(myTeam.id),
+      DB.getMatches(),
+      DB.getStandings()
+    ]);
 
-    const result = await DB.deletePlayer(pendingDelete);
-
-    btnConfirmDeletePlayer.disabled = false;
-    btnConfirmDeletePlayer.innerHTML = `<svg viewBox="0 0 20 20" fill="currentColor" width="16"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/></svg> Sí, eliminar`;
-
-    if (!result.ok) {
-      alert('Error al eliminar el jugador: ' + (result.error || ''));
-      return;
-    }
-
-    myPlayers = await DB.getPlayersByTeam(myTeam.id);
-    statPlayers.textContent = myPlayers.length;
-    renderRoster();
-    deletePlayerModal.classList.add('hidden');
-    pendingDelete = null;
-  });
-
-  // Cerrar modal al hacer clic fuera
-  deletePlayerModal.addEventListener('click', (e) => {
-    if (e.target === deletePlayerModal) {
-      deletePlayerModal.classList.add('hidden');
-      pendingDelete = null;
-    }
-  });
-
-  // ════════════════════════════════════════════════════════════════
-  // TAB: PARTIDOS (completo)
-  // ════════════════════════════════════════════════════════════════
-  async function renderMatchesTab() {
-    allMatches = await DB.getMatches();
-    const myMatches = allMatches.filter(m =>
-      m.equipo_local_id === myTeam.id || m.equipo_visit_id === myTeam.id
-    );
-
-    if (!myMatches.length) {
-      matchesContainer.innerHTML = `<div class="empty-state"><div class="empty-icon">📅</div><p>No hay partidos programados para tu equipo.</p></div>`;
-      return;
-    }
-
-    matchesContainer.innerHTML = `<div class="next-matches-list">${myMatches.map(m => matchItemHTML(m)).join('')}</div>`;
+    renderStats();
+    renderPlayers();
+    renderHomeMatches();
   }
 
-  // ════════════════════════════════════════════════════════════════
-  // TAB: TABLA DE POSICIONES
-  // ════════════════════════════════════════════════════════════════
+  // ── Stats ────────────────────────────────────────────────────
+  function renderStats() {
+    sPlayers.textContent = players.length;
+    const row = standings.find(s => s.team.id === myTeam.id);
+    if (row) {
+      sPJ.textContent  = row.pj;
+      sPTS.textContent = row.pts;
+      const pos = standings.indexOf(row) + 1;
+      sPOS.textContent = pos + '°';
+    } else {
+      sPJ.textContent = '0'; sPTS.textContent = '0'; sPOS.textContent = '—';
+    }
+  }
+
+  // ── Jugadores (tarjetas con foto) ────────────────────────────
+  function renderPlayers() {
+    playerCount.textContent = players.length ? `(${players.length} jugadores)` : '';
+
+    if (!players.length) {
+      playersGrid.innerHTML = `<div class="empty"><div class="empty-icon">🦺</div>No hay jugadores aún.<br/>Haz clic en <strong>Agregar Jugador</strong>.</div>`;
+      return;
+    }
+
+    playersGrid.innerHTML = `<div class="players-grid">${players.map(p => playerCard(p)).join('')}</div>`;
+
+    playersGrid.querySelectorAll('.btn-remove-card').forEach(btn => {
+      btn.addEventListener('click', () => {
+        pendingDelId = btn.dataset.id;
+        delName.textContent = btn.dataset.name;
+        deleteModal.classList.remove('hidden');
+      });
+    });
+  }
+
+  function playerCard(p) {
+    const foto = p.foto
+      ? `<img src="${p.foto}" alt="${esc(p.nombre)}" class="player-photo" />`
+      : `<div class="player-photo-placeholder">👤</div>`;
+
+    const dob = p.fecha_nac
+      ? new Date(p.fecha_nac + 'T00:00:00').toLocaleDateString('es-CO', { day:'2-digit', month:'short', year:'numeric' })
+      : '';
+
+    return `
+      <div class="player-card">
+        <div class="player-dorsal-badge">${p.dorsal}</div>
+        ${foto}
+        <div class="player-name">${esc(p.nombre)}</div>
+        <div class="player-pos-pill pos-${p.posicion}">${p.posicion}</div>
+        <div class="player-doc">${esc(p.documento)}${dob ? ' · ' + dob : ''}</div>
+        <button class="btn-remove-card" data-id="${p.id}" data-name="${esc(p.nombre)}">🗑 Eliminar</button>
+      </div>`;
+  }
+
+  // ── Partidos (tab inicio) ────────────────────────────────────
+  function renderHomeMatches() {
+    const mine = myMatches();
+    if (!mine.length) {
+      homeMatchesEl.innerHTML = `<div class="empty"><div class="empty-icon">📅</div>Aún no tienes partidos programados.</div>`;
+      return;
+    }
+    homeMatchesEl.innerHTML = mine.map(m => matchRow(m)).join('');
+  }
+
+  // ── Partidos (tab partidos) ──────────────────────────────────
+  async function renderMatchList() {
+    matches = await DB.getMatches();
+    const mine = myMatches();
+    if (!mine.length) {
+      matchListEl.innerHTML = `<div class="empty"><div class="empty-icon">📅</div>No hay partidos para tu equipo.</div>`;
+      return;
+    }
+    matchListEl.innerHTML = mine.map(m => matchRow(m)).join('');
+  }
+
+  function myMatches() {
+    return matches.filter(m => m.equipo_local_id === myTeam.id || m.equipo_visit_id === myTeam.id);
+  }
+
+  function matchRow(m) {
+    const localNombre = m.equipo_local?.nombre  || '—';
+    const visitNombre = m.equipo_visit?.nombre || '—';
+    const isLocal = m.equipo_local_id === myTeam.id;
+    const localTag = isLocal ? `<span class="my">${esc(localNombre)}</span>` : esc(localNombre);
+    const visitTag = !isLocal ? `<span class="my">${esc(visitNombre)}</span>` : esc(visitNombre);
+
+    const fecha = m.fecha ? new Date(m.fecha + 'T00:00:00').toLocaleDateString('es-CO', { weekday:'short', day:'2-digit', month:'short' }) : '—';
+    const hora  = m.hora ? m.hora.slice(0,5) : '';
+    const done  = m.estado === 'finalizado';
+
+    return `
+      <div class="match-row">
+        <div>
+          <div class="match-row-teams">${localTag}<span class="vs">VS</span>${visitTag}</div>
+          <div class="match-row-date">📅 ${fecha}${hora ? ' · ⏰ ' + hora : ''}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          ${done ? `<span class="match-result-score">${m.goles_local} – ${m.goles_visit}</span>` : ''}
+          <span class="pill ${done ? 'pill-done' : 'pill-pend'}">${done ? 'Finalizado' : 'Pendiente'}</span>
+        </div>
+      </div>`;
+  }
+
+  // ── Tabla posiciones ─────────────────────────────────────────
   async function renderStandings() {
-    standingsContainer.innerHTML = `<div class="empty-state"><div class="empty-icon">⏳</div><p>Cargando...</p></div>`;
+    standingsWrap.innerHTML = `<div class="empty"><div class="empty-icon">⏳</div>Calculando...</div>`;
     standings = await DB.getStandings();
 
     if (!standings.length) {
-      standingsContainer.innerHTML = `<div class="empty-state"><div class="empty-icon">🏆</div><p>Aún no hay datos de posiciones.</p></div>`;
+      standingsWrap.innerHTML = `<div class="empty"><div class="empty-icon">🏆</div>Aún no hay datos.</div>`;
       return;
     }
 
-    standingsContainer.innerHTML = `
-      <table class="roster-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Equipo</th>
-            <th>PJ</th>
-            <th>PG</th>
-            <th>PE</th>
-            <th>PP</th>
-            <th>GF</th>
-            <th>GC</th>
-            <th>DG</th>
-            <th>PTS</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${standings.map((s, i) => {
-            const isMyTeam = s.team.id === myTeam?.id;
-            return `
-              <tr style="${isMyTeam ? 'background:rgba(99,102,241,.12);' : ''}">
-                <td style="font-weight:700;color:${i < 3 ? '#fde047' : 'rgba(255,255,255,.5)'};">${i + 1}</td>
-                <td style="font-weight:${isMyTeam ? '700' : '400'};color:${isMyTeam ? '#a5b4fc' : 'rgba(255,255,255,.85)'};">
-                  ${isMyTeam ? '⭐ ' : ''}${escapeHTML(s.team.nombre)}
-                </td>
-                <td>${s.pj}</td>
-                <td style="color:#86efac;">${s.pg}</td>
-                <td>${s.pe}</td>
-                <td style="color:#fca5a5;">${s.pp}</td>
-                <td>${s.gf}</td>
-                <td>${s.gc}</td>
-                <td>${s.gf - s.gc > 0 ? '+' : ''}${s.gf - s.gc}</td>
-                <td style="font-weight:700;color:#fff;">${s.pts}</td>
-              </tr>`;
-          }).join('')}
-        </tbody>
-      </table>`;
+    const rows = standings.map((s, i) => {
+      const mine = s.team.id === myTeam?.id;
+      const dg   = s.gf - s.gc;
+      const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1;
+      return `<tr class="${mine ? 'my-row' : ''}">
+        <td style="font-weight:700;">${medal}</td>
+        <td>${mine ? '⭐ ' : ''}${esc(s.team.nombre)}</td>
+        <td>${s.pj}</td>
+        <td>${s.pg}</td>
+        <td>${s.pe}</td>
+        <td>${s.pp}</td>
+        <td>${s.gf}</td>
+        <td>${s.gc}</td>
+        <td>${dg > 0 ? '+' : ''}${dg}</td>
+        <td style="font-weight:700;color:#fff;">${s.pts}</td>
+      </tr>`;
+    }).join('');
+
+    standingsWrap.innerHTML = `
+      <div style="overflow-x:auto;">
+        <table class="pos-table">
+          <thead>
+            <tr>
+              <th>#</th><th>Equipo</th><th title="Partidos Jugados">PJ</th>
+              <th title="Ganados">PG</th><th title="Empatados">PE</th><th title="Perdidos">PP</th>
+              <th>GF</th><th>GC</th><th>DG</th><th>PTS</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <p style="font-size:.72rem;color:rgba(255,255,255,.3);margin-top:10px;text-align:right;">
+        Criterios: Puntos · Diferencia de goles · Goles a favor
+      </p>`;
   }
 
-  // ════════════════════════════════════════════════════════════════
-  // UTILIDADES
-  // ════════════════════════════════════════════════════════════════
-  function resetPlayerForm() {
-    addPlayerForm.classList.add('hidden');
-    btnShowAddPlayer.disabled = false;
-    playerName.value = '';
-    playerDoc.value  = '';
-    playerDorsal.value = '';
-    playerPos.value  = '';
-    playerDob.value  = '';
-    playerFormError.textContent = '';
+  // ── Helpers ──────────────────────────────────────────────────
+  function resetForm() {
+    addPlayerForm.style.display = 'none';
+    btnShowForm.style.display   = '';
+    pName.value = ''; pDoc.value = ''; pDorsal.value = ''; pPos.value = ''; pDob.value = '';
+    playerErr.textContent = '';
+    photoBase64 = null;
+    photoInput.value = '';
+    photoPreview.innerHTML = '📷';
     btnSavePlayer.disabled = false;
-    btnSavePlayer.innerHTML = `<svg viewBox="0 0 20 20" fill="currentColor" width="16"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> Guardar`;
   }
 
-  function showFormError(msg) {
-    playerFormError.textContent = msg;
+  function showErr(msg) { playerErr.textContent = msg; }
+
+  function esc(str) {
+    return String(str ?? '')
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  function capitalize(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  }
-
-  function escapeHTML(str) {
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
+  // ── Iniciar ──────────────────────────────────────────────────
+  await loadAll();
 });

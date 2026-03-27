@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS jugadores (
   posicion        TEXT NOT NULL CHECK (posicion IN ('Portero','Defensa','Mediocampista','Delantero')),
   dorsal          INT NOT NULL CHECK (dorsal BETWEEN 1 AND 99),
   fecha_nac       DATE,
+  foto            TEXT,
   created_at      TIMESTAMPTZ DEFAULT now(),
   UNIQUE (equipo_id, dorsal),
   UNIQUE (equipo_id, documento)
