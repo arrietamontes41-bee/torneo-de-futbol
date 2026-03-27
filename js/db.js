@@ -239,6 +239,40 @@ const DB = (() => {
     };
   };
 
+  // ================================================================
+  // JUGADORES
+  // ================================================================
+  const getPlayersByTeam = async (teamId) => {
+    const { data, error } = await sb()
+      .from('jugadores')
+      .select('*')
+      .eq('equipo_id', teamId)
+      .order('dorsal');
+    if (error) { console.error(error); return []; }
+    return data;
+  };
+
+  const addPlayers = async (teamId, players) => {
+    if (!players || players.length === 0) return { ok: true };
+    const rows = players.map(p => ({
+      equipo_id:  teamId,
+      nombre:     p.nombre.trim(),
+      documento:  p.documento.trim(),
+      posicion:   p.posicion,
+      dorsal:     parseInt(p.dorsal),
+      fecha_nac:  p.fecha_nac || null
+    }));
+    const { error } = await sb().from('jugadores').insert(rows);
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
+  };
+
+  const deletePlayer = async (id) => {
+    const { error } = await sb().from('jugadores').delete().eq('id', id);
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
+  };
+
   // Init inmediato
   init();
 
@@ -247,6 +281,8 @@ const DB = (() => {
     getSession, setSession, clearSession, login,
     // Equipos
     getTeams, getTeamById, addTeam, deleteTeam,
+    // Jugadores
+    getPlayersByTeam, addPlayers, deletePlayer,
     // Partidos
     getMatches, getMatchById, addMatch, updateMatch, setMatchResult, deleteMatch,
     // Computed

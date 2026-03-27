@@ -46,6 +46,20 @@ INSERT INTO usuarios (email, password, nombre, rol)
 VALUES ('admin@torneo.com', 'admin123', 'Administrador', 'admin')
 ON CONFLICT (email) DO NOTHING;
 
+-- 4. JUGADORES
+CREATE TABLE IF NOT EXISTS jugadores (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  equipo_id       UUID NOT NULL REFERENCES equipos(id) ON DELETE CASCADE,
+  nombre          TEXT NOT NULL,
+  documento       TEXT NOT NULL,
+  posicion        TEXT NOT NULL CHECK (posicion IN ('Portero','Defensa','Mediocampista','Delantero')),
+  dorsal          INT NOT NULL CHECK (dorsal BETWEEN 1 AND 99),
+  fecha_nac       DATE,
+  created_at      TIMESTAMPTZ DEFAULT now(),
+  UNIQUE (equipo_id, dorsal),
+  UNIQUE (equipo_id, documento)
+);
+
 -- ============================================================
 -- SEGURIDAD: Row Level Security (RLS)
 -- Permite acceso público para leer y que el front maneje auth
@@ -66,3 +80,8 @@ CREATE POLICY "public_read_partidos" ON partidos  FOR SELECT USING (true);
 CREATE POLICY "public_insert_partidos" ON partidos FOR INSERT WITH CHECK (true);
 CREATE POLICY "public_update_partidos" ON partidos FOR UPDATE USING (true);
 CREATE POLICY "public_delete_partidos" ON partidos FOR DELETE USING (true);
+
+ALTER TABLE jugadores ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "public_read_jugadores"   ON jugadores FOR SELECT USING (true);
+CREATE POLICY "public_insert_jugadores" ON jugadores FOR INSERT WITH CHECK (true);
+CREATE POLICY "public_delete_jugadores" ON jugadores FOR DELETE USING (true);

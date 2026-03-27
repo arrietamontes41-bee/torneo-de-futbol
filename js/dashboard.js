@@ -47,6 +47,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   const btnCancelResult    = document.getElementById('btnCancelResult');
   const closeResultModal   = document.getElementById('closeResultModal');
 
+  // Roster modal
+  const rosterModal       = document.getElementById('rosterModal');
+  const rosterModalTitle  = document.getElementById('rosterModalTitle');
+  const rosterModalSub    = document.getElementById('rosterModalSub');
+  const rosterContent     = document.getElementById('rosterContent');
+  const closeRosterModal  = document.getElementById('closeRosterModal');
+  const btnCloseRoster    = document.getElementById('btnCloseRoster');
+
   // ---- Session UI ----
   dashUserName.textContent    = session.nombre || session.email;
   userRoleBadge.textContent   = session.rol === 'admin' ? 'Administrador' : 'Equipo';
@@ -105,6 +113,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     teamsContainer.innerHTML = `<div class="teams-grid">${teams.map(teamCard).join('')}</div>`;
 
+    // Click en tarjeta para ver plantilla
+    teamsContainer.querySelectorAll('.team-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        // Evitar conflicto con el botón eliminar
+        if (e.target.closest('.team-delete-btn')) return;
+        const teamId   = card.dataset.id;
+        const teamName = card.dataset.name;
+        const teamCity = card.dataset.city;
+        openRosterModal(teamId, teamName, teamCity);
+      });
+    });
+
     if (session.rol === 'admin') {
       teamsContainer.querySelectorAll('.team-delete-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
@@ -130,13 +150,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       ? `<button class="btn-icon btn-icon-red team-delete-btn" data-id="${t.id}" data-name="${escHtml(t.nombre)}" title="Eliminar equipo">✕</button>`
       : '';
     return `
-      <div class="team-card">
+      <div class="team-card" data-id="${t.id}" data-name="${escHtml(t.nombre)}" data-city="${escHtml(t.municipio || 'Montería')}" style="cursor:pointer;" title="Ver plantilla">
         ${deleteBtn}
         <div class="team-avatar">${initials}</div>
         <div class="team-name">${escHtml(t.nombre)}</div>
         <div class="team-city">📍 ${escHtml(t.municipio || 'Montería')}</div>
         <div class="team-email">${escHtml(t.email)}</div>
         <span class="team-badge">Inscrito</span>
+        <div style="font-size:.7rem;color:rgba(255,255,255,.3);margin-top:6px;">👆 Ver plantilla</div>
       </div>`;
   };
 
@@ -308,6 +329,73 @@ document.addEventListener('DOMContentLoaded', async () => {
   closeResultModal.addEventListener('click', closeModal);
   btnCancelResult.addEventListener('click',  closeModal);
   resultModal.addEventListener('click', e => { if (e.target === resultModal) closeModal(); });
+
+  // ---- ROSTER MODAL ----
+  const openRosterModal = async (teamId, teamName, teamCity) => {
+    rosterModal.classList.remove('hidden');
+    rosterModalTitle.textContent = teamName;
+    rosterModalSub.textContent   = `📍 ${teamCity}`;
+    rosterContent.innerHTML = `<div class="empty-state"><div class="empty-icon">⏳</div><p>Cargando jugadores...</p></div>`;
+
+    const players = await DB.getPlayersByTeam(teamId);
+
+    if (!players.length) {
+      rosterContent.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">👤</div>
+          <p>Este equipo aún no tiene jugadores registrados.</p>
+        </div>`;
+      return;
+    }
+
+    const posIcons = { Portero: '🧤', Defensa: '🛡️', Mediocampista: '⚙️', Delantero: '⚡' };
+
+    const rows = players.map(p => {
+      const icon    = posIcons[p.posicion] || '⚽';
+      const dob     = p.fecha_nac ? formatDate(p.fecha_nac) : '—';
+      const age     = p.fecha_nac ? calcAge(p.fecha_nac) : '';
+      const ageStr  = age ? ` (${age} años)` : '';
+      return `
+        <tr>
+          <td style="text-align:center;font-weight:700;color:var(--primary-light,#a5b4fc);">${p.dorsal}</td>
+          <td>${escHtml(p.nombre)}</td>
+          <td>${icon} ${escHtml(p.posicion)}</td>
+          <td style="color:var(--gray-400);font-size:.78rem;">${escHtml(p.documento)}</td>
+          <td style="color:var(--gray-400);font-size:.78rem;">${dob}${ageStr}</td>
+        </tr>`;
+    }).join('');
+
+    rosterContent.innerHTML = `
+      <p style="font-size:.78rem;color:var(--gray-400);margin:0 0 12px;">${players.length} jugador${players.length !== 1 ? 'es' : ''} registrado${players.length !== 1 ? 's' : ''}</p>
+      <div style="overflow-x:auto;">
+        <table class="standings-table" style="min-width:480px;">
+          <thead>
+            <tr>
+              <th title="Dorsal">#</th>
+              <th>Nombre</th>
+              <th>Posición</th>
+              <th>Documento</th>
+              <th>Nacimiento</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  };
+
+  const calcAge = (dateStr) => {
+    const today = new Date();
+    const birth = new Date(dateStr);
+    let age = today.getFullYear() - birth.getFullYear();
+    const m = today.getMonth() - birth.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+    return age;
+  };
+
+  const closeRoster = () => rosterModal.classList.add('hidden');
+  closeRosterModal.addEventListener('click', closeRoster);
+  btnCloseRoster.addEventListener('click',   closeRoster);
+  rosterModal.addEventListener('click', e => { if (e.target === rosterModal) closeRoster(); });
 
   btnSaveResult.addEventListener('click', async () => {
     const id = resultMatchId.value;

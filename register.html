@@ -4,11 +4,201 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Registrar Equipo – Torneo de Fútbol Montería</title>
-  <meta name="description" content="Registra tu equipo en el torneo de fútbol de Montería, Córdoba." />
+  <meta name="description" content="Registra tu equipo y jugadores en el torneo de fútbol de Montería, Córdoba." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* ── Wizard steps ── */
+    .wizard-steps {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 28px;
+    }
+    .wizard-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+    }
+    .step-circle {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .8rem; font-weight: 700;
+      border: 2px solid rgba(255,255,255,.2);
+      color: rgba(255,255,255,.4);
+      background: transparent;
+      flex-shrink: 0;
+      transition: all .3s;
+    }
+    .step-circle.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+      box-shadow: 0 0 0 4px rgba(99,102,241,.25);
+    }
+    .step-circle.done {
+      background: var(--success, #22c55e);
+      border-color: var(--success, #22c55e);
+      color: #fff;
+    }
+    .step-label {
+      font-size: .75rem;
+      font-weight: 500;
+      color: rgba(255,255,255,.4);
+      white-space: nowrap;
+      transition: color .3s;
+    }
+    .wizard-step.active .step-label { color: rgba(255,255,255,.9); }
+    .wizard-step.done  .step-label { color: rgba(255,255,255,.6); }
+    .step-line {
+      flex: 1; height: 2px;
+      background: rgba(255,255,255,.1);
+      margin: 0 8px;
+      border-radius: 2px;
+    }
+
+    /* ── Step panels ── */
+    .wizard-panel { display: none; }
+    .wizard-panel.active { display: block; }
+
+    /* ── Players section ── */
+    .players-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .players-header h3 {
+      font-size: .9rem;
+      font-weight: 600;
+      color: rgba(255,255,255,.85);
+      margin: 0;
+    }
+    .players-count-badge {
+      font-size: .72rem;
+      background: rgba(99,102,241,.2);
+      color: var(--primary-light, #a5b4fc);
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-weight: 600;
+    }
+    .player-row {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 10px;
+      position: relative;
+      animation: slideIn .25s ease;
+    }
+    @keyframes slideIn {
+      from { opacity:0; transform: translateY(-8px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+    .player-row-title {
+      font-size: .78rem;
+      font-weight: 700;
+      color: var(--primary-light, #a5b4fc);
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .btn-remove-player {
+      background: rgba(239,68,68,.15);
+      border: none;
+      color: #f87171;
+      width: 24px; height: 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: .85rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s;
+    }
+    .btn-remove-player:hover { background: rgba(239,68,68,.3); }
+
+    .player-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .player-grid .form-field { margin-bottom: 0; }
+    .player-grid .form-field label {
+      font-size: .72rem;
+      margin-bottom: 4px;
+      display: block;
+      color: rgba(255,255,255,.55);
+    }
+    .player-grid input,
+    .player-grid select {
+      padding: 8px 10px;
+      font-size: .82rem;
+      height: auto;
+    }
+    .player-grid .full-col { grid-column: 1 / -1; }
+
+    .btn-add-player {
+      width: 100%;
+      padding: 11px;
+      background: rgba(99,102,241,.1);
+      border: 1.5px dashed rgba(99,102,241,.4);
+      border-radius: 10px;
+      color: var(--primary-light, #a5b4fc);
+      font-size: .83rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      margin-top: 4px;
+    }
+    .btn-add-player:hover {
+      background: rgba(99,102,241,.18);
+      border-color: rgba(99,102,241,.7);
+    }
+
+    .players-empty {
+      text-align: center;
+      padding: 20px;
+      color: rgba(255,255,255,.3);
+      font-size: .82rem;
+    }
+
+    .wizard-footer {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .btn-back {
+      flex: 0 0 auto;
+      padding: 13px 20px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 12px;
+      color: rgba(255,255,255,.7);
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .btn-back:hover { background: rgba(255,255,255,.12); }
+
+    .register-card-wide {
+      max-width: 580px;
+    }
+
+    /* Scrollable players list */
+    .players-list {
+      max-height: 420px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .players-list::-webkit-scrollbar { width:4px; }
+    .players-list::-webkit-scrollbar-track { background: transparent; }
+    .players-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius:2px; }
+  </style>
 </head>
 <body class="auth-body">
 
@@ -18,7 +208,7 @@
     <div class="auth-blob blob-3"></div>
   </div>
 
-  <div class="auth-card" id="registerCard">
+  <div class="auth-card register-card-wide" id="registerCard">
     <div class="auth-logo">
       <div class="logo-circle">
         <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -32,63 +222,109 @@
       </div>
     </div>
     <h1 class="auth-title">Registrar Equipo</h1>
-    <p class="auth-subtitle">Únete al torneo</p>
+    <p class="auth-subtitle">Únete al torneo de Montería</p>
 
-    <form id="registerForm" class="auth-form" novalidate>
-      <div class="form-field">
-        <label for="teamName">Nombre del Equipo</label>
-        <div class="input-wrap">
-          <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/></svg>
-          <input type="text" id="teamName" name="teamName" placeholder="Los Tigres FC" required maxlength="50" />
+    <!-- WIZARD STEPS -->
+    <div class="wizard-steps">
+      <div class="wizard-step active" id="wStep1">
+        <div class="step-circle active" id="stepCircle1">1</div>
+        <span class="step-label">Datos del Equipo</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="wizard-step" id="wStep2">
+        <div class="step-circle" id="stepCircle2">2</div>
+        <span class="step-label">Jugadores</span>
+      </div>
+    </div>
+
+    <!-- ── PANEL 1: Datos del equipo ── -->
+    <div class="wizard-panel active" id="panel1">
+      <form id="registerForm" class="auth-form" novalidate>
+        <div class="form-field">
+          <label for="teamName">Nombre del Equipo</label>
+          <div class="input-wrap">
+            <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/></svg>
+            <input type="text" id="teamName" name="teamName" placeholder="Los Tigres FC" required maxlength="50" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="regEmail">Correo electrónico</label>
+          <div class="input-wrap">
+            <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
+            <input type="email" id="regEmail" name="email" placeholder="correo@ejemplo.com" autocomplete="email" required />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="regPassword">Contraseña</label>
+          <div class="input-wrap">
+            <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
+            <input type="password" id="regPassword" name="password" placeholder="••••••••" autocomplete="new-password" required minlength="6" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="regPasswordConfirm">Confirmar Contraseña</label>
+          <div class="input-wrap">
+            <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
+            <input type="password" id="regPasswordConfirm" name="passwordConfirm" placeholder="••••••••" autocomplete="new-password" required minlength="6" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="teamCity">Municipio</label>
+          <div class="input-wrap input-wrap-select">
+            <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+            <select id="teamCity" name="city" required>
+              <option value="">Selecciona municipio</option>
+              <option value="Montería">Montería</option>
+              <option value="Cereté">Cereté</option>
+              <option value="Sahagún">Sahagún</option>
+              <option value="Lorica">Lorica</option>
+              <option value="Chinú">Chinú</option>
+              <option value="Montelíbano">Montelíbano</option>
+              <option value="Planeta Rica">Planeta Rica</option>
+              <option value="Pueblo Nuevo">Pueblo Nuevo</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-error" id="registerError"></div>
+        <button type="submit" class="btn-auth" id="btnNextStep">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="18"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+          Siguiente: Agregar Jugadores
+        </button>
+      </form>
+      <p class="auth-switch">¿Ya tienes cuenta? <a href="index.html" id="goToLogin">Inicia sesión</a></p>
+    </div>
+
+    <!-- ── PANEL 2: Jugadores ── -->
+    <div class="wizard-panel" id="panel2">
+      <div class="players-header">
+        <h3>⚽ Plantilla del Equipo</h3>
+        <span class="players-count-badge" id="playersCountBadge">0 jugadores</span>
+      </div>
+      <p style="font-size:.78rem;color:rgba(255,255,255,.45);margin-bottom:14px;">
+        Puedes agregar hasta 25 jugadores. Mínimo 0 para continuar.
+      </p>
+
+      <div class="players-list" id="playersList">
+        <div class="players-empty" id="playersEmpty">
+          Aún no hay jugadores. Agrega el primero 👇
         </div>
       </div>
-      <div class="form-field">
-        <label for="regEmail">Correo electrónico</label>
-        <div class="input-wrap">
-          <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
-          <input type="email" id="regEmail" name="email" placeholder="correo@ejemplo.com" autocomplete="email" required />
-        </div>
-      </div>
-      <div class="form-field">
-        <label for="regPassword">Contraseña</label>
-        <div class="input-wrap">
-          <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
-          <input type="password" id="regPassword" name="password" placeholder="••••••••" autocomplete="new-password" required minlength="6" />
-        </div>
-      </div>
-      <div class="form-field">
-        <label for="regPasswordConfirm">Confirmar Contraseña</label>
-        <div class="input-wrap">
-          <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
-          <input type="password" id="regPasswordConfirm" name="passwordConfirm" placeholder="••••••••" autocomplete="new-password" required minlength="6" />
-        </div>
-      </div>
-      <div class="form-field">
-        <label for="teamCity">Municipio</label>
-        <div class="input-wrap input-wrap-select">
-          <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
-          <select id="teamCity" name="city" required>
-            <option value="">Selecciona municipio</option>
-            <option value="Montería">Montería</option>
-            <option value="Cereté">Cereté</option>
-            <option value="Sahagún">Sahagún</option>
-            <option value="Lorica">Lorica</option>
-            <option value="Chinú">Chinú</option>
-            <option value="Montelíbano">Montelíbano</option>
-            <option value="Planeta Rica">Planeta Rica</option>
-            <option value="Pueblo Nuevo">Pueblo Nuevo</option>
-            <option value="Otro">Otro</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-error" id="registerError"></div>
-      <button type="submit" class="btn-auth" id="btnRegister">
-        <svg viewBox="0 0 20 20" fill="currentColor" width="18"><path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"/></svg>
-        Registrar Equipo
+
+      <button class="btn-add-player" id="btnAddPlayer" type="button">
+        + Agregar jugador
       </button>
-    </form>
 
-    <p class="auth-switch">¿Ya tienes cuenta? <a href="index.html" id="goToLogin">Inicia sesión</a></p>
+      <div class="form-error" id="playersError"></div>
+
+      <div class="wizard-footer">
+        <button class="btn-back" id="btnBackStep" type="button">← Volver</button>
+        <button class="btn-auth" id="btnRegisterFinal" type="button" style="flex:1;">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="18"><path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"/></svg>
+          Registrar Equipo
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Supabase SDK -->

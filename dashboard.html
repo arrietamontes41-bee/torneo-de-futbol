@@ -87,6 +87,7 @@
       <div class="tab-content active" id="tabContentTeams">
         <div class="tab-content-header">
           <h2 class="tab-content-title">Equipos Registrados</h2>
+          <p style="font-size:.78rem;color:var(--gray-400);margin:0;">Haz clic en un equipo para ver su plantilla</p>
         </div>
         <div id="teamsContainer">
           <div class="empty-state"><div class="empty-icon">⏳</div><p>Cargando equipos...</p></div>
@@ -194,6 +195,27 @@
           Guardar Resultado
         </button>
         <button class="btn-cancel-sm" id="btnCancelResult">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PLANTILLA DEL EQUIPO -->
+  <div class="modal-overlay hidden" id="rosterModal">
+    <div class="modal-card" style="max-width:640px;">
+      <div class="modal-header">
+        <div>
+          <h3 id="rosterModalTitle">Plantilla del Equipo</h3>
+          <p id="rosterModalSub" style="font-size:.78rem;color:var(--gray-400);margin:4px 0 0;"></p>
+        </div>
+        <button class="modal-close" id="closeRosterModal">✕</button>
+      </div>
+      <div class="modal-body" style="padding-top:0;">
+        <div id="rosterContent">
+          <div class="empty-state"><div class="empty-icon">⏳</div><p>Cargando jugadores...</p></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel-sm" id="btnCloseRoster">Cerrar</button>
       </div>
     </div>
   </div>

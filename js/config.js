@@ -1,13 +1,7 @@
 /**
  * config.js — Configuración de Supabase
- * 
- * INSTRUCCIONES PARA EL CLIENTE:
- * 1. Ve a https://supabase.com y crea una cuenta gratuita
- * 2. Crea un nuevo proyecto
- * 3. Ve a: Configuración → API
- * 4. Copia "Project URL" y "anon public key" aquí abajo
- * 5. Ve a: SQL Editor → corre el contenido de "database_schema.sql"
+ * Torneo de Fútbol – Montería, Córdoba
  */
 
-const SUPABASE_URL  = 'TU_SUPABASE_URL_AQUI';
-const SUPABASE_ANON = 'TU_SUPABASE_ANON_KEY_AQUI';
+const SUPABASE_URL  = 'https://lnkzrwumryfqxlwmztbs.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxua3pyd3VtcnlmcXhsd216dGJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NzkzNTksImV4cCI6MjA5MDE1NTM1OX0.5NvdHiA2amMAXY24huacgSbzwNR7Yfp9rrkg8JuxInc';
