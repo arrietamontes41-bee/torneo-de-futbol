@@ -10,15 +10,28 @@
 let _supabase = null;
 
 // ================================================================
-// HASH DE CONTRASEÑA (SHA-256 via Web Crypto API — nativa del navegador)
+// HASH DE CONTRASEÑA (SHA-256 via Web Crypto API)
+// Funciona en HTTPS y localhost. En file:// usa fallback.
 // ================================================================
 const hashPassword = async (plain) => {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(plain);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(hashBuffer))
-    .map(b => b.toString(16).padStart(2, '0'))
-    .join('');
+  // crypto.subtle solo funciona en contextos seguros (HTTPS / localhost)
+  if (window.isSecureContext && crypto.subtle) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(plain);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(hashBuffer))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+  }
+  // Fallback para desarrollo local (file://) — NO usar en producción
+  // Genera un hash simple pero consistente
+  let hash = 0;
+  for (let i = 0; i < plain.length; i++) {
+    const chr = plain.charCodeAt(i);
+    hash = ((hash << 5) - hash) + chr;
+    hash |= 0;
+  }
+  return 'local_' + Math.abs(hash).toString(16).padStart(8, '0');
 };
 
 const DB = (() => {

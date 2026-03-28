@@ -28,21 +28,17 @@ CREATE POLICY "allow_insert_usuarios"
   ON usuarios FOR INSERT
   WITH CHECK (true);
 
--- IMPORTANTE: sin UPDATE/DELETE público → solo el admin puede desde el dashboard
--- (el código JS ya controla esto por rol)
-
--- ============================================================
--- Eliminar política UPDATE permissiva en partidos
--- Solo el admin puede actualizar resultados (controlado en JS)
--- ============================================================
-DROP POLICY IF EXISTS "public_delete_equipos" ON equipos;
-
-CREATE POLICY "restrict_delete_equipos"
-  ON equipos FOR DELETE
-  USING (true);  -- el JS ya verifica que sea admin
-
 -- ============================================================
 -- VERIFICAR que todo quedó bien
 -- ============================================================
-SELECT email, rol, LEFT(password, 12) || '...' AS password_hash
+SELECT email, rol, LEFT(password, 20) || '...' AS password_hash
 FROM usuarios;
+
+-- ============================================================
+-- NOTA IMPORTANTE:
+-- En producción (Netlify con HTTPS) el hash SHA-256 funciona
+-- automáticamente. Al abrir index.html directamente en el
+-- navegador (file://) el sistema usa un hash local diferente.
+-- Para probar localmente, usa un servidor local:
+--   npx serve . o Live Server de VS Code
+-- ============================================================
