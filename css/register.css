@@ -191,3 +191,27 @@
 .players-list::-webkit-scrollbar { width:4px; }
 .players-list::-webkit-scrollbar-track { background: transparent; }
 .players-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius:2px; }
+
+/* ── Responsive Registro ── */
+@media (max-width: 768px) {
+  .register-card-wide { max-width: 100%; }
+
+  .wizard-steps { gap: 0; overflow-x: auto; }
+  .step-label   { display: none; }   /* ocultar labels en móvil, solo círculos */
+  .step-line    { min-width: 20px; }
+
+  .player-grid  { grid-template-columns: 1fr; }
+  .player-grid .full-col { grid-column: 1; }
+
+  .wizard-footer { flex-direction: column-reverse; }
+  .wizard-footer button { width: 100%; justify-content: center; }
+  .btn-back { flex: none; }
+
+  .players-list { max-height: 300px; }
+}
+
+@media (max-width: 480px) {
+  .player-row   { padding: 12px 10px; }
+  .btn-add-player { font-size: .8rem; padding: 10px; }
+}
+

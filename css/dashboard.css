@@ -100,4 +100,29 @@
 .acta-footer {
   padding: 16px 24px; border-top: 1px solid rgba(255,255,255,.07);
   display: flex; justify-content: flex-end; gap: 10px; align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ── Responsive Acta ── */
+@media (max-width: 768px) {
+  .acta-overlay { padding: 0; align-items: flex-end; }
+  .acta-box {
+    border-radius: 20px 20px 0 0;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .acta-cols { grid-template-columns: 1fr; }
+  .acta-col  { border-right: none; border-bottom: 1px solid rgba(255,255,255,.06); }
+  .acta-col:last-child { border-bottom: none; }
+  .acta-head { padding: 14px 16px; }
+  .acta-footer { justify-content: stretch; }
+  .acta-footer button { flex: 1; justify-content: center; }
+  .acta-vs-bar { gap: 10px; padding: 10px 16px; }
+  .acta-team-name { font-size: .88rem; }
+}
+
+@media (max-width: 480px) {
+  .acta-table { font-size: .72rem; }
+  .goles-inp  { width: 36px; font-size: .8rem; }
+  .acta-total-val { font-size: 1.3rem; }
 }
