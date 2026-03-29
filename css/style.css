@@ -1137,3 +1137,42 @@ body {
   .btn-primary-sm, .btn-secondary-sm { width: 100%; justify-content: center; }
   .match-form-actions { flex-direction: column; }
 }
+
+/* ======================================================
+   UTILIDADES CSP – Reemplazan atributos style=""
+   (Sin estas clases, se requeriría unsafe-inline)
+====================================================== */
+
+/* dashboard.html */
+.hint-click-team {
+  font-size: .78rem;
+  color: var(--gray-400);
+  margin: 0;
+}
+.form-error-flex { flex: 1; }
+.modal-max-640   { max-width: 640px; }
+.modal-body-pt0  { padding-top: 0; }
+.roster-sub {
+  font-size: .78rem;
+  color: var(--gray-400);
+  margin: 4px 0 0;
+}
+
+/* register.html */
+.wizard-hint {
+  font-size: .78rem;
+  color: rgba(255,255,255,.45);
+  margin-bottom: 14px;
+}
+.btn-auth-flex { flex: 1; }
+
+/* team-panel.html / shared */
+.form-error-mt { margin-top: 10px; }
+.del-name-strong { color: #fff; }
+.btn-del-confirm { background: rgba(239,68,68,.8) !important; }
+.btn-logout-sm   { font-size: .8rem; padding: 8px 14px; }
+.player-count-sub {
+  font-size: .78rem;
+  color: rgba(255,255,255,.4);
+  font-weight: 400;
+}

@@ -1,6 +1,6 @@
 # =============================================
-# .htaccess - Configuración de seguridad básica
-# Torneo de Fútbol - Montería
+# .htaccess - Configuración de seguridad
+# Torneo de Fútbol – Montería, Córdoba
 # =============================================
 
 # --- Bloquear acceso a archivos sensibles ---
@@ -14,10 +14,38 @@ Options -Indexes
 
 # --- Cabeceras de seguridad ---
 <IfModule mod_headers.c>
+
+    # Content-Security-Policy estricta sin unsafe-inline
+    # Directivas completas para evitar alertas de OWASP ZAP:
+    #   - default-src  : fallback base, solo 'self'
+    #   - script-src   : solo scripts locales ('self')
+    #   - style-src    : solo CSS locales ('self')
+    #   - font-src     : solo fuentes locales ('self')
+    #   - img-src      : self + data URIs (avatares/base64) + blob (canvas)
+    #   - connect-src  : self + Supabase API
+    #   - object-src   : 'none'  → bloquea Flash/plugins (sin fallback a default-src)
+    #   - worker-src   : 'none'  → bloquea Service Workers no deseados
+    #   - media-src    : 'none'  → no se usan audio/video
+    #   - form-action  : solo envíos al mismo origen
+    #   - base-uri     : solo 'self' → evita inyección de base href
+    #   - frame-ancestors: 'none' → equivalente a X-Frame-Options DENY
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://*.supabase.co; object-src 'none'; worker-src 'none'; media-src 'none'; form-action 'self'; base-uri 'self'; frame-ancestors 'none';"
+
+    # Evita que el navegador adivine el MIME type
     Header set X-Content-Type-Options "nosniff"
-    Header set X-Frame-Options "SAMEORIGIN"
-    Header set X-XSS-Protection "1; mode=block"
+
+    # Evita clickjacking (redundante con frame-ancestors 'none' pero añade compatibilidad)
+    Header set X-Frame-Options "DENY"
+
+    # Fuerza HTTPS en el navegador durante 1 año (activar cuando tengas SSL)
+    # Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+    # Política de referrer: solo origen, sin ruta
     Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Deshabilitar características del navegador innecesarias
+    Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+
 </IfModule>
 
 # --- Redirigir a HTTPS (activar cuando tengas SSL) ---
