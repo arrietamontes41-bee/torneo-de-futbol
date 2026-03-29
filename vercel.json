@@ -9,7 +9,7 @@
 
         {
           "key": "Access-Control-Allow-Origin",
-          "value": "https://torneo-de-futbol.vercel.app"
+          "value": "https://torneo-de-futbol-hazel.vercel.app"
         },
 
         {
