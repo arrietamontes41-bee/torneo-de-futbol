@@ -1,0 +1,70 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "https://torneo-de-futbol.vercel.app"
+        },
+
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization, X-Requested-With, Accept"
+        },
+
+        {
+          "key": "Access-Control-Max-Age",
+          "value": "86400"
+        },
+
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://*.supabase.co; object-src 'none'; worker-src 'none'; media-src 'none'; form-action 'self'; base-uri 'self'; frame-ancestors 'none';"
+        },
+
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+
+        {
+          "key": "Permissions-Policy",
+          "value": "geolocation=(), microphone=(), camera=()"
+        },
+
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000; includeSubDomains; preload"
+        }
+
+      ]
+    }
+  ],
+
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/index.html"
+    }
+  ]
+}

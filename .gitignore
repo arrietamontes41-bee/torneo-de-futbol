@@ -12,3 +12,9 @@ desktop.ini
 
 # Editor
 .vscode/settings.json
+
+# Archivos temporales de configuración (pueden contener tokens)
+actualizar_remote.txt
+
+# Archivos SQL de base de datos (no van al repo público)
+*.sql
