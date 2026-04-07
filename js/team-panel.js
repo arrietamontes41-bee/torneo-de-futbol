@@ -364,7 +364,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ── Helpers ──────────────────────────────────────────────────
   function resetForm() {
-    addPlayerForm.style.display = 'none';
+    addPlayerForm.style.display = '';
     btnShowForm.style.display   = '';
     pName.value = ''; pDoc.value = ''; pDorsal.value = ''; pPos.value = ''; pDob.value = '';
     playerErr.textContent = '';
