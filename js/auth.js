@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const showError  = msg => { errorDiv.textContent = msg; };
   const clearError = ()  => { errorDiv.textContent = ''; };
 
-  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   [emailInput, passInput].forEach(el => el.addEventListener('input', clearError));
 
