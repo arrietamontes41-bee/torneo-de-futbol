@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,6 +10,7 @@
   <link rel="stylesheet" href="css/inter-font.css" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
+
 <body class="auth-body">
 
   <div class="auth-bg">
@@ -20,13 +22,14 @@
   <div class="auth-card" id="registerCard">
     <div class="auth-logo">
       <div class="logo-circle">
-        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
-          <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-          <path d="M4 22h16"/>
-          <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
-          <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
-          <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+          <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+          <path d="M4 22h16" />
+          <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+          <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+          <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
         </svg>
       </div>
     </div>
@@ -37,7 +40,10 @@
       <div class="form-field">
         <label for="teamName">Nombre del Equipo</label>
         <div class="input-wrap">
-          <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/></svg>
+          <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor">
+            <path
+              d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+          </svg>
           <input type="text" id="teamName" name="teamName" placeholder="Los Tigres FC" required maxlength="50" />
         </div>
       </div>
@@ -45,34 +51,57 @@
       <div class="form-field">
         <label for="regEmail">Correo electrónico</label>
         <div class="input-wrap">
-          <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
-          <input type="email" id="regEmail" name="email" placeholder="correo@ejemplo.com" autocomplete="email" required />
+          <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+          </svg>
+          <input type="email" id="regEmail" name="email" placeholder="correo@ejemplo.com" autocomplete="email"
+            required />
         </div>
       </div>
 
       <div class="form-field">
         <label for="regPassword">Contraseña</label>
         <div class="input-wrap">
-          <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
-          <input type="password" id="regPassword" name="password" placeholder="••••••••" autocomplete="new-password" required minlength="6" />
-          <button type="button" id="btnTogglePass" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:#888;padding:0;line-height:1;" title="Mostrar/ocultar contraseña">👁</button>
+          <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd"
+              d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+              clip-rule="evenodd" />
+          </svg>
+          <input type="password" id="regPassword" name="password" placeholder="••••••••" autocomplete="new-password"
+            required minlength="6" />
+          <button type="button" id="btnTogglePass"
+            style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:#888;padding:0;line-height:1;"
+            title="Mostrar/ocultar contraseña">👁</button>
         </div>
-        <small style="color:#888;font-size:.75rem;margin-top:4px;display:block;">Mínimo 6 caracteres, debe incluir al menos un número.</small>
+        <small style="color:#888;font-size:.75rem;margin-top:4px;display:block;">Mínimo 6 caracteres, debe incluir al
+          menos un número.</small>
       </div>
 
       <div class="form-field">
         <label for="regPasswordConfirm">Confirmar Contraseña</label>
         <div class="input-wrap">
-          <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
-          <input type="password" id="regPasswordConfirm" name="passwordConfirm" placeholder="••••••••" autocomplete="new-password" required minlength="6" />
-          <button type="button" id="btnToggleConfirm" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:#888;padding:0;line-height:1;" title="Mostrar/ocultar contraseña">👁</button>
+          <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd"
+              d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+              clip-rule="evenodd" />
+          </svg>
+          <input type="password" id="regPasswordConfirm" name="passwordConfirm" placeholder="••••••••"
+            autocomplete="new-password" required minlength="6" />
+          <button type="button" id="btnToggleConfirm"
+            style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;color:#888;padding:0;line-height:1;"
+            title="Mostrar/ocultar contraseña">👁</button>
         </div>
       </div>
 
       <div class="form-field">
         <label for="teamCity">Municipio</label>
         <div class="input-wrap input-wrap-select">
-          <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+          <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd"
+              d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+              clip-rule="evenodd" />
+          </svg>
           <select id="teamCity" name="city" required>
             <option value="">Selecciona municipio</option>
             <option value="Montería">Montería</option>
@@ -91,7 +120,10 @@
       <div class="form-error" id="registerError"></div>
 
       <button type="submit" class="btn-auth" id="btnRegister">
-        <svg viewBox="0 0 20 20" fill="currentColor" width="18"><path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"/></svg>
+        <svg viewBox="0 0 20 20" fill="currentColor" width="18">
+          <path
+            d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
+        </svg>
         Registrar Equipo
       </button>
     </form>
@@ -105,4 +137,5 @@
   <script src="js/db.js"></script>
   <script src="js/register.js"></script>
 </body>
+
 </html>
