@@ -16,9 +16,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   const passInput = document.getElementById('loginPassword');
   const errorDiv  = document.getElementById('loginError');
   const btnLogin  = document.getElementById('btnLogin');
+  const btnTogglePass = document.getElementById('btnTogglePass');
+
+  // Toggle mostrar/ocultar contraseña
+  if (btnTogglePass) {
+    btnTogglePass.addEventListener('click', () => {
+      const isPass = passInput.type === 'password';
+      passInput.type = isPass ? 'text' : 'password';
+      btnTogglePass.textContent = isPass ? '🙈' : '👁';
+    });
+  }
 
   const showError  = msg => { errorDiv.textContent = msg; };
   const clearError = ()  => { errorDiv.textContent = ''; };
+
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
   [emailInput, passInput].forEach(el => el.addEventListener('input', clearError));
 
@@ -29,7 +41,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const email    = emailInput.value.trim();
     const password = passInput.value;
 
-    if (!email || !password) { showError('Por favor completa todos los campos.'); return; }
+    if (!email)                       { showError('El correo electrónico es obligatorio.'); emailInput.focus(); return; }
+    if (!EMAIL_REGEX.test(email))     { showError('Ingresa un correo electrónico válido (ej: nombre@dominio.com).'); emailInput.focus(); return; }
+    if (!password)                    { showError('La contraseña es obligatoria.'); passInput.focus(); return; }
+    if (password.length < 6)          { showError('La contraseña debe tener al menos 6 caracteres.'); passInput.focus(); return; }
 
     // Estado de carga
     btnLogin.disabled = true;

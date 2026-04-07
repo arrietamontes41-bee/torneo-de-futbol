@@ -43,6 +43,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   const showError  = msg => { errorDiv.textContent = msg; };
   const clearError = ()  => { errorDiv.textContent = ''; };
 
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  // Toggle mostrar/ocultar contraseña
+  [['btnTogglePass', 'regPassword'], ['btnToggleConfirm', 'regPasswordConfirm']].forEach(([btnId, inputId]) => {
+    const btn = document.getElementById(btnId);
+    const inp = document.getElementById(inputId);
+    if (btn && inp) {
+      btn.addEventListener('click', () => {
+        const isPass = inp.type === 'password';
+        inp.type = isPass ? 'text' : 'password';
+        btn.textContent = isPass ? '🙈' : '👁';
+      });
+    }
+  });
+
   [teamNameInput, emailInput, passInput, passConfirm, citySelect].forEach(el => {
     el.addEventListener('input',  clearError);
     el.addEventListener('change', clearError);
@@ -61,13 +76,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const conf  = passConfirm.value;
     const city  = citySelect.value;
 
-    if (!name)           { showError('El nombre del equipo es obligatorio.');            teamNameInput.focus(); return; }
-    if (name.length < 3) { showError('El nombre debe tener al menos 3 caracteres.');                           return; }
-    if (!email)          { showError('El correo electrónico es obligatorio.');           emailInput.focus();   return; }
-    if (!pass)           { showError('La contraseña es obligatoria.');                   passInput.focus();    return; }
-    if (pass.length < 6) { showError('La contraseña debe tener al menos 6 caracteres.');                      return; }
-    if (pass !== conf)   { showError('Las contraseñas no coinciden.');                   passConfirm.focus();  return; }
-    if (!city)           { showError('Selecciona un municipio.');                        citySelect.focus();   return; }
+    if (!name)                { showError('El nombre del equipo es obligatorio.');            teamNameInput.focus(); return; }
+    if (name.length < 3)      { showError('El nombre debe tener al menos 3 caracteres.');                           return; }
+    if (/[<>"'`]/.test(name)) { showError('El nombre del equipo contiene caracteres no permitidos.');              return; }
+    if (!email)               { showError('El correo electrónico es obligatorio.');            emailInput.focus();   return; }
+    if (!EMAIL_REGEX.test(email)) { showError('Ingresa un correo electrónico válido (ej: equipo@dominio.com).'); emailInput.focus(); return; }
+    if (!pass)                { showError('La contraseña es obligatoria.');                   passInput.focus();    return; }
+    if (pass.length < 6)      { showError('La contraseña debe tener al menos 6 caracteres.');                      return; }
+    if (!/\d/.test(pass))     { showError('La contraseña debe contener al menos un número (ej: futbol1).');          return; }
+    if (pass !== conf)        { showError('Las contraseñas no coinciden.');                   passConfirm.focus();  return; }
+    if (!city)                { showError('Selecciona un municipio.');                         citySelect.focus();   return; }
 
     goToStep2();
   });

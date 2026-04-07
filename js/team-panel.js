@@ -116,11 +116,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     const posicion = pPos.value;
     const dob      = pDob.value || null;
 
-    if (!nombre)   return showErr('El nombre es obligatorio.');
-    if (!doc)      return showErr('El documento es obligatorio.');
+    if (!nombre)                        return showErr('El nombre es obligatorio.');
+    if (nombre.length < 3)              return showErr('El nombre debe tener al menos 3 caracteres.');
+    if (!doc)                           return showErr('El documento es obligatorio.');
     if (!dorsal || dorsal < 1 || dorsal > 99) return showErr('El dorsal debe ser entre 1 y 99.');
-    if (!posicion) return showErr('Selecciona una posición.');
-    if (players.length >= 25) return showErr('Máximo 25 jugadores por equipo.');
+    if (!posicion)                      return showErr('Selecciona una posición.');
+    if (players.length >= 25)           return showErr('Máximo 25 jugadores por equipo.');
+
+    // Verificar dorsal duplicado en jugadores existentes
+    if (players.some(p => Number(p.dorsal) === dorsal))
+      return showErr(`El dorsal ${dorsal} ya está en uso por otro jugador del equipo.`);
+
+    // Verificar documento duplicado en jugadores existentes
+    if (players.some(p => p.documento.trim().toLowerCase() === doc.toLowerCase()))
+      return showErr('Este número de documento ya está registrado en el equipo.');
 
     btnSavePlayer.disabled = true;
     btnSavePlayer.textContent = 'Guardando...';
