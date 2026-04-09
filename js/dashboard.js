@@ -578,7 +578,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <tr>
           <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:12px;height:16px;background:${color};border-radius:2px;"></div>${label}</div></td>
           <td><b>${escHtml(f.jugadores?.nombre)}</b> <span style="color:#888;font-size:.8rem;">(#${f.jugadores?.dorsal})</span></td>
-          <td>${escHtml(f.equipos?.nombre)}</td>
+          <td>${escHtml(f.jugadores?.equipos?.nombre || '—')}</td>
           <td>${dateStr}</td>
           <td>
             <button class="btn-primary-sm btn-mark-paid" data-id="${f.id}" style="padding:6px 12px;font-size:.75rem;">

@@ -446,7 +446,7 @@ const DB = (() => {
   const getAllPendingFines = async () => {
     const { data, error } = await sb()
       .from('eventos_partido')
-      .select('id, tipo, jugadores(nombre, dorsal), partidos(fecha), equipos(nombre)')
+      .select('id, tipo, jugadores(nombre, dorsal, equipos(nombre)), partidos(fecha)')
       .in('tipo', ['amarilla', 'roja'])
       .eq('pagada', false)
       .order('created_at', { ascending: false });
