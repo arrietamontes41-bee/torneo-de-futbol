@@ -448,8 +448,7 @@ const DB = (() => {
       .from('eventos_partido')
       .select('id, tipo, equipo_id, jugadores(nombre, dorsal), partidos(fecha)')
       .in('tipo', ['amarilla', 'roja'])
-      .eq('pagada', false)
-      .order('created_at', { ascending: false });
+      .eq('pagada', false);
     if (error) { console.error(error); return []; }
     return data || [];
   };
