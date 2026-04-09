@@ -303,6 +303,22 @@ const DB = (() => {
     return { ok: true };
   };
 
+  /**
+   * Verifica si un documento ya está registrado en cualquier equipo del torneo.
+   * @param {string} documento - El número de cédula a verificar
+   * @returns {{ exists: boolean, equipo?: string }} - Si existe y a qué equipo pertenece
+   */
+  const checkDocumentoGlobal = async (documento) => {
+    const { data, error } = await sb()
+      .from('jugadores')
+      .select('id, nombre, equipo_id, equipos(nombre)')
+      .eq('documento', documento.trim())
+      .limit(1);
+    if (error) { console.error(error); return { exists: false }; }
+    if (!data || data.length === 0) return { exists: false };
+    return { exists: true, equipo: data[0]?.equipos?.nombre || 'otro equipo' };
+  };
+
   // ================================================================
   // EVENTOS DE PARTIDO (goles y tarjetas por jugador)
   // ================================================================
@@ -341,7 +357,7 @@ const DB = (() => {
     // Equipos
     getTeams, getTeamById, addTeam, deleteTeam,
     // Jugadores
-    getPlayersByTeam, addPlayers, deletePlayer,
+    getPlayersByTeam, addPlayers, deletePlayer, checkDocumentoGlobal,
     // Partidos
     getMatches, getMatchById, addMatch, updateMatch, setMatchResult, deleteMatch,
     // Eventos
