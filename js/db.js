@@ -97,7 +97,7 @@ const DB = (() => {
     return data || null;
   };
 
-  const addTeam = async ({ name, email, password, city }) => {
+  const addTeam = async ({ name, email, password, city, escudo }) => {
     try {
       // 1. Verificar que no exista el nombre
       const { data: existing } = await sb().from('equipos').select('id').ilike('nombre', name.trim()).single();
@@ -123,7 +123,8 @@ const DB = (() => {
         nombre: name.trim(),
         email: email.toLowerCase().trim(),
         municipio: city || 'Montería',
-        usuario_id: user.id
+        usuario_id: user.id,
+        escudo: escudo || null
       }]).select().single();
 
       if (teamErr) {

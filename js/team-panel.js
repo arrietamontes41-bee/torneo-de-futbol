@@ -221,13 +221,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     teamCity.textContent       = myTeam.municipio || '—';
     teamEmail.textContent      = myTeam.email || '—';
 
-    // Escudo con iniciales
+    // Escudo: imagen real o iniciales
     const ini = myTeam.nombre.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
-    teamShield.textContent = '';
-    teamShield.style.fontSize = '1.3rem';
+    teamShield.style.fontSize  = '1.3rem';
     teamShield.style.fontWeight = '800';
-    teamShield.style.color = '#fff';
-    teamShield.textContent = ini;
+    teamShield.style.color     = '#fff';
+    if (myTeam.escudo) {
+      teamShield.innerHTML = `<img src="${myTeam.escudo}" alt="escudo" style="width:100%;height:100%;object-fit:cover;border-radius:18px;" />`;
+    } else {
+      teamShield.textContent = ini;
+    }
 
     [players, matches, standings] = await Promise.all([
       DB.getPlayersByTeam(myTeam.id),
@@ -281,8 +284,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Escudo e initials del equipo
     if (myTeam) {
       const ini = myTeam.nombre.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-      carnetShield.textContent = ini;
-      carnetTeam.textContent   = myTeam.nombre;
+      if (myTeam.escudo) {
+        carnetShield.innerHTML = `<img src="${myTeam.escudo}" alt="escudo" style="width:100%;height:100%;object-fit:cover;border-radius:10px;" />`;
+      } else {
+        carnetShield.textContent = ini;
+      }
+      carnetTeam.textContent = myTeam.nombre;
     }
 
     carnetModal.classList.remove('hidden');

@@ -16,11 +16,31 @@ document.addEventListener('DOMContentLoaded', async () => {
   const citySelect   = document.getElementById('teamCity');
   const errorDiv     = document.getElementById('registerError');
   const btnRegister  = document.getElementById('btnRegister');
+  const shieldInput  = document.getElementById('shieldInput');
+  const shieldPreview= document.getElementById('shieldPreview');
+  let shieldBase64   = null;
 
   const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const showError  = msg => { errorDiv.textContent = msg; };
   const clearError = ()  => { errorDiv.textContent = ''; };
+
+  // Preview del escudo
+  shieldInput.addEventListener('change', () => {
+    const file = shieldInput.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      showError('El escudo debe pesar menos de 2MB.');
+      shieldInput.value = '';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = e => {
+      shieldBase64 = e.target.result;
+      shieldPreview.innerHTML = `<img src="${shieldBase64}" alt="escudo" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
+    };
+    reader.readAsDataURL(file);
+  });
 
   // Limpiar error al escribir
   [teamNameInput, emailInput, passInput, passConfirm, citySelect].forEach(el => {
@@ -69,7 +89,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnRegister.textContent = 'Registrando...';
 
     // Crear equipo en Supabase
-    const result = await DB.addTeam({ name, email, password: pass, city });
+    const result = await DB.addTeam({ name, email, password: pass, city, escudo: shieldBase64 || null });
 
     if (!result.ok) {
       showError(result.error || 'Error al registrar el equipo.');
