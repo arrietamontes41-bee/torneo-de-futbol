@@ -100,8 +100,27 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // Auto login y redirigir al panel
-    await DB.login(email, pass);
-    window.location.href = 'team-panel.html';
+    // Éxito: mostrar pantalla de confirmación (NO auto-login)
+    const registerCard = document.getElementById('registerCard');
+    const shieldImg = shieldBase64
+      ? `<img src="${shieldBase64}" alt="escudo" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`
+      : '🏆';
+
+    registerCard.innerHTML = `
+      <div style="text-align:center;padding:16px 0;">
+        <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:2rem;overflow:hidden;border:3px solid rgba(99,102,241,.5);">
+          ${shieldImg}
+        </div>
+        <div style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:rgba(34,197,94,.15);border:2px solid rgba(34,197,94,.4);margin-bottom:14px;">
+          <svg viewBox="0 0 20 20" fill="#22c55e" width="20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+        </div>
+        <h2 style="font-size:1.3rem;font-weight:800;color:#fff;margin:0 0 8px;">¡Equipo registrado!</h2>
+        <p style="color:rgba(255,255,255,.55);font-size:.88rem;margin:0 0 6px;">El equipo <strong style="color:#a5b4fc;">${name}</strong> fue inscrito correctamente.</p>
+        <p style="color:rgba(255,255,255,.4);font-size:.8rem;margin:0 0 28px;">Ahora inicia sesión con tu correo y contraseña para acceder al panel.</p>
+        <a href="index.html" style="display:inline-flex;align-items:center;gap:8px;padding:13px 32px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:12px;color:#fff;font-size:.9rem;font-weight:700;text-decoration:none;transition:opacity .2s;">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="16"><path fill-rule="evenodd" d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/></svg>
+          Ir a Iniciar Sesión
+        </a>
+      </div>`;
   });
 });
