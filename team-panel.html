@@ -224,6 +224,53 @@
     </div>
   </div>
 
+  <!-- Modal Carnet Digital del Jugador -->
+  <div class="carnet-overlay hidden" id="carnetModal">
+    <div>
+      <div class="carnet-card" id="carnetCard">
+        <div class="carnet-bg">
+          <div class="carnet-header">
+            <div class="carnet-logo-text">
+              Torneo de Fútbol
+              <strong>Montería 2025</strong>
+            </div>
+            <span class="carnet-season">🏆 Temporada 2025</span>
+          </div>
+          <div class="carnet-photo-wrap">
+            <span class="carnet-dorsal" id="carnetDorsal">#10</span>
+            <div class="carnet-photo" id="carnetPhoto">👤</div>
+          </div>
+          <div class="carnet-info">
+            <p class="carnet-name" id="carnetName">—</p>
+            <span class="carnet-pos" id="carnetPos">—</span>
+            <div class="carnet-data-row">
+              <div class="carnet-data-item">
+                <span class="carnet-data-lbl">Cédula</span>
+                <span class="carnet-data-val" id="carnetDoc">—</span>
+              </div>
+              <div class="carnet-data-item">
+                <span class="carnet-data-lbl">F. Nac.</span>
+                <span class="carnet-data-val" id="carnetDob">—</span>
+              </div>
+            </div>
+          </div>
+          <div class="carnet-divider"></div>
+          <div class="carnet-team-row">
+            <div class="carnet-team-shield" id="carnetShield">—</div>
+            <span class="carnet-team-name" id="carnetTeam">—</span>
+          </div>
+        </div>
+        <div class="carnet-footer">
+          <span class="carnet-footer-text">Credencial Oficial del Jugador</span>
+          <span class="carnet-footer-icon">⚽</span>
+        </div>
+      </div>
+      <div class="carnet-actions">
+        <button class="btn-carnet-close" id="btnCarnetClose">✕ Cerrar</button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/vendor/supabase.min.js"></script>
   <script src="js/config.js"></script>
   <script src="js/db.js"></script>

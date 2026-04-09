@@ -59,6 +59,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   const confirmDel  = $('confirmDel');
   const cancelDel   = $('cancelDel');
 
+  // Carnet modal
+  const carnetModal  = $('carnetModal');
+  const carnetPhoto  = $('carnetPhoto');
+  const carnetDorsal = $('carnetDorsal');
+  const carnetName   = $('carnetName');
+  const carnetPos    = $('carnetPos');
+  const carnetDoc    = $('carnetDoc');
+  const carnetDob    = $('carnetDob');
+  const carnetShield = $('carnetShield');
+  const carnetTeam   = $('carnetTeam');
+  const btnCarnetClose = $('btnCarnetClose');
+
   // ── Header usuario ───────────────────────────────────────────
   const initials = (session.nombre || session.email || '?').charAt(0).toUpperCase();
   userAvatar.textContent = initials;
@@ -166,6 +178,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   cancelDel.addEventListener('click', () => { deleteModal.classList.add('hidden'); pendingDelId = null; });
   deleteModal.addEventListener('click', e => { if (e.target === deleteModal) { deleteModal.classList.add('hidden'); pendingDelId = null; } });
 
+  // Carnet modal — cerrar
+  btnCarnetClose.addEventListener('click', () => carnetModal.classList.add('hidden'));
+  carnetModal.addEventListener('click', e => { if (e.target === carnetModal) carnetModal.classList.add('hidden'); });
+
   confirmDel.addEventListener('click', async () => {
     if (!pendingDelId) return;
     confirmDel.disabled = true;
@@ -239,6 +255,39 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ── Jugadores (tarjetas con foto) ────────────────────────────
+  // ── Carnet Digital ──────────────────────────────────────────────
+  function openCarnet(p) {
+    // Foto
+    carnetPhoto.innerHTML = p.foto
+      ? `<img src="${p.foto}" alt="${esc(p.nombre)}" />`
+      : '\ud83d\udc64';
+
+    // Datos
+    carnetDorsal.textContent = `#${p.dorsal}`;
+    carnetName.textContent   = p.nombre;
+
+    // Posición con color
+    carnetPos.textContent = p.posicion;
+    carnetPos.className = `carnet-pos pos-${p.posicion}`;
+
+    // Cédula
+    carnetDoc.textContent = p.documento;
+
+    // Fecha nacimiento
+    carnetDob.textContent = p.fecha_nac
+      ? new Date(p.fecha_nac + 'T00:00:00').toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })
+      : '—';
+
+    // Escudo e initials del equipo
+    if (myTeam) {
+      const ini = myTeam.nombre.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+      carnetShield.textContent = ini;
+      carnetTeam.textContent   = myTeam.nombre;
+    }
+
+    carnetModal.classList.remove('hidden');
+  }
+
   function renderPlayers() {
     playerCount.textContent = players.length ? `(${players.length} jugadores)` : '';
 
@@ -248,6 +297,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     playersGrid.innerHTML = `<div class="players-grid">${players.map(p => playerCard(p)).join('')}</div>`;
+
+    playersGrid.querySelectorAll('.btn-carnet-card').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const player = players.find(p => p.id === btn.dataset.id);
+        if (player) openCarnet(player);
+      });
+    });
 
     playersGrid.querySelectorAll('.btn-remove-card').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -274,6 +330,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="player-name">${esc(p.nombre)}</div>
         <div class="player-pos-pill pos-${p.posicion}">${p.posicion}</div>
         <div class="player-doc">${esc(p.documento)}${dob ? ' · ' + dob : ''}</div>
+        <button class="btn-carnet-card" data-id="${p.id}">🎫 Ver Carnet</button>
         <button class="btn-remove-card" data-id="${p.id}" data-name="${esc(p.nombre)}">🗑 Eliminar</button>
       </div>`;
   }
