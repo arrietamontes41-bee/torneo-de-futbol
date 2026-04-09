@@ -201,6 +201,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     pendingDelId = null;
   });
 
+  // ── Actualizar Escudo ──────────────────────────────────────────────
+  const updateShieldInput = $('updateShieldInput');
+  updateShieldInput.addEventListener('change', () => {
+    const file = updateShieldInput.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { alert('El escudo debe pesar menos de 2MB.'); return; }
+    
+    // UI Carga temporal
+    const oldHtml = teamShield.innerHTML;
+    teamShield.innerHTML = '<span style="font-size:1.5rem">⏳</span>';
+    
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const base64 = e.target.result;
+      const res = await DB.updateTeamShield(myTeam.id, base64);
+      if (res.ok) {
+        myTeam.escudo = base64;
+        teamShield.innerHTML = `<img src="${base64}" alt="escudo" style="width:100%;height:100%;object-fit:cover;border-radius:18px;" />`;
+      } else {
+        alert('Error al actualizar escudo: ' + res.error);
+        teamShield.innerHTML = oldHtml;
+      }
+    };
+    reader.readAsDataURL(file);
+    updateShieldInput.value = '';
+  });
+
   // ════════════════════════════════════════════════════════════
   // CARGA INICIAL
   // ════════════════════════════════════════════════════════════

@@ -38,7 +38,11 @@
 
     <!-- Tarjeta del equipo -->
     <div class="my-team-card">
-      <div class="my-team-shield" id="teamShield">🏆</div>
+      <div style="position:relative; flex-shrink:0;">
+        <div class="my-team-shield" id="teamShield">🏆</div>
+        <label for="updateShieldInput" class="btn-update-shield" title="Cambiar escudo">✏️</label>
+        <input type="file" id="updateShieldInput" accept="image/*" style="display:none;" />
+      </div>
       <div class="my-team-info">
         <p class="my-team-name-big" id="teamNameBig">—</p>
         <div class="my-team-meta">

@@ -161,6 +161,12 @@ const DB = (() => {
     }
   };
 
+  const updateTeamShield = async (teamId, escudo) => {
+    const { data, error } = await sb().from('equipos').update({ escudo }).eq('id', teamId).select().single();
+    if (error) return { ok: false, error: error.message };
+    return { ok: true, team: data };
+  };
+
   // ================================================================
   // PARTIDOS
   // ================================================================
@@ -433,7 +439,7 @@ const DB = (() => {
     // Sesión
     getSession, setSession, clearSession, login,
     // Equipos
-    getTeams, getTeamById, addTeam, deleteTeam,
+    getTeams, getTeamById, addTeam, deleteTeam, updateTeamShield,
     // Jugadores
     getPlayersByTeam, addPlayers, deletePlayer, checkDocumentoGlobal,
     // Partidos
