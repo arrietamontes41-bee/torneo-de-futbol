@@ -432,6 +432,34 @@ const DB = (() => {
     return { ok: true };
   };
 
+  const getPendingFines = async (teamId) => {
+    const { data, error } = await sb()
+      .from('eventos_partido')
+      .select('id, tipo, jugadores(nombre, dorsal), partidos(fecha)')
+      .eq('equipo_id', teamId)
+      .in('tipo', ['amarilla', 'roja'])
+      .eq('pagada', false);
+    if (error) { console.error(error); return []; }
+    return data || [];
+  };
+
+  const getAllPendingFines = async () => {
+    const { data, error } = await sb()
+      .from('eventos_partido')
+      .select('id, tipo, jugadores(nombre, dorsal), partidos(fecha), equipos(nombre)')
+      .in('tipo', ['amarilla', 'roja'])
+      .eq('pagada', false)
+      .order('created_at', { ascending: false });
+    if (error) { console.error(error); return []; }
+    return data || [];
+  };
+
+  const markFineAsPaid = async (id) => {
+    const { error } = await sb().from('eventos_partido').update({ pagada: true }).eq('id', id);
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
+  };
+
   // Init inmediato
   init();
 
@@ -444,8 +472,8 @@ const DB = (() => {
     getPlayersByTeam, addPlayers, deletePlayer, checkDocumentoGlobal,
     // Partidos
     getMatches, getMatchById, addMatch, updateMatch, setMatchResult, deleteMatch,
-    // Eventos
-    getMatchEvents, saveMatchEvents,
+    // Eventos y Sanciones
+    getMatchEvents, saveMatchEvents, getPendingFines, getAllPendingFines, markFineAsPaid,
     // Computed
     getStandings, getStats, getTopScorers, getBestGoalkeepers,
   };

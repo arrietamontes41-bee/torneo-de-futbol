@@ -82,6 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       btn.classList.add('active');
       document.getElementById(`tabContent${capitalize(btn.dataset.tab)}`).classList.add('active');
       if (btn.dataset.tab === 'standings') await renderStandings();
+      if (btn.dataset.tab === 'sanciones') await renderSanciones();
     });
   });
 
@@ -546,6 +547,76 @@ document.addEventListener('DOMContentLoaded', async () => {
       <p style="font-size:.78rem;color:var(--gray-400);margin-top:10px;text-align:right;">
         Criterios: Puntos · Diferencia de goles · Goles a favor
       </p>`;
+  };
+
+  // ---- SANCIONES ----
+  const sancionesContainer = document.getElementById('sancionesContainer');
+  const renderSanciones = async () => {
+    sancionesContainer.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">⏳</div>
+        <p>Cargando sanciones pendientes...</p>
+      </div>`;
+
+    const fines = await DB.getAllPendingFines();
+
+    if (!fines || !fines.length) {
+      sancionesContainer.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">✅</div>
+          <p>No hay multas de tarjetas pendientes por pagar</p>
+        </div>`;
+      return;
+    }
+
+    const rows = fines.map(f => {
+      const isRed = f.tipo === 'roja';
+      const color = isRed ? '#ef4444' : '#eab308';
+      const label = isRed ? 'Roja' : 'Amarilla';
+      const dateStr = f.partidos?.fecha ? formatDate(f.partidos.fecha) : '—';
+      return `
+        <tr>
+          <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:12px;height:16px;background:${color};border-radius:2px;"></div>${label}</div></td>
+          <td><b>${escHtml(f.jugadores?.nombre)}</b> <span style="color:#888;font-size:.8rem;">(#${f.jugadores?.dorsal})</span></td>
+          <td>${escHtml(f.equipos?.nombre)}</td>
+          <td>${dateStr}</td>
+          <td>
+            <button class="btn-primary-sm btn-mark-paid" data-id="${f.id}" style="padding:6px 12px;font-size:.75rem;">
+              Marcar como Pagada
+            </button>
+          </td>
+        </tr>`;
+    }).join('');
+
+    sancionesContainer.innerHTML = `
+      <div class="standings-wrap">
+        <table class="standings-table">
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Jugador</th>
+              <th>Equipo</th>
+              <th>Fecha del Partido</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+
+    sancionesContainer.querySelectorAll('.btn-mark-paid').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        btn.disabled = true;
+        btn.textContent = 'Procesando...';
+        const res = await DB.markFineAsPaid(btn.dataset.id);
+        if (res.ok) {
+          await renderSanciones(); // recargar
+        } else {
+          alert('Error: ' + res.error);
+          btn.disabled = false;
+        }
+      });
+    });
   };
 
   // ---- Utils ----

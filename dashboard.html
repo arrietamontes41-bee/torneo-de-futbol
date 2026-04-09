@@ -81,6 +81,7 @@
         <button class="tab-btn active" data-tab="teams"    id="tabTeams">Equipos</button>
         <button class="tab-btn"        data-tab="matches"  id="tabMatches">Partidos</button>
         <button class="tab-btn"        data-tab="standings"id="tabStandings">Tabla de Posiciones</button>
+        <button class="tab-btn"        data-tab="sanciones"id="tabSanciones">Sanciones</button>
       </div>
 
       <!-- TAB: EQUIPOS -->
@@ -160,6 +161,17 @@
         </div>
         <div id="standingsContainer">
           <div class="empty-state"><div class="empty-icon">🏆</div><p>Selecciona la pestaña para ver la tabla</p></div>
+        </div>
+      </div>
+
+      <!-- TAB: SANCIONES -->
+      <div class="tab-content" id="tabContentSanciones">
+        <div class="tab-content-header">
+          <h2 class="tab-content-title">Control de Sanciones y Multas</h2>
+          <p class="hint-click-team">Las tarjetas sin pagar le aparecerán como alerta al equipo en su panel.</p>
+        </div>
+        <div id="sancionesContainer">
+          <div class="empty-state"><div class="empty-icon">⏳</div><p>Cargando sanciones...</p></div>
         </div>
       </div>
     </div>

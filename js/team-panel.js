@@ -269,6 +269,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderPlayers();
     renderHomeMatches();
     renderHomeStars();
+    renderFinesAlert();
+  }
+
+  // ── Sanciones / Alertas ──────────────────────────────────────
+  async function renderFinesAlert() {
+    const finesContainer = $('finesAlertContainer');
+    if (!finesContainer) return;
+    
+    const fines = await DB.getPendingFines(myTeam.id);
+    if (!fines || fines.length === 0) {
+      finesContainer.innerHTML = '';
+      finesContainer.classList.add('hidden');
+      return;
+    }
+
+    const finesHtml = fines.map(f => {
+      const typeColor = f.tipo === 'roja' ? '#ef4444' : '#eab308';
+      const typeLabel = f.tipo === 'roja' ? 'Tarjeta Roja' : 'Tarjeta Amarilla';
+      const dateStr   = f.partidos?.fecha ? new Date(f.partidos.fecha).toLocaleDateString('es-CO') : '—';
+      return `<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;background:rgba(0,0,0,.2);padding:10px;border-radius:8px;">
+                <div style="width:16px;height:24px;background:${typeColor};border-radius:3px;"></div>
+                <div style="flex:1;">
+                  <strong style="color:#fff;font-size:.9rem;">${f.jugadores?.nombre} (Dorsal ${f.jugadores?.dorsal})</strong>
+                  <div style="font-size:.75rem;color:rgba(255,255,255,.6);">Partido del ${dateStr}</div>
+                </div>
+                <div style="font-weight:bold;color:${typeColor};font-size:.8rem;text-transform:uppercase;">Pendiente</div>
+              </div>`;
+    }).join('');
+
+    finesContainer.innerHTML = `
+      <div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:16px;">
+        <h3 style="color:#f87171;margin:0 0 12px;font-size:1rem;">⚠️ Tienes tarjetas con multa pendiente de pago</h3>
+        ${finesHtml}
+        <p style="margin:10px 0 0;font-size:.8rem;color:rgba(255,255,255,.5);">* Por favor, cancela la multa correspondiente con el organizador. El administrador retirará esta alerta al confirmar el pago.</p>
+      </div>
+    `;
+    finesContainer.classList.remove('hidden');
   }
 
   // ── Stats ────────────────────────────────────────────────────
