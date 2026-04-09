@@ -150,13 +150,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const teamCard = t => {
     const initials  = t.nombre.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+    const avatar = t.escudo
+      ? `<img src="${t.escudo}" alt="escudo" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" />`
+      : initials;
     const deleteBtn = session.rol === 'admin'
       ? `<button class="btn-icon btn-icon-red team-delete-btn" data-id="${t.id}" data-name="${escHtml(t.nombre)}" title="Eliminar equipo">✕</button>`
       : '';
     return `
       <div class="team-card" data-id="${t.id}" data-name="${escHtml(t.nombre)}" data-city="${escHtml(t.municipio || 'Montería')}" style="cursor:pointer;" title="Ver plantilla">
         ${deleteBtn}
-        <div class="team-avatar">${initials}</div>
+        <div class="team-avatar">${avatar}</div>
         <div class="team-name">${escHtml(t.nombre)}</div>
         <div class="team-city">📍 ${escHtml(t.municipio || 'Montería')}</div>
         <div class="team-email">${escHtml(t.email)}</div>
@@ -498,12 +501,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       const rankClass= i < 3 ? `rank-${i + 1}` : '';
       const medal    = i < 3 ? `<span class="pos-medal">${medals[i]}</span>` : '';
       const initials = r.team.nombre.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+      const avatar   = r.team.escudo
+        ? `<img src="${r.team.escudo}" alt="escudo" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" />`
+        : initials;
       return `
         <tr class="${rankClass}">
           <td class="pos-num">${medal || (i + 1)}</td>
           <td>
             <div class="team-name-cell">
-              <div class="team-avatar-sm">${initials}</div>
+              <div class="team-avatar-sm">${avatar}</div>
               <span>${escHtml(r.team.nombre)}</span>
             </div>
           </td>
