@@ -252,16 +252,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   // Nuevo partido
-  const getAllPendingFines = async () => {
-    const { data, error } = await sb()
-      .from('eventos_partido')
-      .select('equipo_id')
-      .in('tipo', ['amarilla', 'roja'])
-      .eq('pagada', false)
-      .order('created_at', { ascending: false });
-    if (error) { console.error(error); return []; }
-    return data || [];
-  };
   btnNewMatch.addEventListener('click', async () => {
     const teams = await DB.getTeams();
     if (teams.length < 2) {
