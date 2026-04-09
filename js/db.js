@@ -269,6 +269,83 @@ const DB = (() => {
     };
   };
 
+  /**
+   * Devuelve el top de goleadores del torneo.
+   * @param {number} limit - Cuántos jugadores devolver (default 5)
+   */
+  const getTopScorers = async (limit = 5) => {
+    try {
+      const { data, error } = await sb()
+        .from('eventos_partido')
+        .select('jugador_id, cantidad, jugadores(nombre, posicion, foto, dorsal, equipos(nombre, escudo))')
+        .eq('tipo', 'gol');
+      if (error || !data) return [];
+
+      // Agrupar por jugador y sumar goles
+      const map = {};
+      data.forEach(e => {
+        const id = e.jugador_id;
+        if (!map[id]) {
+          map[id] = {
+            id,
+            nombre:  e.jugadores?.nombre  || '—',
+            posicion:e.jugadores?.posicion || '—',
+            foto:    e.jugadores?.foto     || null,
+            dorsal:  e.jugadores?.dorsal   || '—',
+            equipo:  e.jugadores?.equipos?.nombre || '—',
+            escudo:  e.jugadores?.equipos?.escudo || null,
+            goles: 0
+          };
+        }
+        map[id].goles += Number(e.cantidad || 0);
+      });
+
+      return Object.values(map)
+        .sort((a, b) => b.goles - a.goles)
+        .slice(0, limit);
+    } catch (e) { console.error(e); return []; }
+  };
+
+  /**
+   * Devuelve los porteros con menos goles recibidos en el torneo
+   * (calculado por goles en contra del equipo en partidos finalizados).
+   * @param {number} limit - Cuántos porteros devolver (default 5)
+   */
+  const getBestGoalkeepers = async (limit = 5) => {
+    try {
+      const [allPlayers, allTeams, allMatches] = await Promise.all([
+        sb().from('jugadores').select('*, equipos(nombre, escudo)').eq('posicion', 'Portero'),
+        getTeams(),
+        getMatches()
+      ]);
+
+      const porteros = allPlayers.data || [];
+      const finished = allMatches.filter(m => m.estado === 'finalizado');
+
+      // Calcular goles recibidos por equipo
+      const gcByTeam = {};
+      allTeams.forEach(t => { gcByTeam[t.id] = 0; });
+      finished.forEach(m => {
+        if (gcByTeam[m.equipo_local_id] !== undefined) gcByTeam[m.equipo_local_id] += Number(m.goles_visit || 0);
+        if (gcByTeam[m.equipo_visit_id] !== undefined) gcByTeam[m.equipo_visit_id] += Number(m.goles_local || 0);
+      });
+
+      // Asignar goles recibidos a cada portero por su equipo
+      return porteros
+        .map(p => ({
+          id:      p.id,
+          nombre:  p.nombre,
+          foto:    p.foto || null,
+          dorsal:  p.dorsal,
+          equipo:  p.equipos?.nombre || '—',
+          escudo:  p.equipos?.escudo || null,
+          gc:      gcByTeam[p.equipo_id] ?? 0
+        }))
+        .sort((a, b) => a.gc - b.gc)
+        .slice(0, limit);
+    } catch (e) { console.error(e); return []; }
+  };
+
   // ================================================================
   // JUGADORES
   // ================================================================
@@ -364,6 +441,6 @@ const DB = (() => {
     // Eventos
     getMatchEvents, saveMatchEvents,
     // Computed
-    getStandings, getStats,
+    getStandings, getStats, getTopScorers, getBestGoalkeepers,
   };
 })();

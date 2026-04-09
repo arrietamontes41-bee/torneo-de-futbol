@@ -713,3 +713,101 @@ body {
   .carnet-actions { display: none; }
   .carnet-card { box-shadow: none; }
 }
+
+/* ══ Estrellas del Torneo ══ */
+.torneo-stars-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+@media (max-width: 600px) { .torneo-stars-grid { grid-template-columns: 1fr; } }
+
+.star-card {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 18px;
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color .2s;
+}
+.star-card:hover { border-color: rgba(99,102,241,.35); }
+
+/* Brillo sutil en la esquina */
+.star-card::before {
+  content: '';
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(rgba(99,102,241,.18), transparent 70%);
+  pointer-events: none;
+}
+
+.star-card-label {
+  font-size: .65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: rgba(255,255,255,.35);
+  margin-bottom: 14px;
+}
+
+.star-player-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.star-photo {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(99,102,241,.5);
+  background: rgba(99,102,241,.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.star-photo img { width: 100%; height: 100%; object-fit: cover; }
+.star-info { flex: 1; min-width: 0; }
+.star-name {
+  font-size: .95rem;
+  font-weight: 800;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0 0 2px;
+}
+.star-team {
+  font-size: .72rem;
+  color: rgba(255,255,255,.45);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.star-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border-radius: 12px;
+  padding: 6px 12px;
+  min-width: 48px;
+}
+.star-badge-num {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+}
+.star-badge-lbl {
+  font-size: .55rem;
+  font-weight: 700;
+  color: rgba(255,255,255,.7);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}

@@ -241,6 +241,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderStats();
     renderPlayers();
     renderHomeMatches();
+    renderHomeStars();
   }
 
   // ── Stats ────────────────────────────────────────────────────
@@ -340,6 +341,65 @@ document.addEventListener('DOMContentLoaded', async () => {
         <button class="btn-carnet-card" data-id="${p.id}">🎫 Ver Carnet</button>
         <button class="btn-remove-card" data-id="${p.id}" data-name="${esc(p.nombre)}">🗑 Eliminar</button>
       </div>`;
+  }
+
+  // ── Estrellas del torneo (inicio) ────────────────────────────────
+  async function renderHomeStars() {
+    const starScorer = $('starScorer');
+    const starKeeper = $('starKeeper');
+
+    if (!starScorer || !starKeeper) return;
+
+    const [scorers, keepers] = await Promise.all([
+      DB.getTopScorers(1),
+      DB.getBestGoalkeepers(1)
+    ]);
+
+    // ─ Máximo goleador
+    if (scorers.length > 0) {
+      const s = scorers[0];
+      const foto = s.foto
+        ? `<img src="${s.foto}" alt="${esc(s.nombre)}" />`
+        : '👤';
+      starScorer.innerHTML = `
+        <div class="star-card-label">⚽ Máximo Goleador</div>
+        <div class="star-player-row">
+          <div class="star-photo">${foto}</div>
+          <div class="star-info">
+            <div class="star-name">${esc(s.nombre)}</div>
+            <div class="star-team">${esc(s.equipo)}</div>
+          </div>
+          <div class="star-badge">
+            <span class="star-badge-num">${s.goles}</span>
+            <span class="star-badge-lbl">goles</span>
+          </div>
+        </div>`;
+    } else {
+      starScorer.innerHTML = `<div class="star-card-label">⚽ Máximo Goleador</div><div class="empty" style="padding:16px 0;"><div class="empty-icon">🥅</div>Sin goles registrados</div>`;
+    }
+
+    // ─ Portero valla menos vencida
+    if (keepers.length > 0) {
+      const k = keepers[0];
+      const foto = k.foto
+        ? `<img src="${k.foto}" alt="${esc(k.nombre)}" />`
+        : '🧴';
+      starKeeper.innerHTML = `
+        <div class="star-card-label">🧾 Valla Menos Vencida</div>
+        <div class="star-player-row">
+          <div class="star-photo">${foto}</div>
+          <div class="star-info">
+            <div class="star-name">${esc(k.nombre)}</div>
+            <div class="star-team">${esc(k.equipo)}</div>
+          </div>
+          <div class="star-badge" style="background:linear-gradient(135deg,#0ea5e9,#6366f1);">
+            <span class="star-badge-num">${k.gc}</span>
+            <span class="star-badge-lbl">en contra</span>
+          </div>
+        </div>`;
+    } else {
+      starKeeper.innerHTML = `<div class="star-card-label">🧾 Valla Menos Vencida</div><div class="empty" style="padding:16px 0;"><div class="empty-icon">🛡️</div>Sin datos aún</div>`;
+    }
   }
 
   // ── Partidos (tab inicio) ────────────────────────────────────
