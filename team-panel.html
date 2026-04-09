@@ -126,7 +126,7 @@
           <div class="form-field full">
             <label for="pName">Nombre completo *</label>
             <div class="input-wrap">
-              <input type="text" id="pName" placeholder="Juan Carlos Pérez" maxlength="80" />
+              <input type="text" id="pName" placeholder="Juan Carlos Pérez" maxlength="80" oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')" />
             </div>
           </div>
 
@@ -134,13 +134,13 @@
           <div class="form-field">
             <label for="pDoc">Cédula / Documento *</label>
             <div class="input-wrap">
-              <input type="text" id="pDoc" placeholder="1001234567" maxlength="20" />
+              <input type="text" id="pDoc" placeholder="1001234567" maxlength="15" oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
             </div>
           </div>
           <div class="form-field">
-            <label for="pDorsal">Dorsal (1–99) *</label>
+            <label for="pDorsal">Dorsal (1–999) *</label>
             <div class="input-wrap">
-              <input type="number" id="pDorsal" min="1" max="99" placeholder="10" />
+              <input type="number" id="pDorsal" min="1" max="999" placeholder="10" oninput="if(this.value.length > 3) this.value = this.value.slice(0,3);" />
             </div>
           </div>
 
@@ -160,7 +160,7 @@
           <div class="form-field">
             <label for="pDob">Fecha de nacimiento</label>
             <div class="input-wrap">
-              <input type="date" id="pDob" />
+              <input type="date" id="pDob" max="2020-12-31" min="1950-01-01" />
             </div>
           </div>
 

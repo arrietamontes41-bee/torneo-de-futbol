@@ -117,10 +117,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     const dob      = pDob.value || null;
 
     if (!nombre)                        return showErr('El nombre es obligatorio.');
-    if (nombre.length < 3)              return showErr('El nombre debe tener al menos 3 caracteres.');
+    if (nombre.length < 3 || nombre.length > 80) return showErr('El nombre debe tener entre 3 y 80 letras.');
     if (!doc)                           return showErr('El documento es obligatorio.');
-    if (!dorsal || dorsal < 1 || dorsal > 99) return showErr('El dorsal debe ser entre 1 y 99.');
+    if (!/^\d+$/.test(doc))             return showErr('El documento debe contener solo números.');
+    if (!dorsal || dorsal < 1 || dorsal > 999) return showErr('El dorsal debe ser un número entre 1 y 999.');
     if (!posicion)                      return showErr('Selecciona una posición.');
+
+    if (dob) {
+      const pDate = new Date(dob);
+      const today = new Date();
+      if (pDate >= today) return showErr('La fecha de nacimiento no puede ser en el futuro.');
+      if (today.getFullYear() - pDate.getFullYear() < 5) return showErr('El jugador debe tener al menos 5 años.');
+      if (pDate.getFullYear() < 1950) return showErr('La fecha de nacimiento es demasiado antigua.');
+    }
+
     if (players.length >= 25)           return showErr('Máximo 25 jugadores por equipo.');
 
     // Verificar dorsal duplicado en jugadores existentes
