@@ -252,6 +252,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   // Nuevo partido
+  const getAllPendingFines = async () => {
+    const { data, error } = await sb()
+      .from('eventos_partido')
+      .select('equipo_id')
+      .in('tipo', ['amarilla', 'roja'])
+      .eq('pagada', false)
+      .order('created_at', { ascending: false });
+    if (error) { console.error(error); return []; }
+    return data || [];
+  };
   btnNewMatch.addEventListener('click', async () => {
     const teams = await DB.getTeams();
     if (teams.length < 2) {
@@ -557,8 +567,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="empty-icon">⏳</div>
         <p>Cargando sanciones pendientes...</p>
       </div>`;
-
-    const fines = await DB.getAllPendingFines();
+    const [fines, teams] = await Promise.all([DB.getAllPendingFines(), DB.getTeams()]);
 
     if (!fines || !fines.length) {
       sancionesContainer.innerHTML = `
@@ -574,11 +583,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       const color = isRed ? '#ef4444' : '#eab308';
       const label = isRed ? 'Roja' : 'Amarilla';
       const dateStr = f.partidos?.fecha ? formatDate(f.partidos.fecha) : '—';
+      const teamObj = teams.find(t => t.id === f.equipo_id);
       return `
         <tr>
           <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:12px;height:16px;background:${color};border-radius:2px;"></div>${label}</div></td>
           <td><b>${escHtml(f.jugadores?.nombre)}</b> <span style="color:#888;font-size:.8rem;">(#${f.jugadores?.dorsal})</span></td>
-          <td>${escHtml(f.jugadores?.equipos?.nombre || '—')}</td>
+          <td>${escHtml(teamObj?.nombre || '—')}</td>
           <td>${dateStr}</td>
           <td>
             <button class="btn-primary-sm btn-mark-paid" data-id="${f.id}" style="padding:6px 12px;font-size:.75rem;">
