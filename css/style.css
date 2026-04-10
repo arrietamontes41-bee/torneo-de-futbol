@@ -104,8 +104,27 @@ body {
 }
 
 @media (max-width: 1024px) {
-  .auth-split-right { display: none; }
-  .auth-split-left { max-width: 100%; }
+  .auth-split {
+    position: relative;
+    justify-content: center;
+  }
+  
+  .auth-split-left {
+    max-width: 100%;
+    width: 100%;
+    background: transparent;
+  }
+
+  /* La imagen pasa a ser el fondo completo en celular */
+  .auth-split-right {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  
+  .auth-split-overlay {
+    background: rgba(2, 6, 23, 0.7); /* Capa oscura más fuerte para que se lea el texto del formulario */
+  }
 }
 
 .auth-bg {
