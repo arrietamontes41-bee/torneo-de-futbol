@@ -4,6 +4,13 @@
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
+  // Segurindad: Ignorar cualquier parámetro de URL (evitar ataques de reflexión/falsos positivos de SQLi)
+  if (window.location.search) {
+    console.warn('Advertencia de Seguridad: Se han detectado parámetros en la URL que serán ignorados.');
+    const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+    window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
+  }
+
   // Si ya hay sesión, redirigir
   const session = DB.getSession();
   if (session) { window.location.href = 'dashboard.html'; return; }
