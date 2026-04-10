@@ -1001,9 +1001,9 @@ body {
   color: var(--gray-900);
 }
 
-.standings-table tr.rank-1 td { background: linear-gradient(to right, #fffbeb, transparent); }
-.standings-table tr.rank-2 td { background: linear-gradient(to right, #f9fafb, transparent); }
-.standings-table tr.rank-3 td { background: linear-gradient(to right, #fff7ed, transparent); }
+.standings-table tr.rank-1 td { background: linear-gradient(to right, #fffbeb, transparent); color: var(--gray-50); }
+.standings-table tr.rank-2 td { background: linear-gradient(to right, #f9fafb, transparent); color: var(--gray-50); }
+.standings-table tr.rank-3 td { background: linear-gradient(to right, #fff7ed, transparent); color: var(--gray-50); }
 
 .pos-medal { font-size: 1.1rem; }
 
