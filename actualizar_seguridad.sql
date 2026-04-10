@@ -27,6 +27,13 @@ CREATE POLICY "allow_read_usuarios"
 CREATE POLICY "allow_insert_usuarios"
   ON usuarios FOR INSERT
   WITH CHECK (true);
+CREATE POLICY "allow_update_usuarios"
+  ON usuarios FOR UPDATE
+  USING (true)
+  WITH CHECK (true);
+
+-- 3. Asegurar columna 'pagada' en eventos_partido (si no existe)
+ALTER TABLE eventos_partido ADD COLUMN IF NOT EXISTS pagada BOOLEAN DEFAULT false;
 
 -- ============================================================
 -- VERIFICAR que todo quedó bien

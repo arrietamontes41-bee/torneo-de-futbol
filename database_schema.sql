@@ -72,6 +72,7 @@ ALTER TABLE partidos   ENABLE ROW LEVEL SECURITY;
 -- Políticas: lectura y escritura pública (el frontend controla la auth)
 CREATE POLICY "public_read_users"    ON usuarios  FOR SELECT USING (true);
 CREATE POLICY "public_insert_users"  ON usuarios  FOR INSERT WITH CHECK (true);
+CREATE POLICY "public_update_users"  ON usuarios  FOR UPDATE USING (true) WITH CHECK (true);
 
 CREATE POLICY "public_read_equipos"  ON equipos   FOR SELECT USING (true);
 CREATE POLICY "public_insert_equipos"ON equipos   FOR INSERT WITH CHECK (true);
@@ -95,6 +96,7 @@ CREATE TABLE IF NOT EXISTS eventos_partido (
   equipo_id   UUID NOT NULL REFERENCES equipos(id)  ON DELETE CASCADE,
   tipo        TEXT NOT NULL CHECK (tipo IN ('gol','amarilla','roja')),
   cantidad    INT  NOT NULL DEFAULT 1 CHECK (cantidad >= 0),
+  pagada      BOOLEAN DEFAULT false,
   created_at  TIMESTAMPTZ DEFAULT now(),
   UNIQUE (partido_id, jugador_id, tipo)
 );

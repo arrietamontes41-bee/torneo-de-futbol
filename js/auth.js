@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               alert('¡Contraseña actualizada con éxito!\n\nEntrarás automáticamente a tu panel.');
               window.location.href = verifRes.user.rol === 'admin' ? 'dashboard.html' : 'team-panel.html';
             } else {
-              alert('Error al guardar la nueva contraseña. Inténtalo de nuevo.');
+              alert('Error al guardar la nueva contraseña: ' + (updateResult.error || 'Inténtalo de nuevo.'));
             }
           } else {
             // Si cancela la creación de nueva clave... (dejamos la temporal por si acaso, y reseteamos)
