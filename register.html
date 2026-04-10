@@ -20,7 +20,10 @@
     <div class="auth-blob blob-3"></div>
   </div>
 
-  <div class="auth-card" id="registerCard">
+  <div class="auth-split">
+    <!-- Mitad Izquierda: Formulario -->
+    <div class="auth-split-left">
+      <div class="auth-card" id="registerCard">
     <div class="auth-logo">
       <div class="logo-circle">
         <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"
@@ -155,7 +158,14 @@
 
     <p class="auth-switch">¿Ya tienes cuenta? <a href="index.html" id="goToLogin">Inicia sesión</a></p>
   </div>
+  </div>
 
+  <!-- Mitad Derecha: Imagen del Estadio -->
+  <div class="auth-split-right">
+    <div class="auth-split-overlay"></div>
+    <img src="img/stadium_bg.png" alt="Estadio de fútbol moderno iluminado de noche">
+  </div>
+</div>
   <!-- Supabase SDK (local) -->
   <script src="js/vendor/supabase.min.js"></script>
   <script src="js/config.js"></script>
