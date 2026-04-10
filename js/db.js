@@ -262,15 +262,15 @@ const DB = (() => {
     clearCache();
     if (homeTeamId === awayTeamId) return { ok: false, error: 'Los equipos deben ser distintos.' };
 
-    // Validar si los equipos ya juegan ese día
+    // Validar si ESA PAREJA de equipos ya juega ese día
     const { data: exists } = await sb()
       .from('partidos')
       .select('id')
       .eq('fecha', date)
-      .or(`equipo_local_id.eq.${homeTeamId},equipo_visit_id.eq.${homeTeamId},equipo_local_id.eq.${awayTeamId},equipo_visit_id.eq.${awayTeamId}`);
+      .or(`and(equipo_local_id.eq.${homeTeamId},equipo_visit_id.eq.${awayTeamId}),and(equipo_local_id.eq.${awayTeamId},equipo_visit_id.eq.${homeTeamId})`);
 
     if (exists && exists.length > 0) {
-      return { ok: false, error: `Uno de los equipos ya tiene un partido programado para esta fecha (${date}).` };
+      return { ok: false, error: `Este enfrentamiento ya está programado para esta fecha (${date}).` };
     }
 
     const { data, error } = await sb().from('partidos').insert([{
@@ -288,16 +288,16 @@ const DB = (() => {
     clearCache();
     if (homeTeamId === awayTeamId) return { ok: false, error: 'Los equipos deben ser distintos.' };
 
-    // Validar si los equipos ya juegan ese día (ignorando este partido)
+    // Validar si ESA PAREJA de equipos ya juega ese día (ignorando este partido)
     const { data: exists } = await sb()
       .from('partidos')
       .select('id')
       .eq('fecha', date)
       .neq('id', id)
-      .or(`equipo_local_id.eq.${homeTeamId},equipo_visit_id.eq.${homeTeamId},equipo_local_id.eq.${awayTeamId},equipo_visit_id.eq.${awayTeamId}`);
+      .or(`and(equipo_local_id.eq.${homeTeamId},equipo_visit_id.eq.${awayTeamId}),and(equipo_local_id.eq.${awayTeamId},equipo_visit_id.eq.${homeTeamId})`);
 
     if (exists && exists.length > 0) {
-      return { ok: false, error: `Uno de los equipos ya tiene otro partido programado para esta fecha (${date}).` };
+      return { ok: false, error: `Este enfrentamiento ya está registrado para esta fecha en otro partido.` };
     }
 
     const { data, error } = await sb().from('partidos').update({
