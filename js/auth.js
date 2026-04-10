@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           alert('¡Éxito! Hemos enviado una contraseña temporal a tu correo.\n\nPor favor, úsala para iniciar sesión.');
         } catch (error) {
           console.error('Error EmailJS:', error);
-          alert('Ocurrió un error al enviar el correo. Intenta de nuevo más tarde.');
+          alert('Error detallado EmailJS: ' + JSON.stringify(error) + '\nStatus: ' + error.status + '\nText: ' + error.text);
         }
 
         btnForgotPass.textContent = originalText;
