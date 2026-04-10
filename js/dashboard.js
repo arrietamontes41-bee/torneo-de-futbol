@@ -504,14 +504,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       const dg       = r.gf - r.gc;
       const dgStr    = dg > 0 ? `+${dg}` : `${dg}`;
       const rankClass= i < 3 ? `rank-${i + 1}` : '';
-      const medal    = i < 3 ? `<span class="pos-medal">${medals[i]}</span>` : '';
-      const initials = r.team.nombre.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-      const avatar   = r.team.escudo
-        ? `<img src="${r.team.escudo}" alt="escudo" class="img-fit-inherit" />`
-        : initials;
       return `
         <tr class="${rankClass}">
-          <td class="pos-num">${medal || (i + 1)}</td>
+          <td class="pos-num">${i + 1}</td>
           <td>
             <div class="team-name-cell">
               <div class="team-avatar-sm">${avatar}</div>

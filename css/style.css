@@ -989,7 +989,7 @@ body {
 .standings-table td {
   padding: 14px 14px;
   text-align: center;
-  color: var(--gray-700);
+  color: #fff;
   font-weight: 500;
 }
 
@@ -1001,9 +1001,7 @@ body {
   color: var(--gray-900);
 }
 
-.standings-table tr.rank-1 td { border-left: 4px solid #fbbf24; background: rgba(251, 191, 36, 0.05); color: #fff; }
-.standings-table tr.rank-2 td { border-left: 4px solid #9ca3af; background: rgba(156, 163, 175, 0.05); color: #fff; }
-.standings-table tr.rank-3 td { border-left: 4px solid #d97706; background: rgba(217, 119, 6, 0.05); color: #fff; }
+/* Estilos de ranking eliminados por uniformidad */
 
 .pos-medal { font-size: 1.1rem; }
 
