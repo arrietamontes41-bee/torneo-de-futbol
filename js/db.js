@@ -53,6 +53,20 @@ const DB = (() => {
     return client;
   };
 
+  // ---- Cache de Memoria ----
+  let _cacheTeams = null;
+  let _cacheMatches = null;
+  let _cacheTime = 0;
+  const CACHE_TTL = 10000; // 10 segundos
+
+  const clearCache = () => {
+    _cacheTeams = null;
+    _cacheMatches = null;
+    _cacheTime = 0;
+  };
+
+  const isCacheFresh = () => (Date.now() - _cacheTime) < CACHE_TTL;
+
   // ================================================================
   // SESIÓN (guardada en sessionStorage para seguridad)
   // ================================================================
@@ -127,9 +141,14 @@ const DB = (() => {
   // EQUIPOS
   // ================================================================
   const getTeams = async () => {
+    if (_cacheTeams && isCacheFresh()) return _cacheTeams;
+
     const { data, error } = await sb().from('equipos').select('*').order('created_at');
     if (error) { console.error(error); return []; }
-    return data;
+    
+    _cacheTeams = data || [];
+    if (_cacheTeams.length > 0) _cacheTime = Date.now();
+    return _cacheTeams;
   };
 
   const getTeamById = async (id) => {
@@ -139,6 +158,7 @@ const DB = (() => {
 
   const addTeam = async ({ name, email, password, city, escudo }) => {
     try {
+      clearCache();
       // 1. Verificar que no exista el nombre
       const { data: existing } = await sb().from('equipos').select('id').ilike('nombre', name.trim()).single();
       if (existing) return { ok: false, error: 'Ya existe un equipo con ese nombre.' };
@@ -181,6 +201,7 @@ const DB = (() => {
 
   const deleteTeam = async (id) => {
     try {
+      clearCache();
       // Obtener usuario_id del equipo
       const { data: team } = await sb().from('equipos').select('usuario_id').eq('id', id).single();
 
@@ -211,6 +232,8 @@ const DB = (() => {
   // PARTIDOS
   // ================================================================
   const getMatches = async () => {
+    if (_cacheMatches && isCacheFresh()) return _cacheMatches;
+
     const { data, error } = await sb()
       .from('partidos')
       .select(`
@@ -220,7 +243,10 @@ const DB = (() => {
       `)
       .order('fecha').order('hora');
     if (error) { console.error(error); return []; }
-    return data;
+    
+    _cacheMatches = data || [];
+    if (_cacheMatches.length > 0) _cacheTime = Date.now();
+    return _cacheMatches;
   };
 
   const getMatchById = async (id) => {
@@ -233,6 +259,7 @@ const DB = (() => {
   };
 
   const addMatch = async ({ homeTeamId, awayTeamId, date, time }) => {
+    clearCache();
     if (homeTeamId === awayTeamId) return { ok: false, error: 'Los equipos deben ser distintos.' };
     const { data, error } = await sb().from('partidos').insert([{
       equipo_local_id: homeTeamId,
@@ -246,6 +273,7 @@ const DB = (() => {
   };
 
   const updateMatch = async (id, { homeTeamId, awayTeamId, date, time }) => {
+    clearCache();
     if (homeTeamId === awayTeamId) return { ok: false, error: 'Los equipos deben ser distintos.' };
     const { data, error } = await sb().from('partidos').update({
       equipo_local_id: homeTeamId,
@@ -258,6 +286,7 @@ const DB = (() => {
   };
 
   const setMatchResult = async (id, homeGoals, awayGoals) => {
+    clearCache();
     const { data, error } = await sb().from('partidos').update({
       goles_local: parseInt(homeGoals),
       goles_visit: parseInt(awayGoals),
@@ -268,6 +297,7 @@ const DB = (() => {
   };
 
   const deleteMatch = async (id) => {
+    clearCache();
     const { error } = await sb().from('partidos').delete().eq('id', id);
     if (error) return { ok: false, error: error.message };
     return { ok: true };
