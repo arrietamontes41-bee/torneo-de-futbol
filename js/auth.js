@@ -77,18 +77,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             { publicKey: EMAILJS_PUBLIC_KEY }
           );
 
-          // 3. Flujo de verificación del PIN con bucle (para que no se cierre si se equivocan)
+          // 3. Flujo de verificación del PIN con bucle
           let verifRes = null;
           let pinIngresado = prompt('¡Correo enviado!\nRevisa tu bandeja de entrada o de Spam e ingresa el código numérico de 6 dígitos aquí:');
           
           while (pinIngresado !== null) {
-            verifRes = await DB.login(recoverEmail.trim(), pinIngresado.trim());
+            // Limpiar cualquier caracter invisible o espacio copiado por error
+            const cleanPin = pinIngresado.replace(/\D/g, '');
+            
+            verifRes = await DB.login(recoverEmail.trim(), cleanPin);
             
             if (verifRes.ok) {
               break; // Código correcto ✅
             }
             // Si falla, volvemos a pedirlo:
-            pinIngresado = prompt('❌ El código ingresado es incorrecto.\n\nAsegúrate de estar viendo el correo más reciente, no uno viejo.\n\nIngresa el código nuevamente:');
+            pinIngresado = prompt('❌ El código ingresado es incorrecto.\n\nPor favor, escríbelo manualmente (a veces copiar y pegar trae espacios invisibles).\n\nIngresa el código nuevamente:');
           }
 
           // Si le dio a Cancelar
