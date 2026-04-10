@@ -83,6 +83,26 @@ const DB = (() => {
     }
   };
 
+  const resetPasswordAndGetTemp = async (email) => {
+    try {
+      const emailLower = email.toLowerCase().trim();
+      const { data, error } = await sb().from('usuarios').select('id, nombre').eq('email', emailLower).single();
+      if (error || !data) return { ok: false, error: 'Correo no encontrado.' };
+
+      // Generar contraseña temporal de 8 caracteres
+      const tempPass = Math.random().toString(36).slice(-8);
+      const hashed = await hashPassword(tempPass);
+
+      // Guardar la temporal en la base de datos
+      const { error: updateErr } = await sb().from('usuarios').update({ password: hashed }).eq('id', data.id);
+      if (updateErr) return { ok: false, error: 'Error al actualizar.' };
+
+      return { ok: true, tempPass, userName: data.nombre };
+    } catch(e) {
+      return { ok: false, error: 'Error de conexión.' };
+    }
+  };
+
   // ================================================================
   // EQUIPOS
   // ================================================================
@@ -464,7 +484,7 @@ const DB = (() => {
 
   return {
     // Sesión
-    getSession, setSession, clearSession, login,
+    getSession, setSession, clearSession, login, resetPasswordAndGetTemp,
     // Equipos
     getTeams, getTeamById, addTeam, deleteTeam, updateTeamShield,
     // Jugadores

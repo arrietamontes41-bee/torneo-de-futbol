@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Lógica de "¿Olvidaste tu contraseña?"
   const btnForgotPass = document.getElementById('btnForgotPass');
   if (btnForgotPass) {
-    btnForgotPass.addEventListener('click', (e) => {
+    btnForgotPass.addEventListener('click', async (e) => {
       e.preventDefault();
       const recoverEmail = prompt('Ingresa el correo electrónico asociado a tu equipo:');
       if (recoverEmail) {
@@ -38,8 +38,48 @@ document.addEventListener('DOMContentLoaded', async () => {
           alert('Por favor, ingresa un correo electrónico válido.');
           return;
         }
-        // Simulador de envío para el prototipo (Protección contra enumeración de correos)
-        alert('Si el correo "' + recoverEmail.trim() + '" está registrado en nuestra base de datos, en los próximos minutos recibirás un enlace seguro para restablecer tu contraseña.\n\n(Aviso del Prototipo: Como este es un entorno de pruebas, no se enviará un correo real).');
+
+        if (typeof emailjs === 'undefined') {
+          alert('Error: La librería de EmailJS no está cargada.');
+          return;
+        }
+        if (EMAILJS_PUBLIC_KEY === 'TU_PUBLIC_KEY') {
+          alert('Configuración pendiente: Administrador, por favor configura tus llaves de EmailJS en js/config.js');
+          return;
+        }
+
+        const originalText = btnForgotPass.textContent;
+        btnForgotPass.textContent = 'Enviando...';
+        btnForgotPass.style.pointerEvents = 'none';
+
+        // 1. Resetear password y obtener la temporal
+        const resetRes = await DB.resetPasswordAndGetTemp(recoverEmail);
+        
+        if (!resetRes.ok) {
+          // Engaño de seguridad: Si no existe, decimos que lo enviamos igual.
+          alert('Si el correo "' + recoverEmail.trim() + '" está registrado, en los próximos minutos recibirás una clave temporal.\n\n(Revisa tu bandeja de Spam).');
+          btnForgotPass.textContent = originalText;
+          btnForgotPass.style.pointerEvents = 'auto';
+          return;
+        }
+
+        // 2. Enviar por EmailJS
+        emailjs.init(EMAILJS_PUBLIC_KEY);
+        try {
+          await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+            to_email: recoverEmail.trim(),
+            to_name: resetRes.userName,
+            temp_password: resetRes.tempPass,
+            reply_to: "no-reply@torneofutbol.com"
+          });
+          alert('¡Éxito! Hemos enviado una contraseña temporal a tu correo.\n\nPor favor, úsala para iniciar sesión.');
+        } catch (error) {
+          console.error('Error EmailJS:', error);
+          alert('Ocurrió un error al enviar el correo. Intenta de nuevo más tarde.');
+        }
+
+        btnForgotPass.textContent = originalText;
+        btnForgotPass.style.pointerEvents = 'auto';
       }
     });
   }
