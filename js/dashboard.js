@@ -431,7 +431,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       const age     = p.fecha_nac ? calcAge(p.fecha_nac) : '';
       const ageStr  = age ? ` (${age} años)` : '';
       return `
-      return `
         <tr>
           <td class="text-center font-bold font-primary">${p.dorsal}</td>
           <td>${escHtml(p.nombre)}</td>
@@ -575,7 +574,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       const label = isRed ? 'Roja' : 'Amarilla';
       const dateStr = f.partidos?.fecha ? formatDate(f.partidos.fecha) : '—';
       const teamObj = teams.find(t => t.id === f.equipo_id);
-      return `
       return `
         <tr>
           <td><div class="sanciones-row-flex"><div class="sanciones-badge-sm" style="background:${color};"></div>${label}</div></td>
