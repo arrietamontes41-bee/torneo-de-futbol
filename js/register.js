@@ -71,6 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const pass  = passInput.value;
     const conf  = passConfirm.value;
     const city  = citySelect.value;
+    const acceptTerms = document.getElementById('acceptTerms').checked;
 
     // Validaciones
     if (!name)                    { showError('El nombre del equipo es obligatorio.');               teamNameInput.focus(); return; }
@@ -83,6 +84,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!/\d/.test(pass))         { showError('La contraseña debe incluir al menos un número.');                            return; }
     if (pass !== conf)            { showError('Las contraseñas no coinciden.');                       passConfirm.focus();  return; }
     if (!city)                    { showError('Selecciona un municipio.');                            citySelect.focus();   return; }
+    if (!acceptTerms)             { showError('Debes aceptar la política de privacidad y tratamiento de datos.');         return; }
 
     // Estado de carga
     btnRegister.disabled = true;
