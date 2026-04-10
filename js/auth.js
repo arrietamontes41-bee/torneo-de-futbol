@@ -74,18 +74,47 @@ document.addEventListener('DOMContentLoaded', async () => {
               temp_password: resetRes.tempPass,
               reply_to: "no-reply@torneofutbol.com"
             },
-            {
-              publicKey: EMAILJS_PUBLIC_KEY
-            }
+            { publicKey: EMAILJS_PUBLIC_KEY }
           );
-          alert('¡Éxito! Hemos enviado una contraseña temporal a tu correo.\n\nPor favor, úsala para iniciar sesión.');
+
+          // 3. Flujo de verificación del PIN
+          btnForgotPass.textContent = originalText;
+          btnForgotPass.style.pointerEvents = 'auto';
+
+          const pinIngresado = prompt('¡Correo enviado!\nRevisa tu bandeja de entrada o de Spam e ingresa el código numérico de 6 dígitos aquí:');
+          if (!pinIngresado) return;
+
+          // Intentar iniciar sesión silenciosamente con el PIN (ya que el PIN reemplazó a la contraseña)
+          const verifRes = await DB.login(recoverEmail.trim(), pinIngresado.trim());
+          
+          if (!verifRes.ok) {
+            alert('El código ingresado es incorrecto.');
+            return;
+          }
+
+          // 4. Si el código es correcto, pedir la nueva contraseña
+          let nuevaClave = prompt('Código correcto ✅\n\nIngresa tu NUEVA contraseña (mínimo 6 caracteres):');
+          while (nuevaClave && nuevaClave.length < 6) {
+            nuevaClave = prompt('La contraseña es muy corta. Debe tener al menos 6 caracteres.\n\nIngresa tu NUEVA contraseña:');
+          }
+
+          if (nuevaClave) {
+            // Actualizar a la nueva contraseña
+            const updateResult = await DB.updatePassword(verifRes.user.id, nuevaClave);
+            if (updateResult.ok) {
+              alert('¡Contraseña actualizada con éxito! Ya puedes iniciar sesión con tu nueva contraseña.');
+            } else {
+              alert('Error al guardar la nueva contraseña. Inténtalo de nuevo.');
+            }
+          }
+
         } catch (error) {
           console.error('Error EmailJS:', error);
           alert('Error detallado EmailJS: ' + JSON.stringify(error) + '\nStatus: ' + error.status + '\nText: ' + error.text);
+          btnForgotPass.textContent = originalText;
+          btnForgotPass.style.pointerEvents = 'auto';
         }
 
-        btnForgotPass.textContent = originalText;
-        btnForgotPass.style.pointerEvents = 'auto';
       }
     });
   }

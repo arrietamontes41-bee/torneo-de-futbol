@@ -89,15 +89,26 @@ const DB = (() => {
       const { data, error } = await sb().from('usuarios').select('id, nombre').eq('email', emailLower).single();
       if (error || !data) return { ok: false, error: 'Correo no encontrado.' };
 
-      // Generar contraseña temporal de 8 caracteres
-      const tempPass = Math.random().toString(36).slice(-8);
-      const hashed = await hashPassword(tempPass);
+      // Generar PIN de 6 dígitos (ej: 482915)
+      const pin = Math.floor(100000 + Math.random() * 900000).toString();
+      const hashed = await hashPassword(pin);
 
-      // Guardar la temporal en la base de datos
+      // Guardar el PIN como contraseña temporal en la base de datos
       const { error: updateErr } = await sb().from('usuarios').update({ password: hashed }).eq('id', data.id);
       if (updateErr) return { ok: false, error: 'Error al actualizar.' };
 
-      return { ok: true, tempPass, userName: data.nombre };
+      return { ok: true, tempPass: pin, userName: data.nombre, userId: data.id };
+    } catch(e) {
+      return { ok: false, error: 'Error de conexión.' };
+    }
+  };
+
+  const updatePassword = async (userId, newPassword) => {
+    try {
+      const hashed = await hashPassword(newPassword);
+      const { error } = await sb().from('usuarios').update({ password: hashed }).eq('id', userId);
+      if (error) return { ok: false, error: error.message };
+      return { ok: true };
     } catch(e) {
       return { ok: false, error: 'Error de conexión.' };
     }
@@ -484,7 +495,7 @@ const DB = (() => {
 
   return {
     // Sesión
-    getSession, setSession, clearSession, login, resetPasswordAndGetTemp,
+    getSession, setSession, clearSession, login, resetPasswordAndGetTemp, updatePassword,
     // Equipos
     getTeams, getTeamById, addTeam, deleteTeam, updateTeamShield,
     // Jugadores
