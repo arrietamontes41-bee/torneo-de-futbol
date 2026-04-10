@@ -526,10 +526,11 @@ body {
 /* ══ Modal carnet ══ */
 .carnet-overlay {
   position: fixed; inset: 0;
-  background: rgba(0,0,0,.82);
-  backdrop-filter: blur(8px);
+  background: rgba(2, 6, 23, 0.92); /* Fondo oscuro casi opaco */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   display: flex; align-items: center; justify-content: center;
-  z-index: 1000;
+  z-index: 2000;
   padding: 20px;
 }
 .carnet-overlay.hidden { display: none; }
@@ -537,10 +538,11 @@ body {
 /* La tarjeta en sí */
 .carnet-card {
   width: 340px;
-  border-radius: 24px;
+  background: #1e1e2f; /* Fondo sólido de seguridad */
+  border-radius: 28px;
   overflow: hidden;
   position: relative;
-  box-shadow: 0 32px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.08);
+  box-shadow: 0 40px 100px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.08);
   animation: carnetPop .3s cubic-bezier(.34,1.56,.64,1);
 }
 @keyframes carnetPop {
@@ -550,8 +552,8 @@ body {
 
 /* Fondo del carnet: gradiente dinámico */
 .carnet-bg {
-  background: linear-gradient(145deg, #0f0c29, #302b63, #24243e);
-  padding: 28px 24px 24px;
+  background: linear-gradient(145deg, #161625 0%, #1e1e3f 100%); /* Degradado sólido y opaco */
+  padding: 32px 24px 24px;
   position: relative;
   overflow: hidden;
 }

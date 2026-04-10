@@ -332,7 +332,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Datos
     carnetDorsal.textContent = `#${p.dorsal}`;
-    carnetName.textContent   = p.nombre;
+    carnetName.textContent   = p.nombre.length > 25 ? p.nombre.substring(0, 25) + '...' : p.nombre;
 
     // Posición con color
     carnetPos.textContent = p.posicion;
