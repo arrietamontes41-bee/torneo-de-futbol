@@ -408,11 +408,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ---- ROSTER MODAL ----
   const openRosterModal = async (teamId, teamName, teamCity) => {
     rosterModal.classList.remove('hidden');
-    rosterModalTitle.textContent = teamName;
-    rosterModalSub.textContent   = `📍 ${teamCity}`;
-    rosterContent.innerHTML = `<div class="empty-state"><div class="empty-icon">⏳</div><p>Cargando jugadores...</p></div>`;
+    rosterModalTitle.textContent = 'Cargando...';
+    rosterModalSub.textContent   = '—';
+    rosterContent.innerHTML = `<div class="empty-state"><div class="empty-icon">⏳</div><p>Cargando jugadores de ${teamName}...</p></div>`;
 
     const players = await DB.getPlayersByTeam(teamId);
+    
+    // Una vez cargados, poner el título real
+    rosterModalTitle.textContent = teamName;
+    rosterModalSub.textContent   = `📍 ${teamCity}`;
 
     if (!players.length) {
       rosterContent.innerHTML = `
