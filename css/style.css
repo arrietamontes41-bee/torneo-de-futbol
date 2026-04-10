@@ -872,8 +872,8 @@ body {
 .match-team.away { text-align: right; }
 
 .match-score {
-  background: var(--gray-800);
-  color: white;
+  background: #fff;
+  color: var(--gray-50); /* Texto oscuro (azul muy profundo) sobre blanco */
   border-radius: 10px;
   padding: 8px 18px;
   font-size: 1.3rem;
@@ -885,8 +885,9 @@ body {
 }
 
 .match-score.pending {
-  background: var(--gray-200);
+  background: var(--gray-100);
   color: var(--gray-500);
+  border: 1px solid var(--gray-200);
   font-size: 0.85rem;
   font-weight: 600;
   padding: 10px 14px;
