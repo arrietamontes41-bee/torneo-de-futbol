@@ -139,9 +139,23 @@
     </div>
 
     <div class="back-btn-container">
-      <a href="javascript:history.back()" class="btn-back">Volver Atrás</a>
+      <button onclick="volverOCerrar()" class="btn-back" style="border: none; cursor: pointer; font-size: 1rem; font-family: inherit;">Entendido / Volver</button>
     </div>
   </div>
 
+  <script>
+    function volverOCerrar() {
+      // Como a veces se abre en una pestaña nueva (target="_blank"), el history.back() no funciona.
+      // Intentamos cerrar la pestaña, y si el navegador no lo permite, redirigimos al inicio.
+      if (window.history.length <= 1 || window.opener != null) {
+        window.close();
+      }
+      
+      // Fallback
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 250);
+    }
+  </script>
 </body>
 </html>
