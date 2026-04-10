@@ -27,6 +27,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  // Lógica de "¿Olvidaste tu contraseña?"
+  const btnForgotPass = document.getElementById('btnForgotPass');
+  if (btnForgotPass) {
+    btnForgotPass.addEventListener('click', (e) => {
+      e.preventDefault();
+      const recoverEmail = prompt('Ingresa el correo electrónico asociado a tu equipo:');
+      if (recoverEmail) {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recoverEmail.trim())) {
+          alert('Por favor, ingresa un correo electrónico válido.');
+          return;
+        }
+        // Simulador de envío para el prototipo (Protección contra enumeración de correos)
+        alert('Si el correo "' + recoverEmail.trim() + '" está registrado en nuestra base de datos, en los próximos minutos recibirás un enlace seguro para restablecer tu contraseña.\n\n(Aviso del Prototipo: Como este es un entorno de pruebas, no se enviará un correo real).');
+      }
+    });
+  }
+
   const showError  = msg => { errorDiv.textContent = msg; };
   const clearError = ()  => { errorDiv.textContent = ''; };
 

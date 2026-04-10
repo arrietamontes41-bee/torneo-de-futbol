@@ -42,7 +42,10 @@
         </div>
       </div>
       <div class="form-field">
-        <label for="loginPassword">Contraseña</label>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <label for="loginPassword" style="margin-bottom:0;">Contraseña</label>
+          <a href="#" id="btnForgotPass" style="font-size:0.75rem; color:#00e5ff; text-decoration:none; font-weight:600;">¿La olvidaste?</a>
+        </div>
         <div class="input-wrap">
           <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
           <input type="password" id="loginPassword" name="password" placeholder="••••••••" autocomplete="current-password" required />
