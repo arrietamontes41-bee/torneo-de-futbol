@@ -699,8 +699,8 @@ body {
 /* Divider */
 .carnet-divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
-  margin: 16px 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+  margin: 20px 0;
 }
 
 /* Footer del carnet: nombre equipo */
@@ -721,6 +721,7 @@ body {
   font-weight: 800;
   color: #fff;
   flex-shrink: 0;
+  overflow: hidden; /* Evita que logos grandes se salgan del cuadro */
 }
 .carnet-team-name {
   font-size: .88rem;

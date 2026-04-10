@@ -350,7 +350,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (myTeam) {
       const ini = myTeam.nombre.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
       if (myTeam.escudo) {
-        carnetShield.innerHTML = `<img src="${myTeam.escudo}" alt="escudo" style="width:100%;height:100%;object-fit:cover;border-radius:10px;" />`;
+        carnetShield.innerHTML = `<img src="${myTeam.escudo}" alt="escudo" style="width:100%;height:100%;object-fit:contain;border-radius:10px;" />`;
       } else {
         carnetShield.textContent = ini;
       }
