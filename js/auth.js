@@ -77,44 +77,55 @@ document.addEventListener('DOMContentLoaded', async () => {
             { publicKey: EMAILJS_PUBLIC_KEY }
           );
 
-          // 3. Flujo de verificación del PIN
-          btnForgotPass.textContent = originalText;
-          btnForgotPass.style.pointerEvents = 'auto';
-
-          const pinIngresado = prompt('¡Correo enviado!\nRevisa tu bandeja de entrada o de Spam e ingresa el código numérico de 6 dígitos aquí:');
-          if (!pinIngresado) return;
-
-          // Intentar iniciar sesión silenciosamente con el PIN (ya que el PIN reemplazó a la contraseña)
-          const verifRes = await DB.login(recoverEmail.trim(), pinIngresado.trim());
+          // 3. Flujo de verificación del PIN con bucle (para que no se cierre si se equivocan)
+          let verifRes = null;
+          let pinIngresado = prompt('¡Correo enviado!\nRevisa tu bandeja de entrada o de Spam e ingresa el código numérico de 6 dígitos aquí:');
           
-          if (!verifRes.ok) {
-            alert('El código ingresado es incorrecto.');
+          while (pinIngresado !== null) {
+            verifRes = await DB.login(recoverEmail.trim(), pinIngresado.trim());
+            
+            if (verifRes.ok) {
+              break; // Código correcto ✅
+            }
+            // Si falla, volvemos a pedirlo:
+            pinIngresado = prompt('❌ El código ingresado es incorrecto.\n\nAsegúrate de estar viendo el correo más reciente, no uno viejo.\n\nIngresa el código nuevamente:');
+          }
+
+          // Si le dio a Cancelar
+          if (pinIngresado === null || !verifRes || !verifRes.ok) {
+            btnForgotPass.textContent = originalText;
+            btnForgotPass.style.pointerEvents = 'auto';
             return;
           }
 
           // 4. Si el código es correcto, pedir la nueva contraseña
-          let nuevaClave = prompt('Código correcto ✅\n\nIngresa tu NUEVA contraseña (mínimo 6 caracteres):');
-          while (nuevaClave && nuevaClave.length < 6) {
-            nuevaClave = prompt('La contraseña es muy corta. Debe tener al menos 6 caracteres.\n\nIngresa tu NUEVA contraseña:');
+          let nuevaClave = prompt('Código correcto ✅\n\nIngresa tu NUEVA contraseña secreta (mínimo 6 caracteres):');
+          while (nuevaClave !== null && nuevaClave.length < 6) {
+            nuevaClave = prompt('❌ La contraseña es muy corta. Debe tener al menos 6 caracteres.\n\nIngresa tu NUEVA contraseña:');
           }
 
           if (nuevaClave) {
-            // Actualizar a la nueva contraseña
+            // Actualizar a la nueva contraseña elegida
             const updateResult = await DB.updatePassword(verifRes.user.id, nuevaClave);
             if (updateResult.ok) {
-              alert('¡Contraseña actualizada con éxito! Ya puedes iniciar sesión con tu nueva contraseña.');
+              alert('¡Contraseña actualizada con éxito!\n\nEntrarás automáticamente a tu panel.');
+              window.location.href = verifRes.user.rol === 'admin' ? 'dashboard.html' : 'team-panel.html';
             } else {
               alert('Error al guardar la nueva contraseña. Inténtalo de nuevo.');
             }
+          } else {
+            // Si cancela la creación de nueva clave... (dejamos la temporal por si acaso, y reseteamos)
+            DB.clearSession();
+            alert('Cancelaste la creación de contraseña. Podrás usar el código de 6 dígitos enviado a tu correo la próxima vez que intentes ingresar, o pedir uno nuevo.');
           }
 
         } catch (error) {
           console.error('Error EmailJS:', error);
           alert('Error detallado EmailJS: ' + JSON.stringify(error) + '\nStatus: ' + error.status + '\nText: ' + error.text);
-          btnForgotPass.textContent = originalText;
-          btnForgotPass.style.pointerEvents = 'auto';
         }
 
+        btnForgotPass.textContent = originalText;
+        btnForgotPass.style.pointerEvents = 'auto';
       }
     });
   }
