@@ -215,6 +215,42 @@
   .btn-add-player { font-size: .8rem; padding: 10px; }
 }
 
+/* ── Security & Layout Utilities (for CSP) ── */
+.font-muted-hint { color: rgba(255,255,255,.35); font-weight: 400; }
+.font-small-hint { color: #888; font-size: 0.75rem; margin-top: 4px; display: block; }
+.terms-label { display: flex; align-items: flex-start; gap: 8px; cursor: pointer; font-size: 0.85rem; color: #ccc; }
+.terms-check { margin-top: 2px; }
+.terms-link { color: #00e5ff; text-decoration: underline; }
+.terms-link:hover { opacity: 0.8; }
+
+/* Success Screen Utility Classes */
+.text-center-py16 { text-align: center; padding: 16px 0; }
+.success-shield-wrap {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 18px; font-size: 2rem; overflow: hidden;
+  border: 3px solid rgba(99,102,241,.5);
+}
+.success-check-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(34,197,94, .15); border: 2px solid rgba(34,197,94, .4);
+  margin-bottom: 14px;
+}
+.success-title { font-size: 1.3rem; font-weight: 800; color: #fff; margin: 0 0 8px; }
+.success-text-muted { color: rgba(255,255,255, .55); font-size: .88rem; margin: 0 0 6px; }
+.success-text-sub { color: rgba(255,255,255, .4); font-size: .8rem; margin: 0 0 28px; }
+.btn-success-redirect {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 13px 32px; background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border-radius: 12px; color: #fff; font-size: .9rem; font-weight: 700;
+  text-decoration: none; transition: opacity .2s;
+}
+.btn-success-redirect:hover { opacity: 0.9; }
+.text-highlight { color: #a5b4fc; }
+.photo-preview-full { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
 /* ── Escudo del equipo (upload opcional) ── */
 .shield-upload-wrap { margin-bottom: 4px; }
 .shield-upload-row {

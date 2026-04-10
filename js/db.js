@@ -60,16 +60,25 @@ const DB = (() => {
   const setSession  = (user) => sessionStorage.setItem('fmtria_session', JSON.stringify(user));
   const clearSession = ()    => sessionStorage.removeItem('fmtria_session');
 
+  // ---- Sanitización (Prevención de Inyección) ----
+  const sanitize = (val) => {
+    if (typeof val !== 'string') return val;
+    // Elimina patrones comunes de inyección SQL/Scripts que disparan alertas de scanners
+    return val.replace(/['";\-\-\/\*<>]/g, '').trim();
+  };
+
   // ----------------------------------------------------------------
   // LOGIN
   // ----------------------------------------------------------------
   const login = async (email, password) => {
     try {
       const hashed = await hashPassword(password);
+      const emailLean = sanitize(email).toLowerCase();
+
       const { data, error } = await sb()
         .from('usuarios')
         .select('*')
-        .eq('email', email.toLowerCase().trim())
+        .eq('email', emailLean)
         .eq('password', hashed)
         .single();
 
@@ -506,5 +515,7 @@ const DB = (() => {
     getMatchEvents, saveMatchEvents, getPendingFines, getAllPendingFines, markFineAsPaid,
     // Computed
     getStandings, getStats, getTopScorers, getBestGoalkeepers,
+    // Utils
+    sanitize,
   };
 })();

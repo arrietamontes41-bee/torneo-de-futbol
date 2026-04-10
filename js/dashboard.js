@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ---- Loading overlay ----
   const setLoading = (on) => {
-    document.body.style.cursor = on ? 'wait' : '';
+    document.body.classList.toggle('cursor-wait', on);
   };
 
   // ---- Tabs ----
@@ -152,20 +152,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   const teamCard = t => {
     const initials  = t.nombre.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
     const avatar = t.escudo
-      ? `<img src="${t.escudo}" alt="escudo" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" />`
+      ? `<img src="${t.escudo}" alt="escudo" class="img-fit-inherit" />`
       : initials;
     const deleteBtn = session.rol === 'admin'
       ? `<button class="btn-icon btn-icon-red team-delete-btn" data-id="${t.id}" data-name="${escHtml(t.nombre)}" title="Eliminar equipo">✕</button>`
       : '';
     return `
-      <div class="team-card" data-id="${t.id}" data-name="${escHtml(t.nombre)}" data-city="${escHtml(t.municipio || 'Montería')}" style="cursor:pointer;" title="Ver plantilla">
+      <div class="team-card cursor-pointer" data-id="${t.id}" data-name="${escHtml(t.nombre)}" data-city="${escHtml(t.municipio || 'Montería')}" title="Ver plantilla">
         ${deleteBtn}
         <div class="team-avatar">${avatar}</div>
         <div class="team-name">${escHtml(t.nombre)}</div>
         <div class="team-city">📍 ${escHtml(t.municipio || 'Montería')}</div>
         <div class="team-email">${escHtml(t.email)}</div>
         <span class="team-badge">Inscrito</span>
-        <div style="font-size:.7rem;color:rgba(255,255,255,.3);margin-top:6px;">👆 Ver plantilla</div>
+        <div class="text-muted-xs mt-6">👆 Ver plantilla</div>
       </div>`;
   };
 
@@ -344,11 +344,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   const loadingRow = () =>
-    `<tr><td colspan="5" style="text-align:center;padding:16px;color:rgba(255,255,255,.3);font-size:.78rem;">Cargando jugadores...</td></tr>`;
+    `<tr><td colspan="5" class="acta-status-cell">Cargando jugadores...</td></tr>`;
 
   const renderActaTeam = (tbody, totalEl, players, events) => {
     if (!players.length) {
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:14px;color:rgba(255,255,255,.3);font-size:.78rem;">Sin jugadores registrados</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5" class="acta-status-cell">Sin jugadores registrados</td></tr>`;
       totalEl.textContent = 0; return;
     }
     const getEv = (jId, tipo) => { const e = events.find(x => x.jugador_id === jId && x.tipo === tipo); return e ? e.cantidad : 0; };
@@ -431,19 +431,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       const age     = p.fecha_nac ? calcAge(p.fecha_nac) : '';
       const ageStr  = age ? ` (${age} años)` : '';
       return `
+      return `
         <tr>
-          <td style="text-align:center;font-weight:700;color:var(--primary-light,#a5b4fc);">${p.dorsal}</td>
+          <td class="text-center font-bold font-primary">${p.dorsal}</td>
           <td>${escHtml(p.nombre)}</td>
           <td>${icon} ${escHtml(p.posicion)}</td>
-          <td style="color:var(--gray-400);font-size:.78rem;">${escHtml(p.documento)}</td>
-          <td style="color:var(--gray-400);font-size:.78rem;">${dob}${ageStr}</td>
+          <td class="text-muted-sm">${escHtml(p.documento)}</td>
+          <td class="text-muted-sm">${dob}${ageStr}</td>
         </tr>`;
     }).join('');
 
     rosterContent.innerHTML = `
-      <p style="font-size:.78rem;color:var(--gray-400);margin:0 0 12px;">${players.length} jugador${players.length !== 1 ? 'es' : ''} registrado${players.length !== 1 ? 's' : ''}</p>
-      <div style="overflow-x:auto;">
-        <table class="standings-table" style="min-width:480px;">
+      <p class="text-muted-sm mb-12">${players.length} jugador${players.length !== 1 ? 'es' : ''} registrado${players.length !== 1 ? 's' : ''}</p>
+      <div class="overflow-x-auto">
+        <table class="standings-table min-w-480">
           <thead>
             <tr>
               <th title="Dorsal">#</th>
@@ -503,7 +504,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const medal    = i < 3 ? `<span class="pos-medal">${medals[i]}</span>` : '';
       const initials = r.team.nombre.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
       const avatar   = r.team.escudo
-        ? `<img src="${r.team.escudo}" alt="escudo" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" />`
+        ? `<img src="${r.team.escudo}" alt="escudo" class="img-fit-inherit" />`
         : initials;
       return `
         <tr class="${rankClass}">
@@ -544,7 +545,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <tbody>${tableRows}</tbody>
         </table>
       </div>
-      <p style="font-size:.78rem;color:var(--gray-400);margin-top:10px;text-align:right;">
+      <p class="text-muted-sm mt-10 text-right">
         Criterios: Puntos · Diferencia de goles · Goles a favor
       </p>`;
   };
@@ -575,13 +576,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       const dateStr = f.partidos?.fecha ? formatDate(f.partidos.fecha) : '—';
       const teamObj = teams.find(t => t.id === f.equipo_id);
       return `
+      return `
         <tr>
-          <td><div style="display:flex;align-items:center;gap:6px;"><div style="width:12px;height:16px;background:${color};border-radius:2px;"></div>${label}</div></td>
-          <td><b>${escHtml(f.jugadores?.nombre)}</b> <span style="color:#888;font-size:.8rem;">(#${f.jugadores?.dorsal})</span></td>
+          <td><div class="sanciones-row-flex"><div class="sanciones-badge-sm" style="background:${color};"></div>${label}</div></td>
+          <td><b class="sanciones-name">${escHtml(f.jugadores?.nombre)}</b> <span class="sanciones-dorsal">(#${f.jugadores?.dorsal})</span></td>
           <td>${escHtml(teamObj?.nombre || '—')}</td>
           <td>${dateStr}</td>
           <td>
-            <button class="btn-primary-sm btn-mark-paid" data-id="${f.id}" style="padding:6px 12px;font-size:.75rem;">
+            <button class="btn-primary-sm btn-mark-paid btn-paid-status" data-id="${f.id}">
               Marcar como Pagada
             </button>
           </td>

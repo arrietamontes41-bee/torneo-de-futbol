@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const reader = new FileReader();
     reader.onload = e => {
       photoBase64 = e.target.result;
-      photoPreview.innerHTML = `<img src="${photoBase64}" alt="foto" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
+      photoPreview.innerHTML = `<img src="${photoBase64}" alt="foto" class="photo-img-full" />`;
     };
     reader.readAsDataURL(file);
   });
@@ -210,7 +210,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // UI Carga temporal
     const oldHtml = teamShield.innerHTML;
-    teamShield.innerHTML = '<span style="font-size:1.5rem">⏳</span>';
+    teamShield.innerHTML = '<span class="loading-icon-big">⏳</span>';
     
     const reader = new FileReader();
     reader.onload = async (e) => {
@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const res = await DB.updateTeamShield(myTeam.id, base64);
       if (res.ok) {
         myTeam.escudo = base64;
-        teamShield.innerHTML = `<img src="${base64}" alt="escudo" style="width:100%;height:100%;object-fit:cover;border-radius:18px;" />`;
+        teamShield.innerHTML = `<img src="${base64}" alt="escudo" class="shield-img-full" />`;
       } else {
         alert('Error al actualizar escudo: ' + res.error);
         teamShield.innerHTML = oldHtml;
@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     teamShield.style.fontWeight = '800';
     teamShield.style.color     = '#fff';
     if (myTeam.escudo) {
-      teamShield.innerHTML = `<img src="${myTeam.escudo}" alt="escudo" style="width:100%;height:100%;object-fit:cover;border-radius:18px;" />`;
+      teamShield.innerHTML = `<img src="${myTeam.escudo}" alt="escudo" class="shield-img-full" />`;
     } else {
       teamShield.textContent = ini;
     }
@@ -288,21 +288,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       const typeColor = f.tipo === 'roja' ? '#ef4444' : '#eab308';
       const typeLabel = f.tipo === 'roja' ? 'Tarjeta Roja' : 'Tarjeta Amarilla';
       const dateStr   = f.partidos?.fecha ? new Date(f.partidos.fecha).toLocaleDateString('es-CO') : '—';
-      return `<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;background:rgba(0,0,0,.2);padding:10px;border-radius:8px;">
-                <div style="width:16px;height:24px;background:${typeColor};border-radius:3px;"></div>
-                <div style="flex:1;">
-                  <strong style="color:#fff;font-size:.9rem;">${f.jugadores?.nombre} (Dorsal ${f.jugadores?.dorsal})</strong>
-                  <div style="font-size:.75rem;color:rgba(255,255,255,.6);">Partido del ${dateStr}</div>
+      return `<div class="fines-alert-row">
+                <div class="fines-alert-badge" style="background:${typeColor};"></div>
+                <div class="fines-alert-info">
+                  <strong class="fines-alert-title">${esc(f.jugadores?.nombre)} (Dorsal ${f.jugadores?.dorsal})</strong>
+                  <div class="fines-alert-sub">Partido del ${dateStr}</div>
                 </div>
-                <div style="font-weight:bold;color:${typeColor};font-size:.8rem;text-transform:uppercase;">Pendiente</div>
+                <div class="fines-alert-status" style="color:${typeColor};">Pendiente</div>
               </div>`;
     }).join('');
 
     finesContainer.innerHTML = `
-      <div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:16px;">
-        <h3 style="color:#f87171;margin:0 0 12px;font-size:1rem;">⚠️ Tienes tarjetas con multa pendiente de pago</h3>
+      <div class="fines-container">
+        <h3 class="fines-container-title">⚠️ Tienes tarjetas con multa pendiente de pago</h3>
         ${finesHtml}
-        <p style="margin:10px 0 0;font-size:.8rem;color:rgba(255,255,255,.5);">* Por favor, cancela la multa correspondiente con el organizador. El administrador retirará esta alerta al confirmar el pago.</p>
+        <p class="fines-container-footer">* Por favor, cancela la multa correspondiente con el organizador. El administrador retirará esta alerta al confirmar el pago.</p>
       </div>
     `;
     finesContainer.classList.remove('hidden');
@@ -439,7 +439,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         </div>`;
     } else {
-      starScorer.innerHTML = `<div class="star-card-label">⚽ Máximo Goleador</div><div class="empty" style="padding:16px 0;"><div class="empty-icon">🥅</div>Sin goles registrados</div>`;
+      starScorer.innerHTML = `<div class="star-card-label">⚽ Máximo Goleador</div><div class="empty star-empty-msg"><div class="empty-icon">🥅</div>Sin goles registrados</div>`;
     }
 
     // ─ Portero valla menos vencida
@@ -456,13 +456,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="star-name">${esc(k.nombre)}</div>
             <div class="star-team">${esc(k.equipo)}</div>
           </div>
-          <div class="star-badge" style="background:linear-gradient(135deg,#0ea5e9,#6366f1);">
+          <div class="star-badge star-badge-alt">
             <span class="star-badge-num">${k.gc}</span>
             <span class="star-badge-lbl">en contra</span>
           </div>
         </div>`;
     } else {
-      starKeeper.innerHTML = `<div class="star-card-label">🧾 Valla Menos Vencida</div><div class="empty" style="padding:16px 0;"><div class="empty-icon">🛡️</div>Sin datos aún</div>`;
+      starKeeper.innerHTML = `<div class="star-card-label">🧾 Valla Menos Vencida</div><div class="empty star-empty-msg"><div class="empty-icon">🛡️</div>Sin datos aún</div>`;
     }
   }
 
@@ -508,7 +508,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="match-row-teams">${localTag}<span class="vs">VS</span>${visitTag}</div>
           <div class="match-row-date">📅 ${fecha}${hora ? ' · ⏰ ' + hora : ''}</div>
         </div>
-        <div style="display:flex;align-items:center;gap:10px;">
+        <div class="flex-center-gap10">
           ${done ? `<span class="match-result-score">${m.goles_local} – ${m.goles_visit}</span>` : ''}
           <span class="pill ${done ? 'pill-done' : 'pill-pend'}">${done ? 'Finalizado' : 'Pendiente'}</span>
         </div>
@@ -544,7 +544,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }).join('');
 
     standingsWrap.innerHTML = `
-      <div style="overflow-x:auto;">
+      <div class="overflow-x-auto">
         <table class="pos-table">
           <thead>
             <tr>
@@ -556,7 +556,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <tbody>${rows}</tbody>
         </table>
       </div>
-      <p style="font-size:.72rem;color:rgba(255,255,255,.3);margin-top:10px;text-align:right;">
+      <p class="standings-footer">
         Criterios: Puntos · Diferencia de goles · Goles a favor
       </p>`;
   }

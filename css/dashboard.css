@@ -126,3 +126,20 @@
   .goles-inp  { width: 36px; font-size: .8rem; }
   .acta-total-val { font-size: 1.3rem; }
 }
+
+/* Security & CSP Utilities */
+.cursor-wait { cursor: wait !important; }
+.cursor-pointer { cursor: pointer !important; }
+.img-fit-inherit { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+.text-muted-xs { font-size: .7rem; color: rgba(255,255,255,.3); }
+.text-muted-sm { font-size: .78rem; color: rgba(255,255,255,.3); }
+.text-right { text-align: right !important; }
+.text-center { text-align: center !important; }
+
+.acta-status-cell { text-align: center; padding: 16px; color: rgba(255,255,255,.3); font-size: .78rem; }
+
+.sanciones-row-flex { display: flex; align-items: center; gap: 6px; }
+.sanciones-badge-sm { width: 12px; height: 16px; border-radius: 2px; }
+.sanciones-name { font-weight: bold; }
+.sanciones-dorsal { color: #888; font-size: .8rem; }
+.btn-paid-status { padding: 6px 12px; font-size: .75rem; }

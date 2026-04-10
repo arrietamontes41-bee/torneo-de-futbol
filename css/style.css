@@ -53,6 +53,40 @@ body {
 
 /* ---------- UTILITIES ---------- */
 .hidden { display: none !important; }
+.text-center { text-align: center !important; }
+.mt-20 { margin-top: 20px !important; }
+.mb-0 { margin-bottom: 0 !important; }
+.mb-6 { margin-bottom: 6px !important; }
+.flex-between-center { display: flex; justify-content: space-between; align-items: center; }
+
+.font-auth-link {
+  font-size: 0.75rem;
+  color: #00e5ff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+.font-auth-link:hover { opacity: 0.8; text-decoration: underline; }
+
+.btn-toggle-pass {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #888;
+  padding: 0;
+  line-height: 1;
+}
+
+.auth-footer-text {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.8rem;
+}
 
 /* ======================================================
    AUTH PAGES  (login.html / register.html)
