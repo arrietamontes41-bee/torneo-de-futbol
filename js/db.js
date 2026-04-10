@@ -261,6 +261,18 @@ const DB = (() => {
   const addMatch = async ({ homeTeamId, awayTeamId, date, time }) => {
     clearCache();
     if (homeTeamId === awayTeamId) return { ok: false, error: 'Los equipos deben ser distintos.' };
+
+    // Validar si los equipos ya juegan ese día
+    const { data: exists } = await sb()
+      .from('partidos')
+      .select('id')
+      .eq('fecha', date)
+      .or(`equipo_local_id.eq.${homeTeamId},equipo_visit_id.eq.${homeTeamId},equipo_local_id.eq.${awayTeamId},equipo_visit_id.eq.${awayTeamId}`);
+
+    if (exists && exists.length > 0) {
+      return { ok: false, error: `Uno de los equipos ya tiene un partido programado para esta fecha (${date}).` };
+    }
+
     const { data, error } = await sb().from('partidos').insert([{
       equipo_local_id: homeTeamId,
       equipo_visit_id: awayTeamId,
@@ -275,6 +287,19 @@ const DB = (() => {
   const updateMatch = async (id, { homeTeamId, awayTeamId, date, time }) => {
     clearCache();
     if (homeTeamId === awayTeamId) return { ok: false, error: 'Los equipos deben ser distintos.' };
+
+    // Validar si los equipos ya juegan ese día (ignorando este partido)
+    const { data: exists } = await sb()
+      .from('partidos')
+      .select('id')
+      .eq('fecha', date)
+      .neq('id', id)
+      .or(`equipo_local_id.eq.${homeTeamId},equipo_visit_id.eq.${homeTeamId},equipo_local_id.eq.${awayTeamId},equipo_visit_id.eq.${awayTeamId}`);
+
+    if (exists && exists.length > 0) {
+      return { ok: false, error: `Uno de los equipos ya tiene otro partido programado para esta fecha (${date}).` };
+    }
+
     const { data, error } = await sb().from('partidos').update({
       equipo_local_id: homeTeamId,
       equipo_visit_id: awayTeamId,
