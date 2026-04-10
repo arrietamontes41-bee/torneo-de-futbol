@@ -64,14 +64,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // 2. Enviar por EmailJS
-        emailjs.init(EMAILJS_PUBLIC_KEY);
         try {
-          await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-            to_email: recoverEmail.trim(),
-            to_name: resetRes.userName,
-            temp_password: resetRes.tempPass,
-            reply_to: "no-reply@torneofutbol.com"
-          });
+          await emailjs.send(
+            EMAILJS_SERVICE_ID,
+            EMAILJS_TEMPLATE_ID,
+            {
+              to_email: recoverEmail.trim(),
+              to_name: resetRes.userName,
+              temp_password: resetRes.tempPass,
+              reply_to: "no-reply@torneofutbol.com"
+            },
+            {
+              publicKey: EMAILJS_PUBLIC_KEY
+            }
+          );
           alert('¡Éxito! Hemos enviado una contraseña temporal a tu correo.\n\nPor favor, úsala para iniciar sesión.');
         } catch (error) {
           console.error('Error EmailJS:', error);
