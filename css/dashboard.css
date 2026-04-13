@@ -413,9 +413,10 @@
    ============================================================ */
 .overview-stats-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* Forzar siempre 2 columnas en escritorio */
+  grid-template-columns: repeat(2, 1fr);
   gap: 24px;
   margin-top: 24px;
+  width: 100%;
   align-items: start;
 }
 
@@ -433,7 +434,8 @@
   transition: transform 0.2s;
   display: flex;
   flex-direction: column;
-  max-height: 500px; /* Altura máxima para permitir el scroll interno */
+  height: 600px; /* Altura fija para el layout lado a lado */
+  width: 100%;
 }
 
 .leaderboard-card:hover {
@@ -442,7 +444,7 @@
 }
 
 .leaderboard-header {
-  padding: 20px 24px;
+  padding: 24px;
   background: rgba(255, 255, 255, 0.02);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   flex-shrink: 0;
@@ -452,6 +454,7 @@
 #topScorersContainer, #bestDefenseContainer {
   overflow-y: auto;
   flex: 1;
+  padding: 8px 0;
 }
 
 #topScorersContainer::-webkit-scrollbar, 
@@ -465,18 +468,13 @@
   border-radius: 10px;
 }
 
-#topScorersContainer::-webkit-scrollbar-thumb:hover, 
-#bestDefenseContainer::-webkit-scrollbar-thumb:hover {
-  background: rgba(16, 185, 129, 0.3);
-}
-
 .leaderboard-title {
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: #fff;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .leader-item {
@@ -485,6 +483,7 @@
   padding: 16px 24px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.03);
   transition: background 0.2s;
+  gap: 15px;
 }
 
 .leader-item:last-child {
@@ -492,35 +491,67 @@
 }
 
 .leader-item:hover {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .leader-rank {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 800;
-  color: rgba(255, 255, 255, 0.2);
-  width: 24px;
+  color: rgba(255, 255, 255, 0.15);
+  width: 28px;
+  flex-shrink: 0;
 }
 
 .leader-avatar {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(16, 185, 129, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  color: #fff;
-  margin-right: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  font-weight: 800;
+  color: #10b981;
+  flex-shrink: 0;
+  border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .leader-info {
   flex: 1;
+  min-width: 0; /* Permite truncado si es necesario pero prioritiza espacio */
 }
 
 .leader-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.leader-team {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+  display: block;
+}
+
+.leader-score {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.leader-score.score-defense {
+  background: rgba(139, 92, 246, 0.15);
+  color: #a78bfa;
+}
   font-size: 0.9rem;
   font-weight: 700;
   color: #fff;
