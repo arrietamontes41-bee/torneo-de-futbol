@@ -78,6 +78,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   sidebarBtns.forEach(btn => {
     btn.addEventListener('click', async () => {
       const targetTab = btn.dataset.tab;
+      console.log('Navegando a pestaña:', targetTab);
       
       // Update UI
       sidebarBtns.forEach(b => b.classList.remove('active'));
@@ -85,7 +86,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       tabContents.forEach(c => c.classList.remove('active'));
       const activeContent = document.getElementById(`tabContent${capitalize(targetTab)}`);
-      if (activeContent) activeContent.classList.add('active');
+      
+      if (activeContent) {
+        console.log('Se encontró el contenedor para:', targetTab);
+        activeContent.classList.add('active');
+      } else {
+        console.error('No se encontró el contenedor tabContent' + capitalize(targetTab));
+      }
 
       // Update Breadcrumb
       if (currentViewTitle) {

@@ -7,8 +7,8 @@
   <meta name="description" content="Panel de control para gestionar el torneo de fútbol de Montería, Córdoba." />
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   <link rel="stylesheet" href="css/inter-font.css" />
-  <link rel="stylesheet" href="css/style.css?v=5.1" />
-  <link rel="stylesheet" href="css/dashboard.css?v=5.1" />
+  <link rel="stylesheet" href="css/style.css?v=5.2" />
+  <link rel="stylesheet" href="css/dashboard.css?v=5.2" />
 </head>
 <body class="dashboard-body">
   <div class="app-layout">
@@ -103,6 +103,7 @@
               <div>
                 <p class="stat-label">Partidos Completados</p>
                 <p class="stat-value" id="statCompleted">—</p>
+              </div>
             </div>
           </div>
 
@@ -215,6 +216,8 @@
           <h2 class="tab-content-title">Control de Sanciones y Multas</h2>
           <p class="hint-click-team">Las tarjetas sin pagar le aparecerán como alerta al equipo en su panel.</p>
         </div>
+        <div id="sancionesContainer">
+          <div class="empty-state"><div class="empty-icon">⏳</div><p>Cargando sanciones...</p></div>
         </div>
       </div>
     </main> <!-- .content -->
