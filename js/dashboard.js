@@ -10,16 +10,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (session.rol !== 'admin') { window.location.href = 'team-panel.html'; return; }
 
   // ---- DOM refs ----
-  const userRoleBadge  = document.getElementById('userRoleBadge');
-  const dashUserName   = document.getElementById('dashUserName');
-  const btnLogout      = document.getElementById('btnLogout');
+  const dashUserNameSide = document.getElementById('dashUserNameSide');
+  const userInitial     = document.getElementById('userInitial');
+  const btnLogout        = document.getElementById('btnLogout');
 
   const statTeams      = document.getElementById('statTeams');
   const statScheduled  = document.getElementById('statScheduled');
   const statCompleted  = document.getElementById('statCompleted');
 
-  const tabBtns        = document.querySelectorAll('.tab-btn');
-  const tabContents    = document.querySelectorAll('.tab-content');
+  // Sidebar navigation elements
+  const sidebar          = document.getElementById('sidebar');
+  const sidebarBtns      = document.querySelectorAll('.sidebar-btn');
+  const btnSidebarOpen   = document.getElementById('btnSidebarOpen');
+  const btnSidebarClose  = document.getElementById('btnSidebarClose');
+  const tabContents      = document.querySelectorAll('.tab-content');
+  const currentViewTitle = document.getElementById('currentViewTitle');
 
   const teamsContainer    = document.getElementById('teamsContainer');
   const btnNewMatch       = document.getElementById('btnNewMatch');
@@ -60,11 +65,45 @@ document.addEventListener('DOMContentLoaded', async () => {
   const btnCloseRoster    = document.getElementById('btnCloseRoster');
 
   // ---- Session UI ----
-  dashUserName.textContent    = session.nombre || session.email;
-  userRoleBadge.textContent   = session.rol === 'admin' ? 'Administrador' : 'Equipo';
+  const fullName = session.nombre || session.email;
+  if (dashUserNameSide) dashUserNameSide.textContent = fullName;
+  if (userInitial) userInitial.textContent = fullName.charAt(0).toUpperCase();
+
+  // ---- Sidebar Toggle (Mobile) ----
+  const toggleSidebar = () => sidebar?.classList.toggle('open');
+  btnSidebarOpen?.addEventListener('click', toggleSidebar);
+  btnSidebarClose?.addEventListener('click', toggleSidebar);
+
+  // ---- Sidebar Navigation ----
+  sidebarBtns.forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const targetTab = btn.dataset.tab;
+      
+      // Update UI
+      sidebarBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      tabContents.forEach(c => c.classList.remove('active'));
+      const activeContent = document.getElementById(`tabContent${capitalize(targetTab)}`);
+      if (activeContent) activeContent.classList.add('active');
+
+      // Update Breadcrumb
+      if (currentViewTitle) {
+        currentViewTitle.textContent = btn.innerText.trim();
+      }
+
+      // Close sidebar on mobile
+      if (window.innerWidth <= 1024) toggleSidebar();
+
+      // View-specific loading
+      if (targetTab === 'standings') await renderStandings();
+      if (targetTab === 'sanciones') await renderSanciones();
+      if (targetTab === 'overview') await renderStats();
+    });
+  });
 
   // ---- Logout ----
-  btnLogout.addEventListener('click', () => {
+  btnLogout?.addEventListener('click', () => {
     DB.clearSession();
     window.location.href = 'index.html';
   });
@@ -73,18 +112,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const setLoading = (on) => {
     document.body.classList.toggle('cursor-wait', on);
   };
-
-  // ---- Tabs ----
-  tabBtns.forEach(btn => {
-    btn.addEventListener('click', async () => {
-      tabBtns.forEach(b => b.classList.remove('active'));
-      tabContents.forEach(c => c.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById(`tabContent${capitalize(btn.dataset.tab)}`).classList.add('active');
-      if (btn.dataset.tab === 'standings') await renderStandings();
-      if (btn.dataset.tab === 'sanciones') await renderSanciones();
-    });
-  });
 
   // ---- Refresh ----
   const refresh = async () => {
