@@ -552,6 +552,58 @@
   background: rgba(139, 92, 246, 0.15);
   color: #a78bfa;
 }
+
+/* ============================================================ 
+   MOBILE OPTIMIZATIONS (≤ 768px) 
+   ============================================================ */
+@media (max-width: 768px) {
+  .stats-row {
+    grid-template-columns: 1fr 1fr; /* 2 columnas en móvil para ahorrar espacio */
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+  }
+
+  .leaderboard-card {
+    height: auto;
+    max-height: 480px;
+  }
+
+  .leader-item {
+    padding: 12px 16px;
+    gap: 10px;
+  }
+
+  .leader-name {
+    white-space: normal; /* Permitir que el nombre baje de línea en móvil */
+    font-size: 0.85rem;
+    line-height: 1.2;
+    margin-bottom: 2px;
+  }
+
+  .leader-score {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+  }
+
+  .leader-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 0.8rem;
+  }
+
+  .leader-rank {
+    width: 20px;
+    font-size: 0.8rem;
+  }
+}
   font-size: 0.9rem;
   font-weight: 700;
   color: #fff;
