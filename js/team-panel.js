@@ -113,8 +113,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ── Formulario jugador ───────────────────────────────────────
   btnShowForm.addEventListener('click', () => {
-    addPlayerForm.classList.remove('hidden');
-    btnShowForm.classList.add('hidden');
+    addPlayerForm.style.display = 'block';
+    btnShowForm.style.display = 'none';
     pName.focus();
   });
 
@@ -389,9 +389,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   function playerCard(p) {
     const foto = p.foto
       ? `<img src="${p.foto}" alt="${esc(p.nombre)}" class="player-photo" />`
-      : `<div class="player-photo-placeholder">
-           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" opacity="0.4"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-         </div>`;
+      : `<div class="player-photo-placeholder">👤</div>`;
 
     const dob = p.fecha_nac
       ? new Date(p.fecha_nac + 'T00:00:00').toLocaleDateString('es-CO', { day:'2-digit', month:'short', year:'numeric' })
@@ -399,17 +397,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     return `
       <div class="player-card">
-        <div class="player-photo-wrap">
-          ${foto}
-          <div class="player-dorsal-badge">${p.dorsal}</div>
-        </div>
+        <div class="player-dorsal-badge">${p.dorsal}</div>
+        ${foto}
         <div class="player-name">${esc(p.nombre)}</div>
         <div class="player-pos-pill pos-${p.posicion}">${p.posicion}</div>
-        <div class="player-meta">${esc(p.documento)}${dob ? ' · ' + dob : ''}</div>
-        <div style="display:flex; gap:8px; margin-top:16px;">
-          <button class="btn-carnet-card" data-id="${p.id}" style="flex:1;">🎫 Carnet</button>
-          <button class="btn-remove-card" data-id="${p.id}" data-name="${esc(p.nombre)}" style="flex:1;">🗑️ Borrar</button>
-        </div>
+        <div class="player-doc">${esc(p.documento)}${dob ? ' · ' + dob : ''}</div>
+        <button class="btn-carnet-card" data-id="${p.id}">🎫 Ver Carnet</button>
+        <button class="btn-remove-card" data-id="${p.id}" data-name="${esc(p.nombre)}">🗑 Eliminar</button>
       </div>`;
   }
 
@@ -569,13 +563,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ── Helpers ──────────────────────────────────────────────────
   function resetForm() {
-    addPlayerForm.classList.add('hidden');
-    btnShowForm.classList.remove('hidden');
+    addPlayerForm.style.display = '';
+    btnShowForm.style.display   = '';
     pName.value = ''; pDoc.value = ''; pDorsal.value = ''; pPos.value = ''; pDob.value = '';
     playerErr.textContent = '';
     photoBase64 = null;
     photoInput.value = '';
-    photoPreview.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" opacity="0.3"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>`;
+    photoPreview.innerHTML = '📷';
     btnSavePlayer.disabled = false;
   }
 
