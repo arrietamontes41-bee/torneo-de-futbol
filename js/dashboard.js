@@ -122,10 +122,56 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ---- STATS ----
   const renderStats = async () => {
-    const s = await DB.getStats();
+    const [s, scorers, goalkeepers] = await Promise.all([
+      DB.getStats(),
+      DB.getTopScorers(5),
+      DB.getBestGoalkeepers(5)
+    ]);
+    
+    // General stats
     statTeams.textContent     = s.teams;
     statScheduled.textContent = s.scheduled;
     statCompleted.textContent = s.completed;
+
+    // Render Scorer Leaderboard
+    const scorersContainer = document.getElementById('topScorersContainer');
+    if (scorersContainer) {
+      if (!scorers.length) {
+        scorersContainer.innerHTML = `<div class="empty-state"><p>No hay goles registrados</p></div>`;
+      } else {
+        scorersContainer.innerHTML = scorers.map((p, i) => `
+          <div class="leader-item">
+            <div class="leader-rank">#${i + 1}</div>
+            <div class="leader-avatar">${p.nombre.charAt(0)}</div>
+            <div class="leader-info">
+              <span class="leader-name">${escHtml(p.nombre)}</span>
+              <span class="leader-team">${escHtml(p.equipo)}</span>
+            </div>
+            <div class="leader-score">${p.goles} Goles</div>
+          </div>
+        `).join('');
+      }
+    }
+
+    // Render Best Defense Leaderboard (Goalkeepers)
+    const defenseContainer = document.getElementById('bestDefenseContainer');
+    if (defenseContainer) {
+      if (!goalkeepers.length) {
+        defenseContainer.innerHTML = `<div class="empty-state"><p>No hay datos disponibles</p></div>`;
+      } else {
+        defenseContainer.innerHTML = goalkeepers.map((p, i) => `
+          <div class="leader-item">
+            <div class="leader-rank">#${i + 1}</div>
+            <div class="leader-avatar">🧤</div>
+            <div class="leader-info">
+              <span class="leader-name">${escHtml(p.nombre)}</span>
+              <span class="leader-team">${escHtml(p.equipo)}</span>
+            </div>
+            <div class="leader-score score-defense">${p.gc} GC</div>
+          </div>
+        `).join('');
+      }
+    }
   };
 
   // ---- TEAMS ----

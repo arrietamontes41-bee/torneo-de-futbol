@@ -407,3 +407,116 @@
     width: 100%;
   }
 }
+
+/* ============================================================ 
+   OVERVIEW LEADERBOARDS 
+   ============================================================ */
+.overview-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+@media (max-width: 768px) {
+  .overview-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.leaderboard-card {
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+
+.leaderboard-card:hover {
+  border-color: rgba(16, 185, 129, 0.2);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+.leaderboard-header {
+  padding: 20px 24px;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.leaderboard-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.leader-item {
+  display: flex;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  transition: background 0.2s;
+}
+
+.leader-item:last-child {
+  border-bottom: none;
+}
+
+.leader-item:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.leader-rank {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.2);
+  width: 24px;
+}
+
+.leader-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #fff;
+  margin-right: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.leader-info {
+  flex: 1;
+}
+
+.leader-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #fff;
+  display: block;
+}
+
+.leader-team {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.leader-score {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  min-width: 40px;
+  text-align: center;
+}
+
+.leader-score.score-defense {
+  background: rgba(139, 92, 246, 0.1);
+  color: #a78bfa;
+}
