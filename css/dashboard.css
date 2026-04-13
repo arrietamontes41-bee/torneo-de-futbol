@@ -612,29 +612,3 @@
     font-size: 0.8rem;
   }
 }
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #fff;
-  display: block;
-}
-
-.leader-team {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.leader-score {
-  background: rgba(16, 185, 129, 0.1);
-  color: #10b981;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 800;
-  min-width: 40px;
-  text-align: center;
-}
-
-.leader-score.score-defense {
-  background: rgba(139, 92, 246, 0.1);
-  color: #a78bfa;
-}
