@@ -124,8 +124,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const renderStats = async () => {
     const [s, scorers, goalkeepers] = await Promise.all([
       DB.getStats(),
-      DB.getTopScorers(5),
-      DB.getBestGoalkeepers(5)
+      DB.getTopScorers(10),
+      DB.getBestGoalkeepers(10)
     ]);
     
     // General stats

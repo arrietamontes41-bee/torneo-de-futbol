@@ -413,12 +413,13 @@
    ============================================================ */
 .overview-stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: repeat(2, 1fr); /* Forzar siempre 2 columnas en escritorio */
   gap: 24px;
   margin-top: 24px;
+  align-items: start;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .overview-stats-grid {
     grid-template-columns: 1fr;
   }
@@ -430,6 +431,9 @@
   border-radius: 20px;
   overflow: hidden;
   transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+  max-height: 500px; /* Altura máxima para permitir el scroll interno */
 }
 
 .leaderboard-card:hover {
@@ -441,6 +445,29 @@
   padding: 20px 24px;
   background: rgba(255, 255, 255, 0.02);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  flex-shrink: 0;
+}
+
+/* Contenedores con scroll interno */
+#topScorersContainer, #bestDefenseContainer {
+  overflow-y: auto;
+  flex: 1;
+}
+
+#topScorersContainer::-webkit-scrollbar, 
+#bestDefenseContainer::-webkit-scrollbar {
+  width: 6px;
+}
+
+#topScorersContainer::-webkit-scrollbar-thumb, 
+#bestDefenseContainer::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+#topScorersContainer::-webkit-scrollbar-thumb:hover, 
+#bestDefenseContainer::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 185, 129, 0.3);
 }
 
 .leaderboard-title {
