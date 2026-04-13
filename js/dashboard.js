@@ -213,10 +213,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (session.rol === 'admin') {
       teamsContainer.querySelectorAll('.team-delete-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
-          if (confirm(`¿Eliminar el equipo "${btn.dataset.name}"? Esto también borrará sus partidos.`)) {
+          if (confirm(`¿Eliminar el equipo "${btn.dataset.name}"? Esto también borrará sus partidos y jugadores.`)) {
             setLoading(true);
-            await DB.deleteTeam(btn.dataset.id);
-            await refresh();
+            const res = await DB.deleteTeam(btn.dataset.id);
+            if (res.ok) {
+              await refresh();
+            } else {
+              alert('Error al borrar equipo: ' + res.error);
+              setLoading(false);
+            }
           }
         });
       });

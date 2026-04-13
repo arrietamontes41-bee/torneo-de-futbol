@@ -202,23 +202,51 @@ const DB = (() => {
   const deleteTeam = async (id) => {
     try {
       clearCache();
-      // Obtener usuario_id del equipo
-      const { data: team } = await sb().from('equipos').select('usuario_id').eq('id', id).single();
+      // 1. Obtener el usuario_id antes de que el equipo sea borrado
+      const { data: team, error: fetchErr } = await sb()
+        .from('equipos')
+        .select('usuario_id')
+        .eq('id', id)
+        .single();
 
-      // Borrar partidos relacionados
-      await sb().from('partidos').delete().or(`equipo_local_id.eq.${id},equipo_visit_id.eq.${id}`);
+      if (fetchErr) {
+        console.error('Error al obtener info del equipo:', fetchErr);
+        return { ok: false, error: 'No se pudo encontrar el equipo.' };
+      }
 
-      // Borrar equipo
-      await sb().from('equipos').delete().eq('id', id);
+      // 2. Borrar el equipo
+      // Nota: El esquema tiene ON DELETE CASCADE, por lo que borrar el equipo 
+      // automáticamente borra sus jugadores, partidos y eventos relacionados.
+      const { error: deleteTeamErr } = await sb()
+        .from('equipos')
+        .delete()
+        .eq('id', id);
 
-      // Borrar usuario vinculado (si no es admin)
-      if (team?.usuario_id) {
-        await sb().from('usuarios').delete().eq('id', team.usuario_id).eq('rol', 'equipo');
+      if (deleteTeamErr) {
+        console.error('Error al borrar equipo:', deleteTeamErr);
+        return { ok: false, error: 'La base de datos rechazó el borrado del equipo.' };
+      }
+
+      // 3. Borrar el usuario vinculado (si existe y es de rol 'equipo')
+      if (team && team.usuario_id) {
+        const { error: deleteUserErr } = await sb()
+          .from('usuarios')
+          .delete()
+          .eq('id', team.usuario_id)
+          .eq('rol', 'equipo');
+
+        if (deleteUserErr) {
+          // Si el borrado de equipo funcionó pero el del usuario no (posiblemente por RLS),
+          // avisamos en consola pero retornamos éxito parcial para no confundir al admin,
+          // ya que el equipo "visual" ya desapareció.
+          console.warn('El equipo fue borrado, pero su usuario asociado permaneció:', deleteUserErr.message);
+        }
       }
 
       return { ok: true };
     } catch (e) {
-      return { ok: false, error: 'Error al eliminar el equipo.' };
+      console.error('Excepción en deleteTeam:', e);
+      return { ok: false, error: 'Ocurrió un error inesperado al intentar borrar.' };
     }
   };
 
