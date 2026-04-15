@@ -256,6 +256,12 @@ const DB = (() => {
     return { ok: true };
   };
 
+  const updateTeamGroup = async (teamId, grupo) => {
+    const { error } = await sb().from('equipos').update({ grupo }).eq('id', teamId);
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
+  };
+
   // ================================================================
   // PARTIDOS
   // ================================================================
@@ -385,7 +391,7 @@ const DB = (() => {
   const getStandings = async () => {
     const [teams, matches] = await Promise.all([getTeams(), getMatches()]);
     // Solo contar partidos finalizados y de "Fase de Grupos" (o que no tengan fase) para la tabla general
-    const finished = matches.filter(m => m.estado === 'finalizado' && (m.fase === 'Fase de Grupos' || !m.fase));
+    const finished = matches.filter(m => m.estado === 'finalizado' && (m.fase === 'Fase de Grupos' || m.fase === 'Clasificación General' || !m.fase));
 
     const table = teams.reduce((acc, t) => {
       acc[t.id] = { team: t, pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, pts: 0 };
@@ -637,7 +643,7 @@ const DB = (() => {
     // Sesión
     getSession, setSession, clearSession, login, resetPasswordAndGetTemp, updatePassword,
     // Equipos
-    getTeams, getTeamById, addTeam, deleteTeam, updateTeamShield,
+    getTeams, getTeamById, addTeam, deleteTeam, updateTeamShield, updateTeamGroup,
     // Jugadores
     getPlayersByTeam, addPlayers, deletePlayer, checkDocumentoGlobal,
     // Partidos

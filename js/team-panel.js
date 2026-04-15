@@ -569,37 +569,52 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    const rows = standings.map((s, i) => {
-      const mine = s.team.id === myTeam?.id;
-      const dg   = s.gf - s.gc;
-      const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1;
-      return `<tr class="${mine ? 'my-row' : ''}">
-        <td style="font-weight:700;">${medal}</td>
-        <td>${mine ? '⭐ ' : ''}${esc(s.team.nombre)}</td>
-        <td>${s.pj}</td>
-        <td>${s.pg}</td>
-        <td>${s.pe}</td>
-        <td>${s.pp}</td>
-        <td>${s.gf}</td>
-        <td>${s.gc}</td>
-        <td>${dg > 0 ? '+' : ''}${dg}</td>
-        <td style="font-weight:700;color:#fff;">${s.pts}</td>
-      </tr>`;
-    }).join('');
+    const groups = {};
+    standings.forEach(r => {
+      const g = r.team.grupo || 'Único';
+      if (!groups[g]) groups[g] = [];
+      groups[g].push(r);
+    });
 
-    standingsWrap.innerHTML = `
-      <div class="overflow-x-auto">
-        <table class="pos-table">
-          <thead>
-            <tr>
-              <th>#</th><th>Equipo</th><th title="Partidos Jugados">PJ</th>
-              <th title="Ganados">PG</th><th title="Empatados">PE</th><th title="Perdidos">PP</th>
-              <th>GF</th><th>GC</th><th>DG</th><th>PTS</th>
-            </tr>
-          </thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>
+    let html = '';
+    const groupNames = Object.keys(groups).sort();
+    
+    groupNames.forEach(gName => {
+      const rowsHtml = groups[gName].map((s, i) => {
+        const mine = s.team.id === myTeam?.id;
+        const dg   = s.gf - s.gc;
+        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1;
+        return `<tr class="${mine ? 'my-row' : ''}">
+          <td style="font-weight:700;">${medal}</td>
+          <td>${mine ? '⭐ ' : ''}${esc(s.team.nombre)}</td>
+          <td>${s.pj}</td>
+          <td>${s.pg}</td>
+          <td>${s.pe}</td>
+          <td>${s.pp}</td>
+          <td>${s.gf}</td>
+          <td>${s.gc}</td>
+          <td>${dg > 0 ? '+' : ''}${dg}</td>
+          <td style="font-weight:700;color:#fff;">${s.pts}</td>
+        </tr>`;
+      }).join('');
+
+      html += `
+        ${groupNames.length > 1 ? `<h3 style="margin: 20px 0 10px 0; color: #fff; font-size: 1.2rem;">🏆 Grupo: ${esc(gName)}</h3>` : ''}
+        <div class="overflow-x-auto" style="margin-bottom: 20px;">
+          <table class="pos-table">
+            <thead>
+              <tr>
+                <th>#</th><th>Equipo</th><th title="Partidos Jugados">PJ</th>
+                <th title="Ganados">PG</th><th title="Empatados">PE</th><th title="Perdidos">PP</th>
+                <th>GF</th><th>GC</th><th>DG</th><th>PTS</th>
+              </tr>
+            </thead>
+            <tbody>${rowsHtml}</tbody>
+          </table>
+        </div>`;
+    });
+
+    standingsWrap.innerHTML = html + `
       <p class="standings-footer">
         Criterios: Puntos · Diferencia de goles · Goles a favor
       </p>`;

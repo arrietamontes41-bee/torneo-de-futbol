@@ -215,7 +215,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (session.rol === 'admin') {
       teamsContainer.querySelectorAll('.team-delete-btn').forEach(btn => {
-        btn.addEventListener('click', async () => {
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
           if (confirm(`¿Eliminar el equipo "${btn.dataset.name}"? Esto también borrará sus partidos y jugadores.`)) {
             setLoading(true);
             const res = await DB.deleteTeam(btn.dataset.id);
@@ -223,6 +224,24 @@ document.addEventListener('DOMContentLoaded', async () => {
               await refresh();
             } else {
               alert('Error al borrar equipo: ' + res.error);
+              setLoading(false);
+            }
+          }
+        });
+      });
+
+      teamsContainer.querySelectorAll('.team-group-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const currentGroup = btn.dataset.group || 'Único';
+          const newGroup = prompt(`Asignar grupo para ${btn.dataset.name}:`, currentGroup);
+          if (newGroup !== null && newGroup.trim() !== '' && newGroup !== currentGroup) {
+            setLoading(true);
+            const res = await DB.updateTeamGroup(btn.dataset.id, newGroup.trim());
+            if (res.ok) {
+              await refresh();
+            } else {
+              alert('Error al actualizar grupo: ' + res.error);
               setLoading(false);
             }
           }
@@ -245,6 +264,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const deleteBtn = session.rol === 'admin'
       ? `<button class="btn-icon btn-icon-red team-delete-btn" data-id="${t.id}" data-name="${escHtml(t.nombre)}" title="Eliminar equipo">✕</button>`
       : '';
+    const groupBtn = session.rol === 'admin'
+      ? `<button class="btn-primary-sm team-group-btn" style="margin-top:5px; padding:2px 5px; font-size:11px;" data-id="${t.id}" data-name="${escHtml(t.nombre)}" data-group="${escHtml(t.grupo || 'Único')}">Grupo: ${escHtml(t.grupo || 'Único')}</button>`
+      : `<div style="font-size:11px; margin-top:5px;">Grupo: ${escHtml(t.grupo || 'Único')}</div>`;
+      
     return `
       <div class="team-card cursor-pointer" data-id="${t.id}" data-name="${escHtml(t.nombre)}" data-city="${escHtml(t.municipio || 'Montería')}" title="Ver plantilla">
         ${deleteBtn}
@@ -252,7 +275,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="team-name">${escHtml(t.nombre)}</div>
         <div class="team-city">📍 ${escHtml(t.municipio || 'Montería')}</div>
         <div class="team-email">${escHtml(t.email)}</div>
-        <span class="team-badge">Inscrito</span>
+        ${groupBtn}
+        <span class="team-badge" style="margin-top: 5px;">Inscrito</span>
         <div class="text-muted-xs mt-6">👆 Ver plantilla</div>
       </div>`;
   };
@@ -369,7 +393,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const awayId = awayTeamSel.value;
     const date   = matchDateInput.value;
     const time   = matchTimeInput.value;
-    const fase   = matchFaseInput ? matchFaseInput.value : 'Fase de Grupos';
+    const fase   = matchFaseInput ? matchFaseInput.value : 'Clasificación General';
 
     if (!homeId || !awayId)  { matchFormError.textContent = 'Selecciona ambos equipos.';       return; }
     if (homeId === awayId)   { matchFormError.textContent = 'Los equipos deben ser distintos.'; return; }
@@ -402,7 +426,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     awayTeamSel.value         = m.equipo_visit_id;
     matchDateInput.value      = m.fecha;
     matchTimeInput.value      = m.hora ? m.hora.slice(0, 5) : '';
-    if (matchFaseInput) matchFaseInput.value = m.fase || 'Fase de Grupos';
+    if (matchFaseInput) matchFaseInput.value = m.fase || 'Clasificación General';
     matchFormError.textContent = '';
     matchFormWrapper.classList.remove('hidden');
     matchFormWrapper.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -667,55 +691,69 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    const medals = ['🥇','🥈','🥉'];
+    const groups = {};
+    rows.forEach(r => {
+      const g = r.team.grupo || 'Único';
+      if (!groups[g]) groups[g] = [];
+      groups[g].push(r);
+    });
 
-    const tableRows = rows.map((r, i) => {
-      const dg       = r.gf - r.gc;
-      const dgStr    = dg > 0 ? `+${dg}` : `${dg}`;
-      const rankClass= i < 3 ? `rank-${i + 1}` : '';
-      const initials = r.team.nombre.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-      const avatar   = r.team.escudo
-        ? `<img src="${r.team.escudo}" alt="escudo" class="img-fit-inherit" />`
-        : initials;
-      return `
-        <tr class="${rankClass}">
-          <td class="pos-num">${i + 1}</td>
-          <td>
-            <div class="team-name-cell">
-              <div class="team-avatar-sm">${avatar}</div>
-              <span>${escHtml(r.team.nombre)}</span>
-            </div>
-          </td>
-          <td>${r.pj}</td>
-          <td>${r.pg}</td>
-          <td>${r.pe}</td>
-          <td>${r.pp}</td>
-          <td>${r.gf}</td>
-          <td>${r.gc}</td>
-          <td>${dgStr}</td>
-          <td class="pts-cell">${r.pts}</td>
-        </tr>`;
-    }).join('');
+    let html = '';
+    const groupNames = Object.keys(groups).sort();
+    
+    groupNames.forEach(gName => {
+      const gRows = groups[gName];
+      const tableRows = gRows.map((r, i) => {
+        const dg       = r.gf - r.gc;
+        const dgStr    = dg > 0 ? `+${dg}` : `${dg}`;
+        const rankClass= i < 3 ? `rank-${i + 1}` : '';
+        const initials = r.team.nombre.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+        const avatar   = r.team.escudo
+          ? `<img src="${r.team.escudo}" alt="escudo" class="img-fit-inherit" />`
+          : initials;
+        return `
+          <tr class="${rankClass}">
+            <td class="pos-num">${i + 1}</td>
+            <td>
+              <div class="team-name-cell">
+                <div class="team-avatar-sm">${avatar}</div>
+                <span>${escHtml(r.team.nombre)}</span>
+              </div>
+            </td>
+            <td>${r.pj}</td>
+            <td>${r.pg}</td>
+            <td>${r.pe}</td>
+            <td>${r.pp}</td>
+            <td>${r.gf}</td>
+            <td>${r.gc}</td>
+            <td>${dgStr}</td>
+            <td class="pts-cell">${r.pts}</td>
+          </tr>`;
+      }).join('');
 
-    standingsContainer.innerHTML = `
-      <div class="standings-wrap">
-        <table class="standings-table">
-          <thead>
-            <tr>
-              <th>#</th><th>Equipo</th>
-              <th title="Partidos Jugados">PJ</th>
-              <th title="Ganados">G</th>
-              <th title="Empatados">E</th>
-              <th title="Perdidos">P</th>
-              <th title="Goles a favor">GF</th>
-              <th title="Goles en contra">GC</th>
-              <th title="Diferencia de goles">DG</th>
-              <th title="Puntos">Pts</th>
-            </tr>
-          </thead>
-          <tbody>${tableRows}</tbody>
-        </table>
-      </div>
+      html += `
+        ${groupNames.length > 1 ? `<h3 style="margin: 20px 0 10px 0; color: #fff; font-size: 1.2rem;">🏆 Grupo: ${escHtml(gName)}</h3>` : ''}
+        <div class="standings-wrap">
+          <table class="standings-table">
+            <thead>
+              <tr>
+                <th>#</th><th>Equipo</th>
+                <th title="Partidos Jugados">PJ</th>
+                <th title="Ganados">G</th>
+                <th title="Empatados">E</th>
+                <th title="Perdidos">P</th>
+                <th title="Goles a favor">GF</th>
+                <th title="Goles en contra">GC</th>
+                <th title="Diferencia de goles">DG</th>
+                <th title="Puntos">Pts</th>
+              </tr>
+            </thead>
+            <tbody>${tableRows}</tbody>
+          </table>
+        </div>`;
+    });
+
+    standingsContainer.innerHTML = html + `
       <p class="text-muted-sm mt-10 text-right">
         Criterios: Puntos · Diferencia de goles · Goles a favor
       </p>`;
