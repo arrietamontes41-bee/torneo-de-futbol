@@ -132,9 +132,12 @@
 
       <!-- TAB: EQUIPOS -->
       <div class="tab-content" id="tabContentTeams">
-        <div class="tab-content-header">
-          <h2 class="tab-content-title">Equipos Registrados</h2>
-          <p class="hint-click-team">Haz clic en un equipo para ver su plantilla</p>
+        <div class="tab-content-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div>
+            <h2 class="tab-content-title">Equipos Registrados</h2>
+            <p class="hint-click-team">Haz clic en un equipo para ver su plantilla</p>
+          </div>
+          <button class="btn-secondary-sm" id="btnAutoGroups" title="Repartir equipos inscritos en grupos equitativamente">🎲 Crear Grupos</button>
         </div>
         <div id="teamsContainer">
           <div class="empty-state"><div class="empty-icon">⏳</div><p>Cargando equipos...</p></div>

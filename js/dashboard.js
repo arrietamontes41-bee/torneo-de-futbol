@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const standingsContainer= document.getElementById('standingsContainer');
   const btnExportExcel    = document.getElementById('btnExportExcel');
   const btnGenerateLiguilla= document.getElementById('btnGenerateLiguilla');
+  const btnAutoGroups     = document.getElementById('btnAutoGroups');
 
   // Acta Modal
   const actaModal    = document.getElementById('actaModal');
@@ -473,6 +474,49 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       alert(`Se han generado ${generated} partidos para ${phaseName}.`);
+      await refresh();
+    });
+  }
+
+  // ---- AUTO REPARTIR GRUPOS ----
+  if (btnAutoGroups) {
+    btnAutoGroups.addEventListener('click', async () => {
+      const teams = await DB.getTeams();
+      if (teams.length < 2) {
+        alert('Se necesitan al menos 2 equipos para crear grupos.');
+        return;
+      }
+      
+      const numGroupsStr = prompt(`Tienes ${teams.length} equipos registrados.\n¿En cuántos grupos quieres dividirlos automáticamente? (Ej. 2, 4, 8)`, '2');
+      if (!numGroupsStr) return;
+      const numGroups = parseInt(numGroupsStr);
+      if (isNaN(numGroups) || numGroups < 2 || numGroups > 10) {
+        alert('Por favor ingresa un número de grupos válido (entre 2 y 10).');
+        return;
+      }
+
+      const confirmMsg = `¿Seguro que deseas repartir a los ${teams.length} equipos en ${numGroups} grupos de manera aleatoria? Esto sobrescribirá su grupo actual.`;
+      if (!confirm(confirmMsg)) return;
+
+      setLoading(true);
+      
+      const shuffled = [...teams];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+
+      const groupLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+      
+      let promises = [];
+      shuffled.forEach((team, index) => {
+        const groupIndex = index % numGroups;
+        const groupName = groupLetters[groupIndex];
+        promises.push(DB.updateTeamGroup(team.id, groupName));
+      });
+
+      await Promise.all(promises);
+      alert(`Se han repartido los ${teams.length} equipos aleatoriamente en ${numGroups} grupos (A, B... etc).`);
       await refresh();
     });
   }
