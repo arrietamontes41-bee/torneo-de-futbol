@@ -386,6 +386,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     editMatchId.value = '';
   });
 
+  const filterAwayTeams = async () => {
+    const teams = await DB.getTeams(); 
+    const homeId = homeTeamSel.value;
+    const fase = matchFaseInput ? matchFaseInput.value : 'Clasificación General';
+    
+    if (!homeId) {
+      awayTeamSel.innerHTML = '<option value="">Seleccionar equipo</option>' + teams.map(t => `<option value="${t.id}">${escHtml(t.nombre)}</option>`).join('');
+      return;
+    }
+
+    const homeTeam = teams.find(t => t.id === homeId);
+    let validAwayTeams = teams.filter(t => t.id !== homeId);
+
+    if (fase === 'Clasificación General' && homeTeam && homeTeam.grupo && homeTeam.grupo !== 'Único') {
+      validAwayTeams = validAwayTeams.filter(t => t.grupo === homeTeam.grupo);
+    }
+    
+    const currentAway = awayTeamSel.value;
+    awayTeamSel.innerHTML = '<option value="">Seleccionar equipo</option>' + validAwayTeams.map(t => `<option value="${t.id}">${escHtml(t.nombre)}</option>`).join('');
+    if (validAwayTeams.find(t => t.id === currentAway)) {
+      awayTeamSel.value = currentAway;
+    }
+  };
+
+  homeTeamSel.addEventListener('change', filterAwayTeams);
+  if (matchFaseInput) {
+    matchFaseInput.addEventListener('change', filterAwayTeams);
+  }
+
   matchForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     matchFormError.textContent = '';
@@ -487,11 +516,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
       
-      const numGroupsStr = prompt(`Tienes ${teams.length} equipos registrados.\n¿En cuántos grupos quieres dividirlos automáticamente? (Ej. 2, 4, 8)`, '2');
+      const numGroupsStr = prompt(`Tienes ${teams.length} equipos registrados.\n¿En cuántos grupos quieres dividirlos automáticamente? (Ej. 2, 4, 8)\n\nIMPORTANTE: Escribe "1" si deseas BORRAR a todos de sus grupos y volver a la tabla Única general.`, '2');
       if (!numGroupsStr) return;
       const numGroups = parseInt(numGroupsStr);
-      if (isNaN(numGroups) || numGroups < 2 || numGroups > 10) {
-        alert('Por favor ingresa un número de grupos válido (entre 2 y 10).');
+      if (isNaN(numGroups) || numGroups < 1 || numGroups > 10) {
+        alert('Por favor ingresa un número de grupos válido (entre 1 y 10).');
+        return;
+      }
+
+      if (numGroups === 1) {
+        if (!confirm('¿Seguro que deseas eliminar todos los grupos y restaurar la Clasificación General de tabla única para todos los equipos?')) return;
+        setLoading(true);
+        let promises = teams.map(t => DB.updateTeamGroup(t.id, 'Único'));
+        await Promise.all(promises);
+        alert('Todos los equipos han sido restaurados al grupo Único.');
+        await refresh();
         return;
       }
 
