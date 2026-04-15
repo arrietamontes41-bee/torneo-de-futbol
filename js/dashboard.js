@@ -36,10 +36,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   const awayTeamSel       = document.getElementById('awayTeam');
   const matchDateInput    = document.getElementById('matchDate');
   const matchTimeInput    = document.getElementById('matchTime');
+  const matchFaseInput    = document.getElementById('matchFase');
   const matchFormError    = document.getElementById('matchFormError');
   const btnCancelMatch    = document.getElementById('btnCancelMatch');
   const matchesContainer  = document.getElementById('matchesContainer');
   const standingsContainer= document.getElementById('standingsContainer');
+  const btnExportExcel    = document.getElementById('btnExportExcel');
+  const btnGenerateLiguilla= document.getElementById('btnGenerateLiguilla');
 
   // Acta Modal
   const actaModal    = document.getElementById('actaModal');
@@ -297,6 +300,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const completed = m.estado === 'finalizado';
     const dateStr   = m.fecha ? formatDate(m.fecha) : '—';
     const timeStr   = m.hora  ? m.hora.slice(0, 5) : '—';
+    const faseStr   = m.fase && m.fase !== 'Fase de Grupos' ? ` | 🏆 ${m.fase}` : '';
 
     const scoreBlock = completed
       ? `<div class="match-score">${m.goles_local} – ${m.goles_visit}</div>`
@@ -326,7 +330,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         </div>
         <div class="match-meta">
-          📅 ${dateStr} &nbsp; 🕐 ${timeStr}
+          📅 ${dateStr} &nbsp; 🕐 ${timeStr} ${faseStr}
           &nbsp;
           <span class="match-status-badge ${completed ? 'status-completed' : 'status-pending'}">
             ${completed ? 'Finalizado' : 'Programado'}
@@ -365,6 +369,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const awayId = awayTeamSel.value;
     const date   = matchDateInput.value;
     const time   = matchTimeInput.value;
+    const fase   = matchFaseInput ? matchFaseInput.value : 'Fase de Grupos';
 
     if (!homeId || !awayId)  { matchFormError.textContent = 'Selecciona ambos equipos.';       return; }
     if (homeId === awayId)   { matchFormError.textContent = 'Los equipos deben ser distintos.'; return; }
@@ -374,8 +379,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     setLoading(true);
     const id = editMatchId.value;
     const result = id
-      ? await DB.updateMatch(id, { homeTeamId: homeId, awayTeamId: awayId, date, time })
-      : await DB.addMatch({ homeTeamId: homeId, awayTeamId: awayId, date, time });
+      ? await DB.updateMatch(id, { homeTeamId: homeId, awayTeamId: awayId, date, time, fase })
+      : await DB.addMatch({ homeTeamId: homeId, awayTeamId: awayId, date, time, fase });
 
     if (result.ok) {
       matchFormWrapper.classList.add('hidden');
@@ -397,10 +402,89 @@ document.addEventListener('DOMContentLoaded', async () => {
     awayTeamSel.value         = m.equipo_visit_id;
     matchDateInput.value      = m.fecha;
     matchTimeInput.value      = m.hora ? m.hora.slice(0, 5) : '';
+    if (matchFaseInput) matchFaseInput.value = m.fase || 'Fase de Grupos';
     matchFormError.textContent = '';
     matchFormWrapper.classList.remove('hidden');
     matchFormWrapper.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   };
+
+  // ---- LIGUILLA AUTOMATICA ----
+  if (btnGenerateLiguilla) {
+    btnGenerateLiguilla.addEventListener('click', async () => {
+      const option = prompt('¿Qué fase deseas generar asumiendo la tabla de posiciones general?\n1. Octavos de Final (Top 16)\n2. Cuartos de Final (Top 8)\n3. Semifinal (Top 4)', '2');
+      if (!option) return;
+      
+      let numToAdvance = 0;
+      let phaseName = '';
+      if (option === '1') { numToAdvance = 16; phaseName = 'Octavos de Final'; }
+      else if (option === '2') { numToAdvance = 8; phaseName = 'Cuartos de Final'; }
+      else if (option === '3') { numToAdvance = 4; phaseName = 'Semifinal'; }
+      else { alert('Opción no válida.'); return; }
+
+      setLoading(true);
+      const standings = await DB.getStandings();
+      if (standings.length < numToAdvance) {
+        alert(`No hay suficientes equipos registrados (se requieren ${numToAdvance}).`);
+        setLoading(false);
+        return;
+      }
+
+      const topTeams = standings.slice(0, numToAdvance).map(s => s.team);
+      const nextDate = new Date();
+      nextDate.setDate(nextDate.getDate() + 7); // Programar 7 días despues por default
+      const defaultDate = nextDate.toISOString().split('T')[0];
+
+      let generated = 0;
+      for (let i = 0; i < numToAdvance / 2; i++) {
+        const home = topTeams[i];
+        const away = topTeams[numToAdvance - 1 - i];
+        await DB.addMatch({
+          homeTeamId: home.id,
+          awayTeamId: away.id,
+          date: defaultDate,
+          time: '18:00',
+          fase: phaseName
+        });
+        generated++;
+      }
+
+      alert(`Se han generado ${generated} partidos para ${phaseName}.`);
+      await refresh();
+    });
+  }
+
+  // ---- EXPORTAR EXCEL ----
+  if (btnExportExcel) {
+    btnExportExcel.addEventListener('click', () => {
+      if (!standingsContainer.querySelector('table')) {
+        alert('No hay tabla generada para exportar.');
+        return;
+      }
+      const table = standingsContainer.querySelector('table');
+      // Crear CSV basico
+      let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; // BOM para acentos en Excel
+      
+      const rows = table.querySelectorAll('tr');
+      rows.forEach(row => {
+        const cols = row.querySelectorAll('th, td');
+        const rowData = Array.from(cols).map(c => {
+          let text = c.innerText.replace(/(\r\n|\n|\r)/gm, " ").trim();
+          text = text.replace(/[🏆🥇🥈🥉]/g, '').trim(); 
+          text = text.replace(/"/g, '""');
+          return `"${text}"`;
+        });
+        csvContent += rowData.join(',') + "\r\n";
+      });
+
+      const encodeUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodeUri);
+      link.setAttribute('download', 'tabla_posiciones.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+  }
 
   // ── ACTA DE PARTIDO ────────────────────────────────────────────
   const closeActa = () => actaModal.classList.add('hidden');

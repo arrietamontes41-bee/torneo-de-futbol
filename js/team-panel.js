@@ -59,6 +59,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const confirmDel  = $('confirmDel');
   const cancelDel   = $('cancelDel');
 
+  const notificationsContainer = $('notificationsContainer');
+  const btnExportExcelTeam = $('btnExportExcelTeam');
+
   // Carnet modal
   const carnetModal  = $('carnetModal');
   const carnetPhoto  = $('carnetPhoto');
@@ -270,6 +273,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderHomeMatches();
     renderHomeStars();
     renderFinesAlert();
+    renderNotifications();
   }
 
   // ── Sanciones / Alertas ──────────────────────────────────────
@@ -306,6 +310,46 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
     `;
     finesContainer.classList.remove('hidden');
+  }
+
+  // ── Notificaciones ─────────────────────────────────────────────
+  async function renderNotifications() {
+    if (!notificationsContainer) return;
+    const notes = await DB.getNotifications(myTeam.id);
+    const unread = notes.filter(n => !n.leida);
+    
+    if (unread.length === 0) {
+      notificationsContainer.innerHTML = '';
+      notificationsContainer.classList.add('hidden');
+      return;
+    }
+
+    const html = unread.map(n => `
+      <div class="fines-alert-row" style="background-color: #f0fdf4; border-color: #bbf7d0;">
+        <div class="fines-alert-badge" style="background:#22c55e;"></div>
+        <div class="fines-alert-info">
+          <strong class="fines-alert-title" style="color:#166534;">Mensaje del Organizador</strong>
+          <div class="fines-alert-sub" style="color:#15803d; font-size: 0.9rem; margin-top: 5px;">${esc(n.mensaje)}</div>
+        </div>
+        <button class="btn-primary-sm btn-mark-read" data-id="${n.id}" style="background-color: #16a34a; padding: 4px 8px; border-radius: 4px;">Entendido</button>
+      </div>`).join('');
+
+    notificationsContainer.innerHTML = `
+      <div class="fines-container" style="border-color: #bbf7d0; background-color: #f0fdf4;">
+        <h3 class="fines-container-title" style="color:#166534;">🔔 Tienes nuevas notificaciones</h3>
+        ${html}
+      </div>
+    `;
+    notificationsContainer.classList.remove('hidden');
+
+    notificationsContainer.querySelectorAll('.btn-mark-read').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        btn.disabled = true;
+        btn.textContent = '...';
+        await DB.markNotificationAsRead(btn.dataset.id);
+        await renderNotifications();
+      });
+    });
   }
 
   // ── Stats ────────────────────────────────────────────────────
@@ -578,6 +622,38 @@ document.addEventListener('DOMContentLoaded', async () => {
   function esc(str) {
     return String(str ?? '')
       .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ── Exportar a Excel ─────────────────────────────────────────
+  if (btnExportExcelTeam) {
+    btnExportExcelTeam.addEventListener('click', () => {
+      if (!standingsWrap.querySelector('table')) {
+        alert('No hay tabla generada para exportar.');
+        return;
+      }
+      const table = standingsWrap.querySelector('table');
+      let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+      
+      const rows = table.querySelectorAll('tr');
+      rows.forEach(row => {
+        const cols = row.querySelectorAll('th, td');
+        const rowData = Array.from(cols).map(c => {
+          let text = c.innerText.replace(/(\r\n|\n|\r)/gm, " ").trim();
+          text = text.replace(/[🏆🥇🥈🥉⭐⭐]/g, '').trim(); 
+          text = text.replace(/"/g, '""');
+          return `"${text}"`;
+        });
+        csvContent += rowData.join(',') + "\r\n";
+      });
+
+      const encodeUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodeUri);
+      link.setAttribute('download', 'tabla_posiciones_equipo.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
   }
 
   // ── Iniciar ──────────────────────────────────────────────────

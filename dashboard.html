@@ -143,12 +143,15 @@
 
       <!-- TAB: PARTIDOS -->
       <div class="tab-content" id="tabContentMatches">
-        <div class="tab-content-header">
+        <div class="tab-content-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
           <h2 class="tab-content-title">Programación de Partidos</h2>
-          <button class="btn-primary-sm" id="btnNewMatch">
-            <svg viewBox="0 0 20 20" fill="currentColor" width="16"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
-            Nuevo Partido
-          </button>
+          <div style="display:flex; gap:10px;">
+            <button class="btn-secondary-sm" id="btnGenerateLiguilla" title="Crear cruces automáticos de fases finales">🏆 Generar Liguilla</button>
+            <button class="btn-primary-sm" id="btnNewMatch">
+              <svg viewBox="0 0 20 20" fill="currentColor" width="16"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
+              Nuevo Partido
+            </button>
+          </div>
         </div>
 
         <!-- FORM: NUEVO PARTIDO -->
@@ -182,6 +185,18 @@
                     <input type="time" id="matchTime" required />
                   </div>
                 </div>
+                <div class="form-field full mt-10" style="grid-column: 1 / -1; margin-top: 10px;">
+                  <label for="matchFase">Fase del Torneo (Solo los de Grupos suman puntos)</label>
+                  <div class="input-wrap input-wrap-select">
+                    <select id="matchFase">
+                      <option value="Fase de Grupos">Fase de Grupos</option>
+                      <option value="Octavos de Final">Octavos de Final</option>
+                      <option value="Cuartos de Final">Cuartos de Final</option>
+                      <option value="Semifinal">Semifinal</option>
+                      <option value="Final">Final</option>
+                    </select>
+                  </div>
+                </div>
               </div>
               <div class="form-error" id="matchFormError"></div>
               <div class="match-form-actions">
@@ -202,8 +217,9 @@
 
       <!-- TAB: TABLA DE POSICIONES -->
       <div class="tab-content" id="tabContentStandings">
-        <div class="tab-content-header">
+        <div class="tab-content-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
           <h2 class="tab-content-title">Tabla de Posiciones</h2>
+          <button class="btn-primary-sm btn-icon-green" id="btnExportExcel" style="background-color: #10b981;">⬇️ Exportar a Excel</button>
         </div>
         <div id="standingsContainer">
           <div class="empty-state"><div class="empty-icon">🏆</div><p>Selecciona la pestaña para ver la tabla</p></div>

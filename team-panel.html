@@ -106,6 +106,7 @@
     <!-- ══ INICIO ══════════════════════════════════════ -->
     <div class="panel-section active" id="sec-inicio">
       <div id="finesAlertContainer" class="mb-20"></div>
+      <div id="notificationsContainer" class="mb-20"></div>
 
       <!-- Info campeonato -->
       <div class="tournament-card">
@@ -242,8 +243,9 @@
 
     <!-- ══ POSICIONES ══════════════════════════════════ -->
     <div class="panel-section" id="sec-posiciones">
-      <div class="section-header">
+      <div class="section-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
         <h2 class="section-title">🏆 Tabla de Posiciones</h2>
+        <button class="btn-primary-sm btn-icon-green" id="btnExportExcelTeam" style="background-color: #10b981;">⬇️ Exportar a Excel</button>
       </div>
       <div id="standingsWrap">
         <div class="empty"><div class="empty-icon">🏆</div>Selecciona la pestaña para cargar</div>

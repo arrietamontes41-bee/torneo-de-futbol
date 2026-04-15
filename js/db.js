@@ -286,9 +286,11 @@ const DB = (() => {
     return data || null;
   };
 
-  const addMatch = async ({ homeTeamId, awayTeamId, date, time }) => {
+  const addMatch = async ({ homeTeamId, awayTeamId, date, time, fase }) => {
     clearCache();
     if (homeTeamId === awayTeamId) return { ok: false, error: 'Los equipos deben ser distintos.' };
+
+    const matchFase = fase || 'Fase de Grupos';
 
     // Validar si ESA PAREJA de equipos ya juega ese día
     const { data: exists } = await sb()
@@ -306,15 +308,23 @@ const DB = (() => {
       equipo_visit_id: awayTeamId,
       fecha: date,
       hora: time,
-      estado: 'pendiente'
+      estado: 'pendiente',
+      fase: matchFase
     }]).select().single();
     if (error) return { ok: false, error: error.message };
+    
+    // Notificar a ambos equipos
+    await createNotification(homeTeamId, `Tienes un nuevo partido programado para el ${date} a las ${time} (${matchFase}).`);
+    await createNotification(awayTeamId, `Tienes un nuevo partido programado para el ${date} a las ${time} (${matchFase}).`);
+
     return { ok: true, match: data };
   };
 
-  const updateMatch = async (id, { homeTeamId, awayTeamId, date, time }) => {
+  const updateMatch = async (id, { homeTeamId, awayTeamId, date, time, fase }) => {
     clearCache();
     if (homeTeamId === awayTeamId) return { ok: false, error: 'Los equipos deben ser distintos.' };
+
+    const matchFase = fase || 'Fase de Grupos';
 
     // Validar si ESA PAREJA de equipos ya juega ese día (ignorando este partido)
     const { data: exists } = await sb()
@@ -332,20 +342,33 @@ const DB = (() => {
       equipo_local_id: homeTeamId,
       equipo_visit_id: awayTeamId,
       fecha: date,
-      hora: time
+      hora: time,
+      fase: matchFase
     }).eq('id', id).select().single();
     if (error) return { ok: false, error: error.message };
+    
+    // Notificar a ambos equipos
+    await createNotification(homeTeamId, `Tu partido del ${date} a las ${time} ha sido actualizado.`);
+    await createNotification(awayTeamId, `Tu partido del ${date} a las ${time} ha sido actualizado.`);
+
     return { ok: true, match: data };
   };
 
   const setMatchResult = async (id, homeGoals, awayGoals) => {
     clearCache();
+    const { data: mData } = await sb().from('partidos').select('equipo_local_id, equipo_visit_id, fecha').eq('id', id).single();
     const { data, error } = await sb().from('partidos').update({
       goles_local: parseInt(homeGoals),
       goles_visit: parseInt(awayGoals),
       estado: 'finalizado'
     }).eq('id', id).select().single();
     if (error) return { ok: false, error: error.message };
+
+    if (mData) {
+      await createNotification(mData.equipo_local_id, `El resultado de tu partido del ${mData.fecha} ha sido publicado (${homeGoals} - ${awayGoals}).`);
+      await createNotification(mData.equipo_visit_id, `El resultado de tu partido del ${mData.fecha} ha sido publicado (${homeGoals} - ${awayGoals}).`);
+    }
+
     return { ok: true, match: data };
   };
 
@@ -361,7 +384,8 @@ const DB = (() => {
   // ================================================================
   const getStandings = async () => {
     const [teams, matches] = await Promise.all([getTeams(), getMatches()]);
-    const finished = matches.filter(m => m.estado === 'finalizado');
+    // Solo contar partidos finalizados y de "Fase de Grupos" (o que no tengan fase) para la tabla general
+    const finished = matches.filter(m => m.estado === 'finalizado' && (m.fase === 'Fase de Grupos' || !m.fase));
 
     const table = teams.reduce((acc, t) => {
       acc[t.id] = { team: t, pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, pts: 0 };
@@ -577,9 +601,33 @@ const DB = (() => {
   };
 
   const markFineAsPaid = async (id) => {
+    const { data: fine } = await sb().from('eventos_partido').select('equipo_id, tipo').eq('id', id).single();
     const { error } = await sb().from('eventos_partido').update({ pagada: true }).eq('id', id);
     if (error) return { ok: false, error: error.message };
+    if (fine) {
+      await createNotification(fine.equipo_id, `Una sanción por tarjeta ${fine.tipo} ha sido marcada como PAGADA.`);
+    }
     return { ok: true };
+  };
+
+  // ================================================================
+  // NOTIFICACIONES
+  // ================================================================
+  const createNotification = async (teamId, message) => {
+    if (!teamId) return;
+    const { error } = await sb().from('notificaciones').insert([{ equipo_id: teamId, mensaje: message }]);
+    if (error) console.error('Error insertando notificacion:', error);
+  };
+
+  const getNotifications = async (teamId) => {
+    const { data, error } = await sb().from('notificaciones')
+      .select('*').eq('equipo_id', teamId).order('created_at', { ascending: false }).limit(20);
+    if (error) return [];
+    return data || [];
+  };
+
+  const markNotificationAsRead = async (notifId) => {
+    await sb().from('notificaciones').update({ leida: true }).eq('id', notifId);
   };
 
   // Init inmediato
@@ -596,6 +644,8 @@ const DB = (() => {
     getMatches, getMatchById, addMatch, updateMatch, setMatchResult, deleteMatch,
     // Eventos y Sanciones
     getMatchEvents, saveMatchEvents, getPendingFines, getAllPendingFines, markFineAsPaid,
+    // Notificaciones
+    createNotification, getNotifications, markNotificationAsRead,
     // Computed
     getStandings, getStats, getTopScorers, getBestGoalkeepers,
     // Utils
