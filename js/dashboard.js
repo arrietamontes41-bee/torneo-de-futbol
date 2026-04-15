@@ -563,33 +563,46 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ---- EXPORTAR EXCEL ----
   if (btnExportExcel) {
     btnExportExcel.addEventListener('click', () => {
-      if (!standingsContainer.querySelector('table')) {
+      const tables = standingsContainer.querySelectorAll('table');
+      if (tables.length === 0) {
         alert('No hay tabla generada para exportar.');
         return;
       }
-      const table = standingsContainer.querySelector('table');
-      // Crear CSV basico
-      let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; // BOM para acentos en Excel
+
+      let csvContent = "\uFEFF"; // BOM para acentos en Excel
       
-      const rows = table.querySelectorAll('tr');
-      rows.forEach(row => {
-        const cols = row.querySelectorAll('th, td');
-        const rowData = Array.from(cols).map(c => {
-          let text = c.innerText.replace(/(\r\n|\n|\r)/gm, " ").trim();
-          text = text.replace(/[🏆🥇🥈🥉]/g, '').trim(); 
-          text = text.replace(/"/g, '""');
-          return `"${text}"`;
-        });
-        csvContent += rowData.join(',') + "\r\n";
+      // Si hay h3 (nombres de grupos), los incluiremos en el export
+      const elements = standingsContainer.querySelectorAll('h3, table');
+      
+      elements.forEach(el => {
+        if (el.tagName === 'H3') {
+          csvContent += `"${el.innerText.replace(/"/g, '""')}"\r\n`;
+        } else if (el.tagName === 'TABLE') {
+          const rows = el.querySelectorAll('tr');
+          rows.forEach(row => {
+            const cols = row.querySelectorAll('th, td');
+            const rowData = Array.from(cols).map(c => {
+              let text = c.innerText.replace(/(\r\n|\n|\r)/gm, " ").trim();
+              // Limpiar emojis y adornos para el Excel
+              text = text.replace(/[🏆🥇🥈🥉⭐]/g, '').trim(); 
+              text = text.replace(/"/g, '""');
+              return `"${text}"`;
+            });
+            csvContent += rowData.join(',') + "\r\n";
+          });
+          csvContent += "\r\n"; // Espacio entre tablas de grupos
+        }
       });
 
-      const encodeUri = encodeURI(csvContent);
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.setAttribute('href', encodeUri);
-      link.setAttribute('download', 'tabla_posiciones.csv');
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'tabla_posiciones_torneo.csv');
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     });
   }
 

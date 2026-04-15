@@ -642,32 +642,43 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ── Exportar a Excel ─────────────────────────────────────────
   if (btnExportExcelTeam) {
     btnExportExcelTeam.addEventListener('click', () => {
-      if (!standingsWrap.querySelector('table')) {
+      const tables = standingsWrap.querySelectorAll('table');
+      if (tables.length === 0) {
         alert('No hay tabla generada para exportar.');
         return;
       }
-      const table = standingsWrap.querySelector('table');
-      let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+
+      let csvContent = "\uFEFF"; // BOM para acentos
+      const elements = standingsWrap.querySelectorAll('h3, table');
       
-      const rows = table.querySelectorAll('tr');
-      rows.forEach(row => {
-        const cols = row.querySelectorAll('th, td');
-        const rowData = Array.from(cols).map(c => {
-          let text = c.innerText.replace(/(\r\n|\n|\r)/gm, " ").trim();
-          text = text.replace(/[🏆🥇🥈🥉⭐⭐]/g, '').trim(); 
-          text = text.replace(/"/g, '""');
-          return `"${text}"`;
-        });
-        csvContent += rowData.join(',') + "\r\n";
+      elements.forEach(el => {
+        if (el.tagName === 'H3') {
+          csvContent += `"${el.innerText.replace(/"/g, '""')}"\r\n`;
+        } else if (el.tagName === 'TABLE') {
+          const rows = el.querySelectorAll('tr');
+          rows.forEach(row => {
+            const cols = row.querySelectorAll('th, td');
+            const rowData = Array.from(cols).map(c => {
+              let text = c.innerText.replace(/(\r\n|\n|\r)/gm, " ").trim();
+              text = text.replace(/[🏆🥇🥈🥉⭐⭐]/g, '').trim(); 
+              text = text.replace(/"/g, '""');
+              return `"${text}"`;
+            });
+            csvContent += rowData.join(',') + "\r\n";
+          });
+          csvContent += "\r\n";
+        }
       });
 
-      const encodeUri = encodeURI(csvContent);
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.setAttribute('href', encodeUri);
-      link.setAttribute('download', 'tabla_posiciones_equipo.csv');
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'mi_tabla_posiciones.csv');
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     });
   }
 
