@@ -665,7 +665,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (groupNames.length > 1) {
           csvContent += `"Grupo: ${gName}"\r\n`;
         }
-        csvContent += headers.map(h => `"${h}"`).join(',') + "\r\n";
+        csvContent += headers.map(h => `"${h}"`).join(';') + "\r\n";
         groups[gName].forEach((s, i) => {
           const dg = s.gf - s.gc;
           const row = [
@@ -676,7 +676,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             (dg > 0 ? '+' : '') + dg,
             s.pts
           ];
-          csvContent += row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',') + "\r\n";
+          csvContent += row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(';') + "\r\n";
         });
         csvContent += "\r\n";
       });

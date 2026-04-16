@@ -587,8 +587,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (groupNames.length > 1) {
           csvContent += `"Grupo: ${gName}"\r\n`;
         }
-        // Cabecera
-        csvContent += headers.map(h => `"${h}"`).join(',') + "\r\n";
+        // Cabecera con separador ; (Excel en español usa ; no ,)
+        csvContent += headers.map(h => `"${h}"`).join(';') + "\r\n";
         // Filas
         groups[gName].forEach((r, i) => {
           const dg = r.gf - r.gc;
@@ -600,7 +600,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             (dg > 0 ? '+' : '') + dg,
             r.pts
           ];
-          csvContent += row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',') + "\r\n";
+          csvContent += row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(';') + "\r\n";
         });
         csvContent += "\r\n";
       });
