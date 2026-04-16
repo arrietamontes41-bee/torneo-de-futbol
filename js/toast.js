@@ -39,8 +39,8 @@ function showToast(message, type = 'info') {
   toast.className = `toast ${type}`;
 
   // Icono según tipo
-  const icons = { success: '<i class="ph-fill ph-check-circle"></i>', error: '<i class="ph-fill ph-x-circle"></i>', info: '<i class="ph-fill ph-info"></i>' };
-  const icon = icons[type] || '<i class="ph-fill ph-info"></i>';
+  const icons = { success: '<i class="fa-solid fa-circle-check"></i>', error: '<i class="fa-solid fa-circle-xmark"></i>', info: '<i class="fa-solid fa-circle-info"></i>' };
+  const icon = icons[type] || '<i class="fa-solid fa-circle-info"></i>';
 
   toast.innerHTML = `
     <div style="display:flex;align-items:center;gap:10px;">
@@ -48,7 +48,7 @@ function showToast(message, type = 'info') {
       <span style="flex:1;font-size:0.88rem;font-weight:600;line-height:1.4;">${escapeHtml(message)}</span>
       <button onclick="dismissToast(this.parentElement.parentElement)"
         style="background:none;border:none;color:inherit;cursor:pointer;font-size:1rem;padding:0;opacity:0.7;flex-shrink:0;"
-        aria-label="Cerrar notificación"><i class="ph ph-trash"></i></button>
+        aria-label="Cerrar notificación"><i class="fa-solid fa-trash"></i></button>
     </div>`;
 
   container.appendChild(toast);

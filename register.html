@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/register.css" />
   <!-- Iconos Phosphor (Modernos y limpios) -->
-  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="icon" href="img/favicon.svg" type="image/svg+xml" />
 </head>
 
@@ -59,10 +59,10 @@
       <div class="form-field shield-upload-wrap">
         <label>Escudo del Equipo <span class="font-muted-hint">(opcional)</span></label>
         <div class="shield-upload-row">
-          <div class="shield-preview" id="shieldPreview"><i class="ph ph-shield-check" style="font-size: 2rem;"></i></div>
+          <div class="shield-preview" id="shieldPreview"><i class="fa-solid fa-shield-halved" style="font-size: 2rem;"></i></div>
           <div class="shield-upload-info">
             <label for="shieldInput" class="shield-upload-btn">
-              <i class="ph ph-image"></i> Subir escudo
+              <i class="fa-solid fa-image"></i> Subir escudo
             </label>
             <input type="file" id="shieldInput" accept="image/*" />
             <span class="shield-hint">JPG, PNG · máx. 2MB</span>
@@ -93,7 +93,7 @@
           <input type="password" id="regPassword" name="password" placeholder="••••••••" autocomplete="new-password"
             required minlength="6" />
           <button type="button" id="btnTogglePass" class="btn-toggle-pass"
-            title="Mostrar/ocultar contraseña"><i class="ph ph-eye"></i></button>
+            title="Mostrar/ocultar contraseña"><i class="fa-solid fa-eye"></i></button>
         </div>
         <small class="font-small-hint">Mínimo 6 caracteres, debe incluir al
           menos un número.</small>
@@ -110,7 +110,7 @@
           <input type="password" id="regPasswordConfirm" name="passwordConfirm" placeholder="••••••••"
             autocomplete="new-password" required minlength="6" />
           <button type="button" id="btnToggleConfirm" class="btn-toggle-pass"
-            title="Mostrar/ocultar contraseña"><i class="ph ph-eye"></i></button>
+            title="Mostrar/ocultar contraseña"><i class="fa-solid fa-eye"></i></button>
         </div>
       </div>
 

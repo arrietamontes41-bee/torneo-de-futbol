@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="css/style.css?v=5.2" />
   <link rel="stylesheet" href="css/dashboard.css?v=5.2" />
   <!-- Iconos Phosphor (Modernos y limpios) -->
-  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="icon" href="img/favicon.svg" type="image/svg+xml" />
 </head>
 <body class="dashboard-body">
@@ -24,7 +24,7 @@
           </div>
           <span class="sidebar-brand">Copa Hazel Admin</span>
         </div>
-        <button class="sidebar-close-mobile" id="btnSidebarClose"><i class="ph ph-x"></i></button>
+        <button class="sidebar-close-mobile" id="btnSidebarClose"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
       <nav class="sidebar-nav">
@@ -83,7 +83,7 @@
           <div class="stats-row">
             <div class="stat-card">
               <div class="stat-card-icon icon-blue">
-                <i class="ph ph-users" style="font-size: 1.5rem;"></i>
+                <i class="fa-solid fa-users" style="font-size: 1.5rem;"></i>
               </div>
               <div>
                 <p class="stat-label">Equipos Registrados</p>
@@ -92,7 +92,7 @@
             </div>
             <div class="stat-card">
               <div class="stat-card-icon icon-green">
-                <i class="ph ph-calendar-blank" style="font-size: 1.5rem;"></i>
+                <i class="fa-solid fa-calendar-days" style="font-size: 1.5rem;"></i>
               </div>
               <div>
                 <p class="stat-label">Partidos Programados</p>
@@ -117,7 +117,7 @@
                 <h3 class="leaderboard-title">⚽ Top Goleadores</h3>
               </div>
               <div id="topScorersContainer">
-                <div class="empty-state"><div class="empty-icon"><i class="ph ph-hourglass-medium"></i></div><p>Cargando goleadores...</p></div>
+                <div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-hourglass-half"></i></div><p>Cargando goleadores...</p></div>
               </div>
             </div>
 
@@ -127,7 +127,7 @@
                 <h3 class="leaderboard-title">🧤 Malla Menos Vencida</h3>
               </div>
               <div id="bestDefenseContainer">
-                <div class="empty-state"><div class="empty-icon"><i class="ph ph-hourglass-medium"></i></div><p>Cargando mejores defensas...</p></div>
+                <div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-hourglass-half"></i></div><p>Cargando mejores defensas...</p></div>
               </div>
             </div>
           </div>
