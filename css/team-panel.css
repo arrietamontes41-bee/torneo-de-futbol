@@ -796,9 +796,9 @@ body {
   padding: 0 4px;
 }
 .carnet-team-shield {
-  width: 52px;
-  height: 52px;
-  min-width: 52px; /* evita que flexbox lo comprima */
+  width: 56px;
+  height: 56px;
+  min-width: 56px;       /* evita que flexbox lo comprima */
   border-radius: 14px;
   background: linear-gradient(135deg, #6366f1, #8b5cf6);
   display: flex;
@@ -808,16 +808,16 @@ body {
   font-weight: 800;
   color: #fff;
   flex-shrink: 0;
-  overflow: hidden;
+  /* SIN overflow:hidden — el tamaño fijo del img garantiza que no se desborde */
   box-shadow: 0 4px 14px rgba(99,102,241,.4);
 }
 .carnet-team-shield img {
   display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain; /* muestra el logo COMPLETO, sin recortar */
-  padding: 4px;        /* margen interno para que el logo no toque el borde */
-  box-sizing: border-box;
+  width: 44px;           /* tamaño fijo: deja 6px de "borde" visible del fondo */
+  height: 44px;
+  object-fit: contain;   /* logo completo, nunca recortado */
+  border-radius: 10px;
+  /* SIN padding, box-sizing ni overflow — valores explícitos en px */
 }
 .carnet-team-name {
   font-size: .88rem;
