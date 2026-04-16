@@ -566,7 +566,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function renderStandings() {
     standingsWrap.innerHTML = `<div class="empty"><div class="empty-icon">⏳</div>Calculando...</div>`;
     standings = await DB.getStandings();
-
     if (!standings.length) {
       standingsWrap.innerHTML = `<div class="empty"><div class="empty-icon">🏆</div>Aún no hay datos.</div>`;
       return;
@@ -645,32 +644,41 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ── Exportar a Excel ─────────────────────────────────────────
   if (btnExportExcelTeam) {
     btnExportExcelTeam.addEventListener('click', () => {
-      const tables = standingsWrap.querySelectorAll('table');
-      if (tables.length === 0) {
-        showToast('No hay tabla generada para exportar.', 'error');
+      if (!standings || !standings.length) {
+        showToast('Primero abre la pestaña "Posiciones" para cargar los datos.', 'error');
         return;
       }
 
+      const groups = {};
+      standings.forEach(r => {
+        const g = r.team.grupo || 'Único';
+        if (!groups[g]) groups[g] = [];
+        groups[g].push(r);
+      });
+
+      const groupNames = Object.keys(groups).sort();
+      const headers = ['#', 'Equipo', 'PJ', 'PG', 'PE', 'PP', 'GF', 'GC', 'DG', 'PTS'];
+
       let csvContent = "\uFEFF"; // BOM para acentos
-      const elements = standingsWrap.querySelectorAll('h3, table');
-      
-      elements.forEach(el => {
-        if (el.tagName === 'H3') {
-          csvContent += `"${el.innerText.replace(/"/g, '""')}"\r\n`;
-        } else if (el.tagName === 'TABLE') {
-          const rows = el.querySelectorAll('tr');
-          rows.forEach(row => {
-            const cols = row.querySelectorAll('th, td');
-            const rowData = Array.from(cols).map(c => {
-              let text = c.innerText.replace(/(\r\n|\n|\r)/gm, " ").trim();
-              text = text.replace(/[🏆🥇🥈🥉⭐⭐]/g, '').trim(); 
-              text = text.replace(/"/g, '""');
-              return `"${text}"`;
-            });
-            csvContent += rowData.join(',') + "\r\n";
-          });
-          csvContent += "\r\n";
+
+      groupNames.forEach(gName => {
+        if (groupNames.length > 1) {
+          csvContent += `"Grupo: ${gName}"\r\n`;
         }
+        csvContent += headers.map(h => `"${h}"`).join(',') + "\r\n";
+        groups[gName].forEach((s, i) => {
+          const dg = s.gf - s.gc;
+          const row = [
+            i + 1,
+            s.team.nombre,
+            s.pj, s.pg, s.pe, s.pp,
+            s.gf, s.gc,
+            (dg > 0 ? '+' : '') + dg,
+            s.pts
+          ];
+          csvContent += row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',') + "\r\n";
+        });
+        csvContent += "\r\n";
       });
 
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -682,6 +690,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
+      showToast('Tabla exportada correctamente.', 'success');
     });
   }
 

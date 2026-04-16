@@ -565,35 +565,44 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ---- EXPORTAR EXCEL ----
   if (btnExportExcel) {
     btnExportExcel.addEventListener('click', () => {
-      const tables = standingsContainer.querySelectorAll('table');
-      if (tables.length === 0) {
-        showToast('No hay tabla generada para exportar.', 'error');
+      if (!_lastStandingsRows || !_lastStandingsRows.length) {
+        showToast('Primero abre la pestaña "Tabla de Posiciones" para cargar los datos.', 'error');
         return;
       }
 
+      // Agrupar igual que renderStandings
+      const groups = {};
+      _lastStandingsRows.forEach(r => {
+        const g = r.team.grupo || 'Único';
+        if (!groups[g]) groups[g] = [];
+        groups[g].push(r);
+      });
+
+      const groupNames = Object.keys(groups).sort();
+      const headers = ['#', 'Equipo', 'PJ', 'PG', 'PE', 'PP', 'GF', 'GC', 'DG', 'Pts'];
+
       let csvContent = "\uFEFF"; // BOM para acentos en Excel
-      
-      // Si hay h3 (nombres de grupos), los incluiremos en el export
-      const elements = standingsContainer.querySelectorAll('h3, table');
-      
-      elements.forEach(el => {
-        if (el.tagName === 'H3') {
-          csvContent += `"${el.innerText.replace(/"/g, '""')}"\r\n`;
-        } else if (el.tagName === 'TABLE') {
-          const rows = el.querySelectorAll('tr');
-          rows.forEach(row => {
-            const cols = row.querySelectorAll('th, td');
-            const rowData = Array.from(cols).map(c => {
-              let text = c.innerText.replace(/(\r\n|\n|\r)/gm, " ").trim();
-              // Limpiar emojis y adornos para el Excel
-              text = text.replace(/[🏆🥇🥈🥉⭐]/g, '').trim(); 
-              text = text.replace(/"/g, '""');
-              return `"${text}"`;
-            });
-            csvContent += rowData.join(',') + "\r\n";
-          });
-          csvContent += "\r\n"; // Espacio entre tablas de grupos
+
+      groupNames.forEach(gName => {
+        if (groupNames.length > 1) {
+          csvContent += `"Grupo: ${gName}"\r\n`;
         }
+        // Cabecera
+        csvContent += headers.map(h => `"${h}"`).join(',') + "\r\n";
+        // Filas
+        groups[gName].forEach((r, i) => {
+          const dg = r.gf - r.gc;
+          const row = [
+            i + 1,
+            r.team.nombre,
+            r.pj, r.pg, r.pe, r.pp,
+            r.gf, r.gc,
+            (dg > 0 ? '+' : '') + dg,
+            r.pts
+          ];
+          csvContent += row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',') + "\r\n";
+        });
+        csvContent += "\r\n";
       });
 
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -605,6 +614,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
+      showToast('Tabla exportada correctamente.', 'success');
     });
   }
 
@@ -771,6 +781,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
   // ---- STANDINGS ----
+  let _lastStandingsRows = []; // guardamos para el export
   const renderStandings = async () => {
     standingsContainer.innerHTML = `
       <div class="empty-state">
@@ -779,6 +790,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>`;
 
     const rows = await DB.getStandings();
+    _lastStandingsRows = rows; // <-- guardar para export
 
     if (!rows.length) {
       standingsContainer.innerHTML = `
