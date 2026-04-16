@@ -617,13 +617,15 @@ body {
 
 /* La tarjeta en sí */
 .carnet-card {
-  width: min(340px, calc(100vw - 32px)); /* se adapta a pantallas pequeñas */
+  width: min(340px, calc(100vw - 32px));
   background: #1e1e2f;
   border-radius: 28px;
   overflow: hidden;
   position: relative;
   box-shadow: 0 40px 100px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.08);
   animation: carnetPop .3s cubic-bezier(.34,1.56,.64,1);
+  /* Evita que el border-radius corte el contenido en webkit/android */
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
 }
 @keyframes carnetPop {
   from { opacity: 0; transform: scale(.85) translateY(20px); }
@@ -633,9 +635,8 @@ body {
 /* Fondo del carnet: gradiente dinámico */
 .carnet-bg {
   background: linear-gradient(145deg, #161625 0%, #1e1e3f 100%);
-  padding: 28px 20px 22px;
+  padding: 28px 20px 36px; /* padding-bottom grande = escudo lejos del borde redondeado */
   position: relative;
-  /* NO overflow:hidden aquí para no cortar elementos internos */
 }
 
 /* Efecto holográfico de fondo */
@@ -794,6 +795,7 @@ body {
   position: relative;
   z-index: 2;
   padding: 0 4px;
+  margin-bottom: 4px; /* separa el shield del borde inferior de la tarjeta */
 }
 .carnet-team-shield {
   width: 56px;
