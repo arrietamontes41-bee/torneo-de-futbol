@@ -215,7 +215,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // UI Carga temporal
     const oldHtml = teamShield.innerHTML;
-    teamShield.innerHTML = '<span class="loading-icon-big"><i class="fa-solid fa-hourglass-half"></i></span>';
+    teamShield.innerHTML = '<span class="loading-icon-big"><svg style="animation: spin 1s linear infinite;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></span>';
     
     const reader = new FileReader();
     reader.onload = async (e) => {
@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!myTeam) {
       teamNameBig.textContent    = 'Equipo no encontrado';
       headerTeamName.textContent = 'Mi Equipo';
-      homeMatchesEl.innerHTML = `<div class="empty"><div class="empty-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>No se encontró tu equipo. Contacta al administrador.</div>`;
+      homeMatchesEl.innerHTML = `<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4m0 4h.01"/></svg></div>No se encontró tu equipo. Contacta al administrador.</div>`;
       return;
     }
 
@@ -307,7 +307,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     finesContainer.innerHTML = `
       <div class="fines-container">
-        <h3 class="fines-container-title"><i class="fa-solid fa-triangle-exclamation"></i> Tienes tarjetas con multa pendiente de pago</h3>
+        <h3 class="fines-container-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4m0 4h.01"/></svg> Tienes tarjetas con multa pendiente de pago</h3>
         ${finesHtml}
         <p class="fines-container-footer">* Por favor, cancela la multa correspondiente con el organizador. El administrador retirará esta alerta al confirmar el pago.</p>
       </div>
@@ -411,7 +411,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     playerCount.textContent = players.length ? `(${players.length} jugadores)` : '';
 
     if (!players.length) {
-      playersGrid.innerHTML = `<div class="empty"><div class="empty-icon"><i class="fa-solid fa-shirt"></i></div>No hay jugadores aún.<br/>Haz clic en <strong>Agregar Jugador</strong>.</div>`;
+      playersGrid.innerHTML = `<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg></div>No hay jugadores aún.<br/>Haz clic en <strong>Agregar Jugador</strong>.</div>`;
       return;
     }
 
@@ -436,7 +436,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   function playerCard(p) {
     const foto = p.foto
       ? `<img src="${p.foto}" alt="${esc(p.nombre)}" class="player-photo" />`
-      : `<div class="player-photo-placeholder"><i class="fa-solid fa-user"></i></div>`;
+      : `<div class="player-photo-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>`;
 
     const dob = p.fecha_nac
       ? new Date(p.fecha_nac + 'T00:00:00').toLocaleDateString('es-CO', { day:'2-digit', month:'short', year:'numeric' })
@@ -471,9 +471,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       const s = scorers[0];
       const foto = s.foto
         ? `<img src="${s.foto}" alt="${esc(s.nombre)}" />`
-        : '<i class="fa-solid fa-user"></i>';
+        : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
       starScorer.innerHTML = `
-        <div class="star-card-label"><i class="fa-solid fa-futbol"></i> Máximo Goleador</div>
+        <div class="star-card-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg> Máximo Goleador</div>
         <div class="star-player-row">
           <div class="star-photo">${foto}</div>
           <div class="star-info">
@@ -486,7 +486,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         </div>`;
     } else {
-      starScorer.innerHTML = `<div class="star-card-label"><i class="fa-solid fa-futbol"></i> Máximo Goleador</div><div class="empty star-empty-msg"><div class="empty-icon"><i class="fa-solid fa-futbol"></i></div>Sin goles registrados</div>`;
+      starScorer.innerHTML = `<div class="star-card-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg> Máximo Goleador</div><div class="empty star-empty-msg"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></div>Sin goles registrados</div>`;
     }
 
     // ─ Portero valla menos vencida
@@ -509,7 +509,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         </div>`;
     } else {
-      starKeeper.innerHTML = `<div class="star-card-label">🧾 Valla Menos Vencida</div><div class="empty star-empty-msg"><div class="empty-icon"><i class="fa-solid fa-shield-halved"></i></div>Sin datos aún</div>`;
+      starKeeper.innerHTML = `<div class="star-card-label">🧾 Valla Menos Vencida</div><div class="empty star-empty-msg"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>Sin datos aún</div>`;
     }
   }
 
@@ -517,7 +517,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   function renderHomeMatches() {
     const mine = myMatches();
     if (!mine.length) {
-      homeMatchesEl.innerHTML = `<div class="empty"><div class="empty-icon"><i class="fa-solid fa-calendar-days"></i></div>Aún no tienes partidos programados.</div>`;
+      homeMatchesEl.innerHTML = `<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>Aún no tienes partidos programados.</div>`;
       return;
     }
     homeMatchesEl.innerHTML = mine.map(m => matchRow(m)).join('');
@@ -528,7 +528,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     matches = await DB.getMatches();
     const mine = myMatches();
     if (!mine.length) {
-      matchListEl.innerHTML = `<div class="empty"><div class="empty-icon"><i class="fa-solid fa-calendar-days"></i></div>No hay partidos para tu equipo.</div>`;
+      matchListEl.innerHTML = `<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>No hay partidos para tu equipo.</div>`;
       return;
     }
     matchListEl.innerHTML = mine.map(m => matchRow(m)).join('');
@@ -553,7 +553,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="match-row">
         <div>
           <div class="match-row-teams">${localTag}<span class="vs">VS</span>${visitTag}</div>
-          <div class="match-row-date"><i class="fa-solid fa-calendar-days"></i> ${fecha}${hora ? ' · ⏰ ' + hora : ''}</div>
+          <div class="match-row-date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ${fecha}${hora ? ' · ⏰ ' + hora : ''}</div>
         </div>
         <div class="flex-center-gap10">
           ${done ? `<span class="match-result-score">${m.goles_local} – ${m.goles_visit}</span>` : ''}
@@ -564,10 +564,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ── Tabla posiciones ─────────────────────────────────────────
   async function renderStandings() {
-    standingsWrap.innerHTML = `<div class="empty"><div class="empty-icon"><i class="fa-solid fa-hourglass-half"></i></div>Calculando...</div>`;
+    standingsWrap.innerHTML = `<div class="empty"><div class="empty-icon"><svg style="animation: spin 1s linear infinite;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></div>Calculando...</div>`;
     standings = await DB.getStandings();
     if (!standings.length) {
-      standingsWrap.innerHTML = `<div class="empty"><div class="empty-icon"><i class="fa-solid fa-trophy"></i></div>Aún no hay datos.</div>`;
+      standingsWrap.innerHTML = `<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></div>Aún no hay datos.</div>`;
       return;
     }
 
@@ -601,7 +601,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }).join('');
 
       html += `
-        ${groupNames.length > 1 ? `<h3 style="margin: 20px 0 10px 0; color: #fff; font-size: 1.2rem;"><i class="fa-solid fa-trophy"></i> Grupo: ${esc(gName)}</h3>` : ''}
+        ${groupNames.length > 1 ? `<h3 style="margin: 20px 0 10px 0; color: #fff; font-size: 1.2rem;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg> Grupo: ${esc(gName)}</h3>` : ''}
         <div class="overflow-x-auto" style="margin-bottom: 20px;">
           <table class="pos-table">
             <thead>

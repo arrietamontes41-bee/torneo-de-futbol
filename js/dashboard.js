@@ -191,7 +191,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!teams.length) {
       teamsContainer.innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon"><i class="fa-solid fa-users"></i></div>
+          <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
           <p>No hay equipos registrados aún</p>
           <a href="register.html" class="btn-secondary-sm">+ Registrar Equipo</a>
         </div>`;
@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       ? `<img src="${t.escudo}" alt="escudo" class="img-fit-inherit" />`
       : initials;
     const deleteBtn = session.rol === 'admin'
-      ? `<button class="btn-icon btn-icon-red team-delete-btn" data-id="${t.id}" data-name="${escHtml(t.nombre)}" title="Eliminar equipo"><i class="fa-solid fa-trash"></i></button>`
+      ? `<button class="btn-icon btn-icon-red team-delete-btn" data-id="${t.id}" data-name="${escHtml(t.nombre)}" title="Eliminar equipo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>`
       : '';
     const groupBtn = session.rol === 'admin'
       ? `<button class="btn-primary-sm team-group-btn" style="margin-top:5px; padding:2px 5px; font-size:11px;" data-id="${t.id}" data-name="${escHtml(t.nombre)}" data-group="${escHtml(t.grupo || 'Único')}">Grupo: ${escHtml(t.grupo || 'Único')}</button>`
@@ -290,7 +290,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!matches.length) {
       matchesContainer.innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon"><i class="fa-solid fa-calendar-days"></i></div>
+          <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
           <p>No hay partidos programados</p>
         </div>`;
       return;
@@ -327,20 +327,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     const completed = m.estado === 'finalizado';
     const dateStr   = m.fecha ? formatDate(m.fecha) : '—';
     const timeStr   = m.hora  ? m.hora.slice(0, 5) : '—';
-    const faseStr   = m.fase && m.fase !== 'Fase de Grupos' ? ` | <i class="fa-solid fa-trophy"></i> ${m.fase}` : '';
+    const faseStr   = m.fase && m.fase !== 'Fase de Grupos' ? ` | <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg> ${m.fase}` : '';
 
     const scoreBlock = completed
       ? `<div class="match-score">${m.goles_local} – ${m.goles_visit}</div>`
       : `<div class="match-score pending">VS</div>`;
 
     const resultBtn = session.rol === 'admin' && !completed
-      ? `<button class="btn-icon btn-icon-green btn-result" data-id="${m.id}" title="Ingresar resultado"><i class="fa-solid fa-futbol"></i></button>`
+      ? `<button class="btn-icon btn-icon-green btn-result" data-id="${m.id}" title="Ingresar resultado"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></button>`
       : '';
     const editBtn = session.rol === 'admin' && !completed
-      ? `<button class="btn-icon btn-icon-blue btn-edit-match" data-id="${m.id}" title="Editar partido"><i class="fa-solid fa-pen"></i></button>`
+      ? `<button class="btn-icon btn-icon-blue btn-edit-match" data-id="${m.id}" title="Editar partido"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>`
       : '';
     const delBtn = session.rol === 'admin'
-      ? `<button class="btn-icon btn-icon-red btn-delete-match" data-id="${m.id}" title="Eliminar partido"><i class="fa-solid fa-trash"></i></button>`
+      ? `<button class="btn-icon btn-icon-red btn-delete-match" data-id="${m.id}" title="Eliminar partido"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>`
       : '';
 
     return `
@@ -357,7 +357,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         </div>
         <div class="match-meta">
-          <i class="fa-solid fa-calendar-days"></i> ${dateStr} &nbsp; 🕐 ${timeStr} ${faseStr}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ${dateStr} &nbsp; 🕐 ${timeStr} ${faseStr}
           &nbsp;
           <span class="match-status-badge ${completed ? 'status-completed' : 'status-pending'}">
             ${completed ? 'Finalizado' : 'Programado'}
@@ -629,7 +629,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     actaMatchId.value      = matchId;
     actaHomeName.textContent = m.equipo_local?.nombre  || 'Local';
     actaAwayName.textContent = m.equipo_visit?.nombre || 'Visitante';
-    actaMeta.textContent     = `<i class="fa-solid fa-calendar-days"></i> ${m.fecha ? formatDate(m.fecha) : '—'}  ·  ⏰ ${m.hora ? m.hora.slice(0,5) : '—'}`;
+    actaMeta.textContent     = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ${m.fecha ? formatDate(m.fecha) : '—'}  ·  ⏰ ${m.hora ? m.hora.slice(0,5) : '—'}`;
     actaError.textContent    = '';
     actaModal.classList.remove('hidden');
     actaHomeBody.innerHTML = loadingRow();
@@ -711,7 +711,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     rosterModal.classList.remove('hidden');
     rosterModalTitle.textContent = 'Cargando...';
     rosterModalSub.textContent   = '—';
-    rosterContent.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="fa-solid fa-hourglass-half"></i></div><p>Cargando jugadores de ${teamName}...</p></div>`;
+    rosterContent.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg style="animation: spin 1s linear infinite;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></div><p>Cargando jugadores de ${teamName}...</p></div>`;
 
     const players = await DB.getPlayersByTeam(teamId);
     
@@ -722,16 +722,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!players.length) {
       rosterContent.innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon"><i class="fa-solid fa-user"></i></div>
+          <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
           <p>Este equipo aún no tiene jugadores registrados.</p>
         </div>`;
       return;
     }
 
-    const posIcons = { Portero: '🧤', Defensa: '<i class="fa-solid fa-shield-halved"></i>', Mediocampista: '⚙️', Delantero: '⚡' };
+    const posIcons = { Portero: '🧤', Defensa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>', Mediocampista: '⚙️', Delantero: '⚡' };
 
     const rows = players.map(p => {
-      const icon    = posIcons[p.posicion] || '<i class="fa-solid fa-futbol"></i>';
+      const icon    = posIcons[p.posicion] || '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>';
       const dob     = p.fecha_nac ? formatDate(p.fecha_nac) : '—';
       const age     = p.fecha_nac ? calcAge(p.fecha_nac) : '';
       const ageStr  = age ? ` (${age} años)` : '';
@@ -785,7 +785,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const renderStandings = async () => {
     standingsContainer.innerHTML = `
       <div class="empty-state">
-        <div class="empty-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+        <div class="empty-icon"><svg style="animation: spin 1s linear infinite;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></div>
         <p>Calculando tabla...</p>
       </div>`;
 
@@ -795,7 +795,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!rows.length) {
       standingsContainer.innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon"><i class="fa-solid fa-trophy"></i></div>
+          <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></div>
           <p>No hay equipos registrados</p>
         </div>`;
       return;
@@ -842,7 +842,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }).join('');
 
       html += `
-        ${groupNames.length > 1 ? `<h3 style="margin: 20px 0 10px 0; color: #fff; font-size: 1.2rem;"><i class="fa-solid fa-trophy"></i> Grupo: ${escHtml(gName)}</h3>` : ''}
+        ${groupNames.length > 1 ? `<h3 style="margin: 20px 0 10px 0; color: #fff; font-size: 1.2rem;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg> Grupo: ${escHtml(gName)}</h3>` : ''}
         <div class="standings-wrap">
           <table class="standings-table">
             <thead>
@@ -874,7 +874,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const renderSanciones = async () => {
     sancionesContainer.innerHTML = `
       <div class="empty-state">
-        <div class="empty-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+        <div class="empty-icon"><svg style="animation: spin 1s linear infinite;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></div>
         <p>Cargando sanciones pendientes...</p>
       </div>`;
     const [fines, teams] = await Promise.all([DB.getAllPendingFines(), DB.getTeams()]);
@@ -882,7 +882,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!fines || !fines.length) {
       sancionesContainer.innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon"><i class="fa-solid fa-circle-check"></i></div>
+          <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
           <p>No hay multas de tarjetas pendientes por pagar</p>
         </div>`;
       return;
