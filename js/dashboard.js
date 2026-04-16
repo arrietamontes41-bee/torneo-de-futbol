@@ -222,9 +222,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             setLoading(true);
             const res = await DB.deleteTeam(btn.dataset.id);
             if (res.ok) {
+              showToast('Equipo eliminado correctamente.', 'success');
               await refresh();
             } else {
-              alert('Error al borrar equipo: ' + res.error);
+              showToast('Error al borrar equipo: ' + res.error, 'error');
               setLoading(false);
             }
           }
@@ -240,9 +241,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             setLoading(true);
             const res = await DB.updateTeamGroup(btn.dataset.id, newGroup.trim());
             if (res.ok) {
+              showToast(`Grupo actualizado a "${newGroup.trim()}".`, 'success');
               await refresh();
             } else {
-              alert('Error al actualizar grupo: ' + res.error);
+              showToast('Error al actualizar grupo: ' + res.error, 'error');
               setLoading(false);
             }
           }
@@ -369,7 +371,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   btnNewMatch.addEventListener('click', async () => {
     const teams = await DB.getTeams();
     if (teams.length < 2) {
-      alert('Necesitas al menos 2 equipos registrados para crear un partido.');
+      showToast('Necesitas al menos 2 equipos registrados para crear un partido.', 'error');
       return;
     }
     editMatchId.value       = '';
@@ -473,12 +475,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (option === '1') { numToAdvance = 16; phaseName = 'Octavos de Final'; }
       else if (option === '2') { numToAdvance = 8; phaseName = 'Cuartos de Final'; }
       else if (option === '3') { numToAdvance = 4; phaseName = 'Semifinal'; }
-      else { alert('Opción no válida.'); return; }
+      else { showToast('Opción no válida.', 'error'); return; }
 
       setLoading(true);
       const standings = await DB.getStandings();
       if (standings.length < numToAdvance) {
-        alert(`No hay suficientes equipos registrados (se requieren ${numToAdvance}).`);
+        showToast(`No hay suficientes equipos (se requieren ${numToAdvance}).`, 'error');
         setLoading(false);
         return;
       }
@@ -502,7 +504,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         generated++;
       }
 
-      alert(`Se han generado ${generated} partidos para ${phaseName}.`);
+      showToast(`Se generaron ${generated} partidos para ${phaseName}.`, 'success');
       await refresh();
     });
   }
@@ -512,7 +514,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnAutoGroups.addEventListener('click', async () => {
       const teams = await DB.getTeams();
       if (teams.length < 2) {
-        alert('Se necesitan al menos 2 equipos para crear grupos.');
+        showToast('Se necesitan al menos 2 equipos para crear grupos.', 'error');
         return;
       }
       
@@ -520,7 +522,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!numGroupsStr) return;
       const numGroups = parseInt(numGroupsStr);
       if (isNaN(numGroups) || numGroups < 1 || numGroups > 10) {
-        alert('Por favor ingresa un número de grupos válido (entre 1 y 10).');
+        showToast('Por favor ingresa un número de grupos válido (entre 1 y 10).', 'error');
         return;
       }
 
@@ -529,7 +531,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         setLoading(true);
         let promises = teams.map(t => DB.updateTeamGroup(t.id, 'Único'));
         await Promise.all(promises);
-        alert('Todos los equipos han sido restaurados al grupo Único.');
+        showToast('Todos los equipos restaurados al grupo Único.', 'success');
         await refresh();
         return;
       }
@@ -555,7 +557,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
 
       await Promise.all(promises);
-      alert(`Se han repartido los ${teams.length} equipos aleatoriamente en ${numGroups} grupos (A, B... etc).`);
+      showToast(`${teams.length} equipos repartidos en ${numGroups} grupos (A, B...).`, 'success');
       await refresh();
     });
   }
@@ -565,7 +567,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnExportExcel.addEventListener('click', () => {
       const tables = standingsContainer.querySelectorAll('table');
       if (tables.length === 0) {
-        alert('No hay tabla generada para exportar.');
+        showToast('No hay tabla generada para exportar.', 'error');
         return;
       }
 
@@ -916,9 +918,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         btn.textContent = 'Procesando...';
         const res = await DB.markFineAsPaid(btn.dataset.id);
         if (res.ok) {
-          await renderSanciones(); // recargar
+          showToast('Sanción marcada como pagada.', 'success');
+          await renderSanciones();
         } else {
-          alert('Error: ' + res.error);
+          showToast('Error: ' + res.error, 'error');
           btn.disabled = false;
         }
       });

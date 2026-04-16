@@ -57,7 +57,7 @@ const DB = (() => {
   let _cacheTeams = null;
   let _cacheMatches = null;
   let _cacheTime = 0;
-  const CACHE_TTL = 10000; // 10 segundos
+  const CACHE_TTL = 60000; // 60 segundos
 
   const clearCache = () => {
     _cacheTeams = null;

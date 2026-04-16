@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const file = photoInput.files[0];
     if (!file) return;
     if (file.size > 2 * 1024 * 1024) {
-      alert('La imagen debe pesar menos de 2MB.');
+      showToast('La imagen debe pesar menos de 2MB.', 'error');
       photoInput.value = '';
       return;
     }
@@ -171,6 +171,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (!result.ok) return showErr(result.error || 'Error al guardar.');
 
+    showToast('Jugador guardado correctamente.', 'success');
     players = await DB.getPlayersByTeam(myTeam.id);
     sPlayers.textContent = players.length;
     renderPlayers();
@@ -195,11 +196,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     confirmDel.disabled = false;
     confirmDel.textContent = 'Sí, eliminar';
 
-    if (!res.ok) { alert('Error: ' + (res.error || '')); return; }
+    if (!res.ok) { showToast('Error: ' + (res.error || ''), 'error'); return; }
 
     players = await DB.getPlayersByTeam(myTeam.id);
     sPlayers.textContent = players.length;
     renderPlayers();
+    showToast('Jugador eliminado.', 'success');
     deleteModal.classList.add('hidden');
     pendingDelId = null;
   });
@@ -209,7 +211,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   updateShieldInput.addEventListener('change', () => {
     const file = updateShieldInput.files[0];
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) { alert('El escudo debe pesar menos de 2MB.'); return; }
+    if (file.size > 2 * 1024 * 1024) { showToast('El escudo debe pesar menos de 2MB.', 'error'); return; }
     
     // UI Carga temporal
     const oldHtml = teamShield.innerHTML;
@@ -222,8 +224,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (res.ok) {
         myTeam.escudo = base64;
         teamShield.innerHTML = `<img src="${base64}" alt="escudo" class="shield-img-full" />`;
+        showToast('Escudo actualizado correctamente.', 'success');
       } else {
-        alert('Error al actualizar escudo: ' + res.error);
+        showToast('Error al actualizar escudo: ' + res.error, 'error');
         teamShield.innerHTML = oldHtml;
       }
     };
@@ -644,7 +647,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnExportExcelTeam.addEventListener('click', () => {
       const tables = standingsWrap.querySelectorAll('table');
       if (tables.length === 0) {
-        alert('No hay tabla generada para exportar.');
+        showToast('No hay tabla generada para exportar.', 'error');
         return;
       }
 
