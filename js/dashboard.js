@@ -191,7 +191,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!teams.length) {
       teamsContainer.innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon">👥</div>
+          <div class="empty-icon"><i class="ph ph-users"></i></div>
           <p>No hay equipos registrados aún</p>
           <a href="register.html" class="btn-secondary-sm">+ Registrar Equipo</a>
         </div>`;
@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       ? `<img src="${t.escudo}" alt="escudo" class="img-fit-inherit" />`
       : initials;
     const deleteBtn = session.rol === 'admin'
-      ? `<button class="btn-icon btn-icon-red team-delete-btn" data-id="${t.id}" data-name="${escHtml(t.nombre)}" title="Eliminar equipo">✕</button>`
+      ? `<button class="btn-icon btn-icon-red team-delete-btn" data-id="${t.id}" data-name="${escHtml(t.nombre)}" title="Eliminar equipo"><i class="ph ph-trash"></i></button>`
       : '';
     const groupBtn = session.rol === 'admin'
       ? `<button class="btn-primary-sm team-group-btn" style="margin-top:5px; padding:2px 5px; font-size:11px;" data-id="${t.id}" data-name="${escHtml(t.nombre)}" data-group="${escHtml(t.grupo || 'Único')}">Grupo: ${escHtml(t.grupo || 'Único')}</button>`
@@ -290,7 +290,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!matches.length) {
       matchesContainer.innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon">📅</div>
+          <div class="empty-icon"><i class="ph ph-calendar-blank"></i></div>
           <p>No hay partidos programados</p>
         </div>`;
       return;
@@ -327,20 +327,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     const completed = m.estado === 'finalizado';
     const dateStr   = m.fecha ? formatDate(m.fecha) : '—';
     const timeStr   = m.hora  ? m.hora.slice(0, 5) : '—';
-    const faseStr   = m.fase && m.fase !== 'Fase de Grupos' ? ` | 🏆 ${m.fase}` : '';
+    const faseStr   = m.fase && m.fase !== 'Fase de Grupos' ? ` | <i class="ph ph-trophy"></i> ${m.fase}` : '';
 
     const scoreBlock = completed
       ? `<div class="match-score">${m.goles_local} – ${m.goles_visit}</div>`
       : `<div class="match-score pending">VS</div>`;
 
     const resultBtn = session.rol === 'admin' && !completed
-      ? `<button class="btn-icon btn-icon-green btn-result" data-id="${m.id}" title="Ingresar resultado">⚽</button>`
+      ? `<button class="btn-icon btn-icon-green btn-result" data-id="${m.id}" title="Ingresar resultado"><i class="ph ph-soccer-ball"></i></button>`
       : '';
     const editBtn = session.rol === 'admin' && !completed
-      ? `<button class="btn-icon btn-icon-blue btn-edit-match" data-id="${m.id}" title="Editar partido">✏️</button>`
+      ? `<button class="btn-icon btn-icon-blue btn-edit-match" data-id="${m.id}" title="Editar partido"><i class="ph ph-pencil-simple"></i></button>`
       : '';
     const delBtn = session.rol === 'admin'
-      ? `<button class="btn-icon btn-icon-red btn-delete-match" data-id="${m.id}" title="Eliminar partido">✕</button>`
+      ? `<button class="btn-icon btn-icon-red btn-delete-match" data-id="${m.id}" title="Eliminar partido"><i class="ph ph-trash"></i></button>`
       : '';
 
     return `
@@ -357,7 +357,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         </div>
         <div class="match-meta">
-          📅 ${dateStr} &nbsp; 🕐 ${timeStr} ${faseStr}
+          <i class="ph ph-calendar-blank"></i> ${dateStr} &nbsp; 🕐 ${timeStr} ${faseStr}
           &nbsp;
           <span class="match-status-badge ${completed ? 'status-completed' : 'status-pending'}">
             ${completed ? 'Finalizado' : 'Programado'}
@@ -629,7 +629,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     actaMatchId.value      = matchId;
     actaHomeName.textContent = m.equipo_local?.nombre  || 'Local';
     actaAwayName.textContent = m.equipo_visit?.nombre || 'Visitante';
-    actaMeta.textContent     = `📅 ${m.fecha ? formatDate(m.fecha) : '—'}  ·  ⏰ ${m.hora ? m.hora.slice(0,5) : '—'}`;
+    actaMeta.textContent     = `<i class="ph ph-calendar-blank"></i> ${m.fecha ? formatDate(m.fecha) : '—'}  ·  ⏰ ${m.hora ? m.hora.slice(0,5) : '—'}`;
     actaError.textContent    = '';
     actaModal.classList.remove('hidden');
     actaHomeBody.innerHTML = loadingRow();
@@ -711,7 +711,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     rosterModal.classList.remove('hidden');
     rosterModalTitle.textContent = 'Cargando...';
     rosterModalSub.textContent   = '—';
-    rosterContent.innerHTML = `<div class="empty-state"><div class="empty-icon">⏳</div><p>Cargando jugadores de ${teamName}...</p></div>`;
+    rosterContent.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="ph ph-hourglass-medium"></i></div><p>Cargando jugadores de ${teamName}...</p></div>`;
 
     const players = await DB.getPlayersByTeam(teamId);
     
@@ -722,16 +722,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!players.length) {
       rosterContent.innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon">👤</div>
+          <div class="empty-icon"><i class="ph ph-user"></i></div>
           <p>Este equipo aún no tiene jugadores registrados.</p>
         </div>`;
       return;
     }
 
-    const posIcons = { Portero: '🧤', Defensa: '🛡️', Mediocampista: '⚙️', Delantero: '⚡' };
+    const posIcons = { Portero: '🧤', Defensa: '<i class="ph ph-shield"></i>', Mediocampista: '⚙️', Delantero: '⚡' };
 
     const rows = players.map(p => {
-      const icon    = posIcons[p.posicion] || '⚽';
+      const icon    = posIcons[p.posicion] || '<i class="ph ph-soccer-ball"></i>';
       const dob     = p.fecha_nac ? formatDate(p.fecha_nac) : '—';
       const age     = p.fecha_nac ? calcAge(p.fecha_nac) : '';
       const ageStr  = age ? ` (${age} años)` : '';
@@ -785,7 +785,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const renderStandings = async () => {
     standingsContainer.innerHTML = `
       <div class="empty-state">
-        <div class="empty-icon">⏳</div>
+        <div class="empty-icon"><i class="ph ph-hourglass-medium"></i></div>
         <p>Calculando tabla...</p>
       </div>`;
 
@@ -795,7 +795,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!rows.length) {
       standingsContainer.innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon">🏆</div>
+          <div class="empty-icon"><i class="ph ph-trophy"></i></div>
           <p>No hay equipos registrados</p>
         </div>`;
       return;
@@ -842,7 +842,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }).join('');
 
       html += `
-        ${groupNames.length > 1 ? `<h3 style="margin: 20px 0 10px 0; color: #fff; font-size: 1.2rem;">🏆 Grupo: ${escHtml(gName)}</h3>` : ''}
+        ${groupNames.length > 1 ? `<h3 style="margin: 20px 0 10px 0; color: #fff; font-size: 1.2rem;"><i class="ph ph-trophy"></i> Grupo: ${escHtml(gName)}</h3>` : ''}
         <div class="standings-wrap">
           <table class="standings-table">
             <thead>
@@ -874,7 +874,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const renderSanciones = async () => {
     sancionesContainer.innerHTML = `
       <div class="empty-state">
-        <div class="empty-icon">⏳</div>
+        <div class="empty-icon"><i class="ph ph-hourglass-medium"></i></div>
         <p>Cargando sanciones pendientes...</p>
       </div>`;
     const [fines, teams] = await Promise.all([DB.getAllPendingFines(), DB.getTeams()]);
@@ -882,7 +882,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!fines || !fines.length) {
       sancionesContainer.innerHTML = `
         <div class="empty-state">
-          <div class="empty-icon">✅</div>
+          <div class="empty-icon"><i class="ph-fill ph-check-circle"></i></div>
           <p>No hay multas de tarjetas pendientes por pagar</p>
         </div>`;
       return;

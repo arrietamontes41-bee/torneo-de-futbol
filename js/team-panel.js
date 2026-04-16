@@ -215,7 +215,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // UI Carga temporal
     const oldHtml = teamShield.innerHTML;
-    teamShield.innerHTML = '<span class="loading-icon-big">⏳</span>';
+    teamShield.innerHTML = '<span class="loading-icon-big"><i class="ph ph-hourglass-medium"></i></span>';
     
     const reader = new FileReader();
     reader.onload = async (e) => {
@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!myTeam) {
       teamNameBig.textContent    = 'Equipo no encontrado';
       headerTeamName.textContent = 'Mi Equipo';
-      homeMatchesEl.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div>No se encontró tu equipo. Contacta al administrador.</div>`;
+      homeMatchesEl.innerHTML = `<div class="empty"><div class="empty-icon"><i class="ph-fill ph-warning"></i></div>No se encontró tu equipo. Contacta al administrador.</div>`;
       return;
     }
 
@@ -307,7 +307,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     finesContainer.innerHTML = `
       <div class="fines-container">
-        <h3 class="fines-container-title">⚠️ Tienes tarjetas con multa pendiente de pago</h3>
+        <h3 class="fines-container-title"><i class="ph-fill ph-warning"></i> Tienes tarjetas con multa pendiente de pago</h3>
         ${finesHtml}
         <p class="fines-container-footer">* Por favor, cancela la multa correspondiente con el organizador. El administrador retirará esta alerta al confirmar el pago.</p>
       </div>
@@ -411,7 +411,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     playerCount.textContent = players.length ? `(${players.length} jugadores)` : '';
 
     if (!players.length) {
-      playersGrid.innerHTML = `<div class="empty"><div class="empty-icon">🦺</div>No hay jugadores aún.<br/>Haz clic en <strong>Agregar Jugador</strong>.</div>`;
+      playersGrid.innerHTML = `<div class="empty"><div class="empty-icon"><i class="ph ph-t-shirt"></i></div>No hay jugadores aún.<br/>Haz clic en <strong>Agregar Jugador</strong>.</div>`;
       return;
     }
 
@@ -436,7 +436,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   function playerCard(p) {
     const foto = p.foto
       ? `<img src="${p.foto}" alt="${esc(p.nombre)}" class="player-photo" />`
-      : `<div class="player-photo-placeholder">👤</div>`;
+      : `<div class="player-photo-placeholder"><i class="ph ph-user"></i></div>`;
 
     const dob = p.fecha_nac
       ? new Date(p.fecha_nac + 'T00:00:00').toLocaleDateString('es-CO', { day:'2-digit', month:'short', year:'numeric' })
@@ -471,9 +471,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       const s = scorers[0];
       const foto = s.foto
         ? `<img src="${s.foto}" alt="${esc(s.nombre)}" />`
-        : '👤';
+        : '<i class="ph ph-user"></i>';
       starScorer.innerHTML = `
-        <div class="star-card-label">⚽ Máximo Goleador</div>
+        <div class="star-card-label"><i class="ph ph-soccer-ball"></i> Máximo Goleador</div>
         <div class="star-player-row">
           <div class="star-photo">${foto}</div>
           <div class="star-info">
@@ -486,7 +486,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         </div>`;
     } else {
-      starScorer.innerHTML = `<div class="star-card-label">⚽ Máximo Goleador</div><div class="empty star-empty-msg"><div class="empty-icon">🥅</div>Sin goles registrados</div>`;
+      starScorer.innerHTML = `<div class="star-card-label"><i class="ph ph-soccer-ball"></i> Máximo Goleador</div><div class="empty star-empty-msg"><div class="empty-icon"><i class="ph ph-soccer-ball"></i></div>Sin goles registrados</div>`;
     }
 
     // ─ Portero valla menos vencida
@@ -509,7 +509,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         </div>`;
     } else {
-      starKeeper.innerHTML = `<div class="star-card-label">🧾 Valla Menos Vencida</div><div class="empty star-empty-msg"><div class="empty-icon">🛡️</div>Sin datos aún</div>`;
+      starKeeper.innerHTML = `<div class="star-card-label">🧾 Valla Menos Vencida</div><div class="empty star-empty-msg"><div class="empty-icon"><i class="ph ph-shield"></i></div>Sin datos aún</div>`;
     }
   }
 
@@ -517,7 +517,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   function renderHomeMatches() {
     const mine = myMatches();
     if (!mine.length) {
-      homeMatchesEl.innerHTML = `<div class="empty"><div class="empty-icon">📅</div>Aún no tienes partidos programados.</div>`;
+      homeMatchesEl.innerHTML = `<div class="empty"><div class="empty-icon"><i class="ph ph-calendar-blank"></i></div>Aún no tienes partidos programados.</div>`;
       return;
     }
     homeMatchesEl.innerHTML = mine.map(m => matchRow(m)).join('');
@@ -528,7 +528,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     matches = await DB.getMatches();
     const mine = myMatches();
     if (!mine.length) {
-      matchListEl.innerHTML = `<div class="empty"><div class="empty-icon">📅</div>No hay partidos para tu equipo.</div>`;
+      matchListEl.innerHTML = `<div class="empty"><div class="empty-icon"><i class="ph ph-calendar-blank"></i></div>No hay partidos para tu equipo.</div>`;
       return;
     }
     matchListEl.innerHTML = mine.map(m => matchRow(m)).join('');
@@ -553,7 +553,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="match-row">
         <div>
           <div class="match-row-teams">${localTag}<span class="vs">VS</span>${visitTag}</div>
-          <div class="match-row-date">📅 ${fecha}${hora ? ' · ⏰ ' + hora : ''}</div>
+          <div class="match-row-date"><i class="ph ph-calendar-blank"></i> ${fecha}${hora ? ' · ⏰ ' + hora : ''}</div>
         </div>
         <div class="flex-center-gap10">
           ${done ? `<span class="match-result-score">${m.goles_local} – ${m.goles_visit}</span>` : ''}
@@ -564,10 +564,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ── Tabla posiciones ─────────────────────────────────────────
   async function renderStandings() {
-    standingsWrap.innerHTML = `<div class="empty"><div class="empty-icon">⏳</div>Calculando...</div>`;
+    standingsWrap.innerHTML = `<div class="empty"><div class="empty-icon"><i class="ph ph-hourglass-medium"></i></div>Calculando...</div>`;
     standings = await DB.getStandings();
     if (!standings.length) {
-      standingsWrap.innerHTML = `<div class="empty"><div class="empty-icon">🏆</div>Aún no hay datos.</div>`;
+      standingsWrap.innerHTML = `<div class="empty"><div class="empty-icon"><i class="ph ph-trophy"></i></div>Aún no hay datos.</div>`;
       return;
     }
 
@@ -601,7 +601,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }).join('');
 
       html += `
-        ${groupNames.length > 1 ? `<h3 style="margin: 20px 0 10px 0; color: #fff; font-size: 1.2rem;">🏆 Grupo: ${esc(gName)}</h3>` : ''}
+        ${groupNames.length > 1 ? `<h3 style="margin: 20px 0 10px 0; color: #fff; font-size: 1.2rem;"><i class="ph ph-trophy"></i> Grupo: ${esc(gName)}</h3>` : ''}
         <div class="overflow-x-auto" style="margin-bottom: 20px;">
           <table class="pos-table">
             <thead>
