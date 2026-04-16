@@ -622,10 +622,10 @@ body {
   border-radius: 28px;
   overflow: hidden;
   position: relative;
+  isolation: isolate; /* crea contexto de apilado, evita recorte en Android */
   box-shadow: 0 40px 100px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.08);
   animation: carnetPop .3s cubic-bezier(.34,1.56,.64,1);
-  /* Evita que el border-radius corte el contenido en webkit/android */
-  -webkit-mask-image: -webkit-radial-gradient(white, black);
+  transform: translateZ(0); /* fuerza aceleración por GPU en móviles */
 }
 @keyframes carnetPop {
   from { opacity: 0; transform: scale(.85) translateY(20px); }
