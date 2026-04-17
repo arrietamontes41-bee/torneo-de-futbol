@@ -10,102 +10,163 @@
   <link rel="stylesheet" href="css/theme.css" />
   <link rel="stylesheet" href="css/style.css" />
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+
+    :root {
+      --primary: #00f2ff;
+      --primary-glow: rgba(0, 242, 255, 0.4);
+      --bg-dark: #07090f;
+      --card-bg: rgba(15, 23, 42, 0.8);
+      --text-main: #ffffff;
+      --text-dim: #94a3b8;
+      --border-color: rgba(51, 65, 85, 0.5);
+    }
+
     body {
-      background-color: #0d1117;
-      color: #c9d1d9;
-      font-family: 'Inter', sans-serif;
-      line-height: 1.6;
+      background: radial-gradient(circle at top right, #1e293b 0%, var(--bg-dark) 70%);
+      color: var(--text-main);
+      font-family: 'Outfit', sans-serif;
+      line-height: 1.8;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
     }
     
     .privacy-container {
-      max-width: 800px;
-      margin: 40px auto;
-      padding: 40px;
-      background: #161b22;
-      border-radius: 12px;
-      border: 1px solid #30363d;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      max-width: 850px;
+      width: 100%;
+      padding: 60px;
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 32px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .privacy-header {
       text-align: center;
-      margin-bottom: 40px;
-      border-bottom: 1px solid #30363d;
-      padding-bottom: 20px;
+      margin-bottom: 60px;
     }
 
     .privacy-container h1 {
       color: #fff;
-      font-size: 2rem;
-      margin-bottom: 10px;
+      font-size: 2.8rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(to right, #fff, var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle-org {
+        color: var(--primary);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: 0.9rem;
     }
 
     .privacy-container h2 {
-      color: #00e5ff;
-      font-size: 1.3rem;
-      margin-top: 30px;
-      margin-bottom: 15px;
-      border-bottom: 1px solid rgba(48, 54, 61, 0.5);
-      padding-bottom: 5px;
+      color: var(--primary);
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin-top: 50px;
+      margin-bottom: 20px;
+      letter-spacing: -0.02em;
     }
 
-    .privacy-container p, .privacy-container ul {
-      margin-bottom: 15px;
-      font-size: 1rem;
+    .privacy-container p, .privacy-container li {
+      margin-bottom: 20px;
+      font-size: 1.1rem;
+      font-weight: 300;
+      color: #f1f5f9;
     }
 
     .privacy-container ul {
       padding-left: 20px;
+      list-style: none;
     }
 
     .privacy-container li {
-      margin-bottom: 8px;
+      margin-bottom: 15px;
+      position: relative;
+      padding-left: 30px;
+    }
+
+    .privacy-container li::before {
+      content: '✦';
+      position: absolute;
+      left: 0;
+      color: var(--primary);
+      font-size: 0.8rem;
+      top: 2px;
     }
 
     .back-btn-container {
-      margin-top: 40px;
+      margin-top: 70px;
       text-align: center;
     }
 
     .btn-back {
-      display: inline-block;
-      padding: 12px 24px;
-      background: #1f6feb;
-      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 40px;
+      background: #fff;
+      color: #000;
       text-decoration: none;
-      border-radius: 6px;
-      font-weight: 600;
-      transition: background 0.2s;
+      border-radius: 16px;
+      font-weight: 700;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
     }
 
     .btn-back:hover {
-      background: #388bfd;
+      transform: translateY(-2px);
+      background: var(--primary);
+      box-shadow: 0 15px 30px var(--primary-glow);
     }
 
     .last-updated {
-      font-size: 0.85rem;
-      color: #8b949e;
+      font-size: 0.9rem;
+      color: var(--text-dim);
       text-align: right;
-      margin-top: 20px;
+      margin-top: 50px;
+      border-top: 1px solid var(--border-color);
+      padding-top: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .privacy-container {
+        padding: 40px 25px;
+      }
+      .privacy-container h1 { font-size: 2rem; }
     }
   </style>
   <link rel="icon" href="img/favicon.svg" type="image/svg+xml" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
-  </head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+</head>
 
 <body>
 
   <div class="privacy-container">
     <div class="privacy-header">
-      <h1>Política de Privacidad y Tratamiento de Datos</h1>
-      <p>Torneo de Fútbol Montería</p>
+      <h1>Tratamiento de Datos</h1>
+      <p class="subtitle-org">Torneo de Fútbol Montería</p>
     </div>
-
-    <!-- 
-      NOTA PARA TI: 
-      Aquí puedes aplicar los conocimientos de tu materia para ir rellenando y perfeccionando 
-      los textos legales correspondientes a cada sección.
-    -->
 
     <p>En el <strong>Torneo de Fútbol Montería</strong>, estamos comprometidos con la protección y el manejo adecuado de la información personal de nuestros delegados, jugadores y usuarios de la plataforma digital.</p>
 
@@ -127,37 +188,36 @@
       <li>Conocer, actualizar y rectificar sus datos personales ante la organización del torneo.</li>
       <li>Solicitar prueba de la autorización otorgada para el tratamiento de sus datos.</li>
       <li>Ser informados sobre el uso que se le ha dado a sus datos personales.</li>
-      <li>Revocar la autorización y/o solicitar la supresión de los datos cuando no exista un deber legal o contractual de permanecer en la base de datos (por ejemplo, tras finalizar la participación en el torneo y estar a paz y salvo).</li>
+      <li>Revocar la autorización y/o solicitar la supresión de los datos cuando no exista un deber legal o contractual de permanecer en la base de datos.</li>
     </ul>
 
     <h2>4. Seguridad de la información</h2>
     <p>El Torneo implementa medidas técnicas, humanas y administrativas necesarias para garantizar la seguridad de los datos personales, evitando su adulteración, pérdida, consulta, uso o acceso no autorizado o fraudulento.</p>
 
     <h2>5. Cambios en la Política de Privacidad</h2>
-    <p>Nos reservamos el derecho de modificar esta política en cualquier momento. Cualquier cambio sustancial será notificado a los delegados de los equipos a través de los medios de contacto registrados o mediante un aviso en la plataforma.</p>
+    <p>Nos reservamos el derecho de modificar esta política en cualquier momento. Cualquier cambio sustancial será notificado a los delegados de los equipos a través de los medios de contacto registrados.</p>
 
     <div class="last-updated">
       Última actualización: Abril de 2026
     </div>
 
     <div class="back-btn-container">
-      <button onclick="volverOCerrar()" class="btn-back" style="border: none; cursor: pointer; font-size: 1rem; font-family: inherit;">Entendido / Volver</button>
+      <button onclick="volverOCerrar()" class="btn-back">
+        <i class="fas fa-chevron-left"></i> Entendido / Volver
+      </button>
     </div>
   </div>
 
   <script>
     function volverOCerrar() {
-      // Como a veces se abre en una pestaña nueva (target="_blank"), el history.back() no funciona.
-      // Intentamos cerrar la pestaña, y si el navegador no lo permite, redirigimos al inicio.
       if (window.history.length <= 1 || window.opener != null) {
         window.close();
       }
-      
-      // Fallback
       setTimeout(() => {
         window.location.href = 'index.html';
       }, 250);
     }
   </script>
 </body>
+
 </html>
