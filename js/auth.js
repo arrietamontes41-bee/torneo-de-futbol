@@ -18,6 +18,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const btnLogin  = document.getElementById('btnLogin');
   const btnTogglePass = document.getElementById('btnTogglePass');
 
+  // Helpers
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const showError   = msg => { if (errorDiv) errorDiv.textContent = msg; };
+  const clearError  = ()  => { if (errorDiv) errorDiv.textContent = ''; };
+
   // Toggle mostrar/ocultar contraseña
   if (btnTogglePass) {
     btnTogglePass.addEventListener('click', () => {
@@ -27,116 +32,139 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // Lógica de "¿Olvidaste tu contraseña?"
+  // --- Lógica de "¿Olvidaste tu contraseña?" (NUEVA UI PERSISTENTE) ---
+  const loginCard     = document.getElementById('loginCard');
+  const recoverCard   = document.getElementById('recoverCard');
   const btnForgotPass = document.getElementById('btnForgotPass');
-  if (btnForgotPass) {
-    btnForgotPass.addEventListener('click', async (e) => {
-      e.preventDefault();
-      const recoverEmail = prompt('Ingresa el correo electrónico asociado a tu equipo:');
-      if (recoverEmail) {
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recoverEmail.trim())) {
-          alert('Por favor, ingresa un correo electrónico válido.');
-          return;
-        }
+  const btnBackLogin  = document.getElementById('btnBackToLogin');
+  
+  const recoverStepText = document.getElementById('recoverStepText');
+  const stepEmail       = document.getElementById('stepEmail');
+  const stepPIN         = document.getElementById('stepPIN');
+  const stepPass        = document.getElementById('stepPass');
+  const recoverError    = document.getElementById('recoverError');
 
-        if (typeof emailjs === 'undefined') {
-          alert('Error: La librería de EmailJS no está cargada.');
-          return;
-        }
-        if (EMAILJS_PUBLIC_KEY === 'TU_PUBLIC_KEY') {
-          alert('Configuración pendiente: Administrador, por favor configura tus llaves de EmailJS en js/config.js');
-          return;
-        }
+  // Funciones de navegación
+  const showRecover = () => {
+    loginCard.classList.add('hidden');
+    recoverCard.classList.remove('hidden');
+    recoverError.textContent = '';
+  };
+  const showLogin = () => {
+    recoverCard.classList.add('hidden');
+    loginCard.classList.remove('hidden');
+    clearError();
+  };
 
-        const originalText = btnForgotPass.textContent;
-        btnForgotPass.textContent = 'Enviando...';
-        btnForgotPass.style.pointerEvents = 'none';
+  if (btnForgotPass) btnForgotPass.addEventListener('click', showRecover);
+  if (btnBackLogin)  btnBackLogin.addEventListener('click', showLogin);
 
-        // 1. Resetear password y obtener la temporal
-        const resetRes = await DB.resetPasswordAndGetTemp(recoverEmail);
-        
-        if (!resetRes.ok) {
-          // Engaño de seguridad: Si no existe, decimos que lo enviamos igual.
-          alert('Si el correo "' + recoverEmail.trim() + '" está registrado, en los próximos minutos recibirás una clave temporal.\n\n(Revisa tu bandeja de Spam).');
-          btnForgotPass.textContent = originalText;
-          btnForgotPass.style.pointerEvents = 'auto';
-          return;
-        }
+  // Paso 1: Enviar PIN
+  const btnSendPIN = document.getElementById('btnSendPIN');
+  const recoverEmailInput = document.getElementById('recoverEmailInput');
 
-        // 2. Enviar por EmailJS
-        try {
-          await emailjs.send(
-            EMAILJS_SERVICE_ID,
-            EMAILJS_TEMPLATE_ID,
-            {
-              to_email: recoverEmail.trim(),
-              to_name: resetRes.userName,
-              temp_password: resetRes.tempPass,
-              reply_to: "no-reply@torneofutbol.com"
-            },
-            { publicKey: EMAILJS_PUBLIC_KEY }
-          );
+  btnSendPIN.addEventListener('click', async () => {
+    recoverError.textContent = '';
+    const email = recoverEmailInput.value.trim();
+    if (!EMAIL_REGEX.test(email)) {
+      recoverError.textContent = 'Ingresa un correo válido.';
+      return;
+    }
 
-          // 3. Flujo de verificación del PIN con bucle
-          let verifRes = null;
-          let pinIngresado = prompt('¡Correo enviado!\nRevisa tu bandeja de entrada o de Spam e ingresa el código numérico de 6 dígitos aquí:');
-          
-          while (pinIngresado !== null) {
-            // Limpiar cualquier caracter invisible o espacio copiado por error
-            const cleanPin = pinIngresado.replace(/\D/g, '');
-            
-            verifRes = await DB.login(recoverEmail.trim(), cleanPin);
-            
-            if (verifRes.ok) {
-              break; // Código correcto ✅
-            }
-            // Si falla, volvemos a pedirlo:
-            pinIngresado = prompt('❌ El código ingresado es incorrecto.\n\nPor favor, escríbelo manualmente (a veces copiar y pegar trae espacios invisibles).\n\nIngresa el código nuevamente:');
-          }
+    btnSendPIN.disabled = true;
+    btnSendPIN.textContent = 'Enviando...';
 
-          // Si le dio a Cancelar
-          if (pinIngresado === null || !verifRes || !verifRes.ok) {
-            btnForgotPass.textContent = originalText;
-            btnForgotPass.style.pointerEvents = 'auto';
-            return;
-          }
-
-          // 4. Si el código es correcto, pedir la nueva contraseña
-          let nuevaClave = prompt('Código correcto ✅\n\nIngresa tu NUEVA contraseña secreta (mínimo 6 caracteres):');
-          while (nuevaClave !== null && nuevaClave.length < 6) {
-            nuevaClave = prompt('❌ La contraseña es muy corta. Debe tener al menos 6 caracteres.\n\nIngresa tu NUEVA contraseña:');
-          }
-
-          if (nuevaClave) {
-            // Actualizar a la nueva contraseña elegida
-            const updateResult = await DB.updatePassword(verifRes.user.id, nuevaClave);
-            if (updateResult.ok) {
-              alert('¡Contraseña actualizada con éxito!\n\nEntrarás automáticamente a tu panel.');
-              window.location.href = verifRes.user.rol === 'admin' ? 'dashboard.html' : 'team-panel.html';
-            } else {
-              alert('Error al guardar la nueva contraseña: ' + (updateResult.error || 'Inténtalo de nuevo.'));
-            }
-          } else {
-            // Si cancela la creación de nueva clave... (dejamos la temporal por si acaso, y reseteamos)
-            DB.clearSession();
-            alert('Cancelaste la creación de contraseña. Podrás usar el código de 6 dígitos enviado a tu correo la próxima vez que intentes ingresar, o pedir uno nuevo.');
-          }
-
-        } catch (error) {
-          console.error('Error EmailJS:', error);
-          alert('Error detallado EmailJS: ' + JSON.stringify(error) + '\nStatus: ' + error.status + '\nText: ' + error.text);
-        }
-
-        btnForgotPass.textContent = originalText;
-        btnForgotPass.style.pointerEvents = 'auto';
+    const resetRes = await DB.resetPasswordAndGetTemp(email);
+    // Engaño de seguridad: Si no existe, decimos que lo enviamos igual.
+    if (!resetRes.ok) {
+      // Simular éxito para no revelar si el correo existe
+    } else {
+      try {
+        await emailjs.send(
+          EMAILJS_SERVICE_ID,
+          EMAILJS_TEMPLATE_ID,
+          {
+            to_email: email,
+            to_name: resetRes.userName || 'Usuario',
+            temp_password: resetRes.tempPass,
+            reply_to: "no-reply@torneofutbol.com"
+          },
+          { publicKey: EMAILJS_PUBLIC_KEY }
+        );
+      } catch (err) {
+        console.error('EmailJS Error:', err);
+        recoverError.textContent = 'Error al enviar correo. Reintenta.';
+        btnSendPIN.disabled = false;
+        btnSendPIN.textContent = 'Enviar Código';
+        return;
       }
-    });
-  }
+    }
 
-  const showError  = msg => { errorDiv.textContent = msg; };
-  const clearError = ()  => { errorDiv.textContent = ''; };
+    // Avanzar al paso del PIN
+    stepEmail.classList.add('hidden');
+    stepPIN.classList.remove('hidden');
+    recoverStepText.textContent = 'Ingresa el código enviado al correo';
+    btnSendPIN.disabled = false;
+    btnSendPIN.textContent = 'Enviar Código';
+  });
 
-  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // Paso 2: Verificar PIN
+  const btnVerifyPIN = document.getElementById('btnVerifyPIN');
+  const recoverPinInput = document.getElementById('recoverPinInput');
+  let loggedSession = null; // Guardar sesión tras login con PIN
+
+  btnVerifyPIN.addEventListener('click', async () => {
+    recoverError.textContent = '';
+    const email = recoverEmailInput.value.trim();
+    const pin = recoverPinInput.value.replace(/\D/g, '');
+
+    if (pin.length < 6) {
+      recoverError.textContent = 'Ingresa los 6 dígitos.';
+      return;
+    }
+
+    btnVerifyPIN.disabled = true;
+    btnVerifyPIN.textContent = 'Verificando...';
+
+    const res = await DB.login(email, pin);
+    if (res.ok) {
+      loggedSession = res.user;
+      stepPIN.classList.add('hidden');
+      stepPass.classList.remove('hidden');
+      recoverStepText.textContent = 'Establece tu nueva contraseña';
+    } else {
+      recoverError.textContent = 'Código incorrecto. Reintenta escribirlo.';
+    }
+    btnVerifyPIN.disabled = false;
+    btnVerifyPIN.textContent = 'Verificar Código';
+  });
+
+  // Paso 3: Actualizar Contraseña
+  const btnUpdatePass = document.getElementById('btnUpdatePass');
+  const recoverNewPass = document.getElementById('recoverNewPass');
+
+  btnUpdatePass.addEventListener('click', async () => {
+    recoverError.textContent = '';
+    const newPass = recoverNewPass.value;
+
+    if (newPass.length < 6) {
+      recoverError.textContent = 'Mínimo 6 caracteres.';
+      return;
+    }
+
+    btnUpdatePass.disabled = true;
+    btnUpdatePass.textContent = 'Guardando...';
+
+    const updateRes = await DB.updatePassword(loggedSession.id, newPass);
+    if (updateRes.ok) {
+      // Éxito: El usuario ya está logueado por el DB.login previo
+      window.location.href = loggedSession.rol === 'admin' ? 'dashboard.html' : 'team-panel.html';
+    } else {
+      recoverError.textContent = 'Error al guardar. Reintenta.';
+      btnUpdatePass.disabled = false;
+      btnUpdatePass.textContent = 'Actualizar y Entrar';
+    }
+  });
 
   [emailInput, passInput].forEach(el => el.addEventListener('input', clearError));
 

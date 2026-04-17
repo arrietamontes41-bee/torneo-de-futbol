@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         scorersContainer.innerHTML = scorers.map((p, i) => `
           <div class="leader-item">
             <div class="leader-rank">#${i + 1}</div>
-            <div class="leader-avatar">${p.nombre.charAt(0)}</div>
+            <div class="leader-avatar">${(p.nombre || '?').charAt(0)}</div>
             <div class="leader-info">
               <span class="leader-name">${escHtml(p.nombre)}</span>
               <span class="leader-team">${escHtml(p.equipo)}</span>
@@ -327,7 +327,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const completed = m.estado === 'finalizado';
     const dateStr   = m.fecha ? formatDate(m.fecha) : '—';
     const timeStr   = m.hora  ? m.hora.slice(0, 5) : '—';
-    const faseStr   = m.fase && m.fase !== 'Fase de Grupos' ? ` | <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg> ${m.fase}` : '';
+    const faseStr   = m.fase && m.fase !== 'Clasificación General' ? ` | <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg> ${m.fase}` : '';
 
     const scoreBlock = completed
       ? `<div class="match-score">${m.goles_local} – ${m.goles_visit}</div>`
