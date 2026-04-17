@@ -126,6 +126,14 @@
 
   "rewrites": [
     {
+      "source": "/(.*\\.sql)",
+      "destination": "/404.html"
+    },
+    {
+      "source": "/(.*\\.md)",
+      "destination": "/404.html"
+    },
+    {
       "source": "/",
       "destination": "/index.html"
     }
