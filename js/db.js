@@ -52,6 +52,10 @@ const DB = {
 
   // ── Autenticación ────────────────────────────────────────────
   async login(email, password) {
+    if (!this.client) {
+      console.error('DB Client no inicializado.');
+      return { ok: false, error: 'Error de configuración de base de datos.' };
+    }
     const hashed = await this.hashPassword(password);
     const { data, error } = await this.client
       .from('usuarios')

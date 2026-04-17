@@ -188,14 +188,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnLogin.disabled = true;
     btnLogin.textContent = 'Ingresando...';
 
-    const result = await DB.login(email, password);
+    try {
+      const result = await DB.login(email, password);
 
-    if (result.ok) {
-      // Redirigir según rol
-      const destino = result.user.rol === 'admin' ? 'dashboard.html' : 'team-panel.html';
-      window.location.href = destino;
-    } else {
-      showError(result.error);
+      if (result.ok) {
+        // Redirigir según rol
+        const destino = result.user.rol === 'admin' ? 'dashboard.html' : 'team-panel.html';
+        window.location.href = destino;
+      } else {
+        showError(result.error);
+        resetLoginBtn();
+      }
+    } catch (err) {
+      console.error('Login Error:', err);
+      showError('Error de conexión o de seguridad en el navegador.');
+      resetLoginBtn();
+    }
+
+    function resetLoginBtn() {
       btnLogin.disabled = false;
       btnLogin.innerHTML = `
         <svg viewBox="0 0 20 20" fill="currentColor" width="18">
