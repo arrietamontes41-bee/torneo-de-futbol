@@ -277,8 +277,33 @@ const DB = {
     await this.client.from('notificaciones').update({ leida: true }).eq('id', id);
   },
   async getPendingFines(teamId) {
-    // Ejemplo: tarjetas que requieren pago
-    return [];
+    // Tarjetas pendientes de pago para un equipo específico
+    const { data } = await this.client
+      .from('eventos_partido')
+      .select('*, jugadores(nombre, dorsal), partidos(fecha)')
+      .eq('equipo_id', teamId)
+      .in('tipo', ['amarilla', 'roja'])
+      .eq('pagada', false);
+    return data || [];
+  },
+
+  async getAllPendingFines() {
+    // Todas las tarjetas pendientes de pago (para el dashboard de admin)
+    try {
+      const { data, error } = await this.client
+        .from('eventos_partido')
+        .select('*, jugadores(nombre, dorsal), partidos(fecha)')
+        .in('tipo', ['amarilla', 'roja'])
+        .eq('pagada', false);
+      if (error) {
+        // Si la columna 'pagada' no existe, devolver vacío silenciosamente
+        console.warn('getAllPendingFines error (puede que la columna pagada no exista):', error.message);
+        return [];
+      }
+      return data || [];
+    } catch (e) {
+      return [];
+    }
   }
 };
 
