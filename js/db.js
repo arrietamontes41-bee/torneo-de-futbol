@@ -56,17 +56,33 @@ const DB = {
       console.error('DB Client no inicializado.');
       return { ok: false, error: 'Error de configuración de base de datos.' };
     }
-    const hashed = await this.hashPassword(password);
-    const { data, error } = await this.client
-      .from('usuarios')
-      .select('*')
-      .eq('email', email.trim().toLowerCase())
-      .eq('password', hashed)
-      .single();
+    
+    try {
+      const hashed = await this.hashPassword(password);
+      console.log('Intento de login para:', email);
 
-    if (error || !data) return { ok: false, error: 'Credenciales incorrectas.' };
-    this.saveSession(data);
-    return { ok: true, user: data };
+      const { data, error, status } = await this.client
+        .from('usuarios')
+        .select('*')
+        .eq('email', email.trim().toLowerCase())
+        .eq('password', hashed)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error Supabase Login:', error, 'Status:', status);
+        // Si el error es 406, puede ser un bloqueo de seguridad del servidor
+        if (status === 406) return { ok: false, error: 'Error de red seguro (406). Intenta refrescar la página.' };
+        return { ok: false, error: 'Error de conexión con la base de datos.' };
+      }
+
+      if (!data) return { ok: false, error: 'Credenciales incorrectas.' };
+
+      this.saveSession(data);
+      return { ok: true, user: data };
+    } catch (err) {
+      console.error('Error Fatal Login:', err);
+      return { ok: false, error: 'Error inesperado en el sistema.' };
+    }
   },
 
   async updatePassword(userId, newPassword) {
