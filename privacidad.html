@@ -8,111 +8,15 @@
   <meta name="description" content="Términos y condiciones sobre el tratamiento de datos." />
   <meta http-equiv="X-Content-Type-Options" content="nosniff" />
   
-  <!-- Cache Busting for external styles -->
-  <link rel="stylesheet" href="css/theme.css?v=1.1" />
-  <link rel="stylesheet" href="css/style.css?v=1.1" />
+  <!-- Estilos externos (permitidos por CSP 'self') -->
+  <link rel="stylesheet" href="css/theme.css?v=1.2" />
+  <link rel="stylesheet" href="css/style.css?v=1.2" />
+  <link rel="stylesheet" href="css/privacy.css?v=1.2" />
   
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
-
-    /* FUERZA EL CONTRASTE EXTREMO */
-    body {
-      background: #0f172a !important; 
-      color: #ffffff !important;
-      font-family: 'Outfit', sans-serif !important;
-      margin: 0 !important;
-      padding: 40px 20px !important;
-      display: flex !important;
-      justify-content: center !important;
-      align-items: center !important;
-      min-height: 100vh !important;
-    }
-    
-    .privacy-container {
-      max-width: 800px !important;
-      background: #1e293b !important; /* Gris azulado más claro */
-      color: #ffffff !important;
-      padding: 50px !important;
-      border-radius: 20px !important;
-      border: 2px solid #38bdf8 !important; /* Borde Cyan brillante */
-      box-shadow: 0 0 40px rgba(56, 189, 248, 0.2) !important;
-      line-height: 1.8 !important;
-    }
-
-    h1 {
-      color: #00f2ff !important;
-      font-size: 2.5rem !important;
-      text-align: center !important;
-      margin-bottom: 30px !important;
-      text-transform: uppercase !important;
-      letter-spacing: 1px !important;
-    }
-
-    h2 {
-      color: #38bdf8 !important;
-      font-size: 1.5rem !important;
-      margin-top: 40px !important;
-      border-bottom: 2px solid rgba(56, 189, 248, 0.3) !important;
-      padding-bottom: 10px !important;
-    }
-
-    p, li {
-      color: #f8fafc !important; /* Casi blanco */
-      font-size: 1.1rem !important;
-      margin-bottom: 15px !important;
-    }
-
-    strong {
-      color: #00f2ff !important;
-      font-weight: 700 !important;
-    }
-
-    ul {
-      list-style: none !important;
-      padding-left: 0 !important;
-    }
-
-    li::before {
-      content: "• " !important;
-      color: #00f2ff !important;
-      font-weight: bold !important;
-    }
-
-    .back-btn-container {
-      margin-top: 50px !important;
-      text-align: center !important;
-    }
-
-    .btn-back {
-      background: #38bdf8 !important;
-      color: #000 !important;
-      padding: 15px 40px !important;
-      border: none !important;
-      border-radius: 12px !important;
-      font-weight: 800 !important;
-      font-size: 1rem !important;
-      cursor: pointer !important;
-      transition: all 0.2s !important;
-    }
-
-    .btn-back:hover {
-      transform: scale(1.05) !important;
-      background: #ffffff !important;
-    }
-
-    .last-updated {
-      text-align: right !important;
-      color: #94a3b8 !important;
-      font-size: 0.9rem !important;
-      margin-top: 40px !important;
-      border-top: 1px solid rgba(255,255,255,0.1) !important;
-      padding-top: 20px !important;
-    }
-  </style>
   <link rel="icon" href="img/favicon.svg" type="image/svg+xml" />
 </head>
 
-<body>
+<body class="privacy-body">
   <div class="privacy-container">
     <h1>Tratamiento de Datos</h1>
     
