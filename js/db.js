@@ -11,7 +11,7 @@ const DB = {
   session: null,
 
   init() {
-    this.client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    this.client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
     this.loadSession();
   },
 
