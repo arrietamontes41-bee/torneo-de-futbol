@@ -58,20 +58,17 @@ const DB = {
     }
     
     try {
-      const hashed = await this.hashPassword(password);
       console.log('Intento de login para:', email);
 
       const { data, error, status } = await this.client
         .from('usuarios')
         .select('*')
         .eq('email', email.trim().toLowerCase())
-        .eq('password', hashed)
+        .eq('password', password)
         .maybeSingle();
 
       if (error) {
         console.error('Error Supabase Login:', error, 'Status:', status);
-        // Si el error es 406, puede ser un bloqueo de seguridad del servidor
-        if (status === 406) return { ok: false, error: 'Error de red seguro (406). Intenta refrescar la página.' };
         return { ok: false, error: 'Error de conexión con la base de datos.' };
       }
 
@@ -86,23 +83,18 @@ const DB = {
   },
 
   async updatePassword(userId, newPassword) {
-    const hashed = await this.hashPassword(newPassword);
     const { error } = await this.client
       .from('usuarios')
-      .update({ password: hashed })
+      .update({ password: newPassword })
       .eq('id', userId);
     return error ? { ok: false, error: error.message } : { ok: true };
   },
 
   async resetPasswordAndGetTemp(email) {
-    // Generar PIN de 6 dígitos
     const tempPass = Math.floor(100000 + Math.random() * 900000).toString();
-    const hashed   = await this.hashPassword(tempPass);
     const { data: user } = await this.client.from('usuarios').select('id, nombre').eq('email', email.trim().toLowerCase()).single();
-    
     if (!user) return { ok: false };
-
-    const { error } = await this.client.from('usuarios').update({ password: hashed }).eq('id', user.id);
+    const { error } = await this.client.from('usuarios').update({ password: tempPass }).eq('id', user.id);
     return error ? { ok: false } : { ok: true, tempPass, userName: user.nombre };
   },
 
@@ -113,12 +105,8 @@ const DB = {
   },
 
   async addTeam(teamData, userData) {
-    // 1. Hash de la contraseña del nuevo usuario
-    const hashedPass = await this.hashPassword(userData.password);
-    const securedUser = { ...userData, password: hashedPass };
-
-    // 2. Crear usuario
-    const { data: user, error: userError } = await this.client.from('usuarios').insert([securedUser]).select().single();
+    // 1. Crear usuario directamente
+    const { data: user, error: userError } = await this.client.from('usuarios').insert([userData]).select().single();
     if (userError) return { ok: false, error: userError.message };
 
     // 2. Crear equipo
