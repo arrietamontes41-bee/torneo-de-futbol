@@ -60,22 +60,46 @@ const DB = {
     try {
       console.log('Intento de login para:', email);
 
-      const { data, error, status } = await this.client
+      // Traeremos al usuario solo por email para verificar la clave manualmente
+      const { data: users, error, status } = await this.client
         .from('usuarios')
         .select('*')
-        .eq('email', email.trim().toLowerCase())
-        .eq('password', password)
-        .maybeSingle();
+        .eq('email', email.trim().toLowerCase());
 
       if (error) {
         console.error('Error Supabase Login:', error, 'Status:', status);
         return { ok: false, error: 'Error de conexión con la base de datos.' };
       }
 
-      if (!data) return { ok: false, error: 'Credenciales incorrectas.' };
+      if (!users || users.length === 0) return { ok: false, error: 'Credenciales incorrectas.' };
 
-      this.saveSession(data);
-      return { ok: true, user: data };
+      const user = users[0];
+      const hashed = await this.hashPassword(password);
+      
+      let isValidLogin = false;
+      let needsMigration = false;
+
+      // 1. Intentar validar con hash (el método correcto y seguro)
+      if (user.password === hashed) {
+        isValidLogin = true;
+      } 
+      // 2. Fallback temporal: Validar si la contraseña en BD sigue en texto plano
+      else if (user.password === password) {
+        isValidLogin = true;
+        needsMigration = true;
+      }
+
+      if (!isValidLogin) return { ok: false, error: 'Credenciales incorrectas.' };
+
+      // Si el usuario aún usaba texto plano, actualizamos silenciosamente su clave al hash seguro
+      if (needsMigration) {
+        console.log('Migrando usuario a contraseña encriptada (SHA-256)...');
+        await this.client.from('usuarios').update({ password: hashed }).eq('id', user.id);
+        user.password = hashed;
+      }
+
+      this.saveSession(user);
+      return { ok: true, user: user };
     } catch (err) {
       console.error('Error Fatal Login:', err);
       return { ok: false, error: 'Error inesperado en el sistema.' };
@@ -83,18 +107,20 @@ const DB = {
   },
 
   async updatePassword(userId, newPassword) {
+    const hashed = await this.hashPassword(newPassword);
     const { error } = await this.client
       .from('usuarios')
-      .update({ password: newPassword })
+      .update({ password: hashed })
       .eq('id', userId);
     return error ? { ok: false, error: error.message } : { ok: true };
   },
 
   async resetPasswordAndGetTemp(email) {
     const tempPass = Math.floor(100000 + Math.random() * 900000).toString();
+    const hashed   = await this.hashPassword(tempPass);
     const { data: user } = await this.client.from('usuarios').select('id, nombre').eq('email', email.trim().toLowerCase()).single();
     if (!user) return { ok: false };
-    const { error } = await this.client.from('usuarios').update({ password: tempPass }).eq('id', user.id);
+    const { error } = await this.client.from('usuarios').update({ password: hashed }).eq('id', user.id);
     return error ? { ok: false } : { ok: true, tempPass, userName: user.nombre };
   },
 
@@ -105,8 +131,12 @@ const DB = {
   },
 
   async addTeam(teamData, userData) {
-    // 1. Crear usuario directamente
-    const { data: user, error: userError } = await this.client.from('usuarios').insert([userData]).select().single();
+    // 1. Hash de la contraseña del nuevo usuario
+    const hashedPass = await this.hashPassword(userData.password);
+    const securedUser = { ...userData, password: hashedPass };
+
+    // 2. Crear usuario
+    const { data: user, error: userError } = await this.client.from('usuarios').insert([securedUser]).select().single();
     if (userError) return { ok: false, error: userError.message };
 
     // 2. Crear equipo
