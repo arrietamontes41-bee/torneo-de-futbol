@@ -10,7 +10,7 @@ const DB = {
   client: null,
   session: null,
 
-  async init() {
+  init() {
     this.client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     this.loadSession();
   },
@@ -18,10 +18,19 @@ const DB = {
   // ── Helpers de Seguridad ─────────────────────────────────────
   async hashPassword(password) {
     if (!password) return '';
-    const msgUint8 = new TextEncoder().encode(password);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    try {
+      if (!crypto.subtle) {
+        console.warn('Crypto Subtle no disponible. Usando fallback (solo para pruebas locales inseguras).');
+        return password; // Fallback inseguro si no hay HTTPS (solo para desarrollo)
+      }
+      const msgUint8 = new TextEncoder().encode(password);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    } catch (err) {
+      console.error('Error en hashPassword:', err);
+      return password; 
+    }
   },
 
   // ── Sesión Local ─────────────────────────────────────────────

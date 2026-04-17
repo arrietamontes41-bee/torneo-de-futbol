@@ -60,26 +60,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (btnBackLogin)  btnBackLogin.addEventListener('click', showLogin);
 
   // Paso 1: Enviar PIN
-  const btnSendPIN = document.getElementById('btnSendPIN');
-  const recoverEmailInput = document.getElementById('recoverEmailInput');
-
   btnSendPIN.addEventListener('click', async () => {
-    recoverError.textContent = '';
-    const email = recoverEmailInput.value.trim();
-    if (!EMAIL_REGEX.test(email)) {
-      recoverError.textContent = 'Ingresa un correo válido.';
-      return;
-    }
+    try {
+      recoverError.textContent = '';
+      const email = recoverEmailInput.value.trim();
+      if (!EMAIL_REGEX.test(email)) {
+        recoverError.textContent = 'Ingresa un correo válido.';
+        return;
+      }
 
-    btnSendPIN.disabled = true;
-    btnSendPIN.textContent = 'Enviando...';
+      btnSendPIN.disabled = true;
+      btnSendPIN.textContent = 'Enviando...';
 
-    const resetRes = await DB.resetPasswordAndGetTemp(email);
-    // Engaño de seguridad: Si no existe, decimos que lo enviamos igual.
-    if (!resetRes.ok) {
-      // Simular éxito para no revelar si el correo existe
-    } else {
-      try {
+      const resetRes = await DB.resetPasswordAndGetTemp(email);
+      // Engaño de seguridad: Si no existe, decimos que lo enviamos igual.
+      if (resetRes.ok) {
         await emailjs.send(
           EMAILJS_SERVICE_ID,
           EMAILJS_TEMPLATE_ID,
@@ -91,21 +86,19 @@ document.addEventListener('DOMContentLoaded', async () => {
           },
           { publicKey: EMAILJS_PUBLIC_KEY }
         );
-      } catch (err) {
-        console.error('EmailJS Error:', err);
-        recoverError.textContent = 'Error al enviar correo. Reintenta.';
-        btnSendPIN.disabled = false;
-        btnSendPIN.textContent = 'Enviar Código';
-        return;
       }
-    }
 
-    // Avanzar al paso del PIN
-    stepEmail.classList.add('hidden');
-    stepPIN.classList.remove('hidden');
-    recoverStepText.textContent = 'Ingresa el código enviado al correo';
-    btnSendPIN.disabled = false;
-    btnSendPIN.textContent = 'Enviar Código';
+      // Avanzar al paso del PIN (siempre avanzamos para seguridad, o si fue exitoso)
+      stepEmail.classList.add('hidden');
+      stepPIN.classList.remove('hidden');
+      recoverStepText.textContent = 'Ingresa el código enviado al correo';
+    } catch (err) {
+      console.error('Error en recuperación:', err);
+      recoverError.textContent = 'Error técnico. Verifica tu conexión.';
+    } finally {
+      btnSendPIN.disabled = false;
+      btnSendPIN.textContent = 'Enviar Código';
+    }
   });
 
   // Paso 2: Verificar PIN
@@ -114,29 +107,35 @@ document.addEventListener('DOMContentLoaded', async () => {
   let loggedSession = null; // Guardar sesión tras login con PIN
 
   btnVerifyPIN.addEventListener('click', async () => {
-    recoverError.textContent = '';
-    const email = recoverEmailInput.value.trim();
-    const pin = recoverPinInput.value.replace(/\D/g, '');
+    try {
+      recoverError.textContent = '';
+      const email = recoverEmailInput.value.trim();
+      const pin = recoverPinInput.value.replace(/\D/g, '');
 
-    if (pin.length < 6) {
-      recoverError.textContent = 'Ingresa los 6 dígitos.';
-      return;
+      if (pin.length < 6) {
+        recoverError.textContent = 'Ingresa los 6 dígitos.';
+        return;
+      }
+
+      btnVerifyPIN.disabled = true;
+      btnVerifyPIN.textContent = 'Verificando...';
+
+      const res = await DB.login(email, pin);
+      if (res.ok) {
+        loggedSession = res.user;
+        stepPIN.classList.add('hidden');
+        stepPass.classList.remove('hidden');
+        recoverStepText.textContent = 'Establece tu nueva contraseña';
+      } else {
+        recoverError.textContent = 'Código incorrecto. Reintenta.';
+      }
+    } catch (err) {
+      console.error('Error en verificación:', err);
+      recoverError.textContent = 'Error de conexión.';
+    } finally {
+      btnVerifyPIN.disabled = false;
+      btnVerifyPIN.textContent = 'Verificar Código';
     }
-
-    btnVerifyPIN.disabled = true;
-    btnVerifyPIN.textContent = 'Verificando...';
-
-    const res = await DB.login(email, pin);
-    if (res.ok) {
-      loggedSession = res.user;
-      stepPIN.classList.add('hidden');
-      stepPass.classList.remove('hidden');
-      recoverStepText.textContent = 'Establece tu nueva contraseña';
-    } else {
-      recoverError.textContent = 'Código incorrecto. Reintenta escribirlo.';
-    }
-    btnVerifyPIN.disabled = false;
-    btnVerifyPIN.textContent = 'Verificar Código';
   });
 
   // Paso 3: Actualizar Contraseña
@@ -144,23 +143,28 @@ document.addEventListener('DOMContentLoaded', async () => {
   const recoverNewPass = document.getElementById('recoverNewPass');
 
   btnUpdatePass.addEventListener('click', async () => {
-    recoverError.textContent = '';
-    const newPass = recoverNewPass.value;
+    try {
+      recoverError.textContent = '';
+      const newPass = recoverNewPass.value;
 
-    if (newPass.length < 6) {
-      recoverError.textContent = 'Mínimo 6 caracteres.';
-      return;
-    }
+      if (newPass.length < 6) {
+        recoverError.textContent = 'Mínimo 6 caracteres.';
+        return;
+      }
 
-    btnUpdatePass.disabled = true;
-    btnUpdatePass.textContent = 'Guardando...';
+      btnUpdatePass.disabled = true;
+      btnUpdatePass.textContent = 'Guardando...';
 
-    const updateRes = await DB.updatePassword(loggedSession.id, newPass);
-    if (updateRes.ok) {
-      // Éxito: El usuario ya está logueado por el DB.login previo
-      window.location.href = loggedSession.rol === 'admin' ? 'dashboard.html' : 'team-panel.html';
-    } else {
-      recoverError.textContent = 'Error al guardar. Reintenta.';
+      const updateRes = await DB.updatePassword(loggedSession.id, newPass);
+      if (updateRes.ok) {
+        window.location.href = loggedSession.rol === 'admin' ? 'dashboard.html' : 'team-panel.html';
+      } else {
+        recoverError.textContent = 'Error al guardar.';
+      }
+    } catch (err) {
+      console.error('Error al actualizar:', err);
+      recoverError.textContent = 'Error técnico.';
+    } finally {
       btnUpdatePass.disabled = false;
       btnUpdatePass.textContent = 'Actualizar y Entrar';
     }
