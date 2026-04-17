@@ -10,9 +10,18 @@ const DB = {
   client: null,
   session: null,
 
-  init() {
+  async init() {
     this.client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     this.loadSession();
+  },
+
+  // ── Helpers de Seguridad ─────────────────────────────────────
+  async hashPassword(password) {
+    if (!password) return '';
+    const msgUint8 = new TextEncoder().encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   },
 
   // ── Sesión Local ─────────────────────────────────────────────
@@ -34,11 +43,12 @@ const DB = {
 
   // ── Autenticación ────────────────────────────────────────────
   async login(email, password) {
+    const hashed = await this.hashPassword(password);
     const { data, error } = await this.client
       .from('usuarios')
       .select('*')
       .eq('email', email.trim().toLowerCase())
-      .eq('password', password)
+      .eq('password', hashed)
       .single();
 
     if (error || !data) return { ok: false, error: 'Credenciales incorrectas.' };
@@ -47,9 +57,10 @@ const DB = {
   },
 
   async updatePassword(userId, newPassword) {
+    const hashed = await this.hashPassword(newPassword);
     const { error } = await this.client
       .from('usuarios')
-      .update({ password: newPassword })
+      .update({ password: hashed })
       .eq('id', userId);
     return error ? { ok: false, error: error.message } : { ok: true };
   },
@@ -57,11 +68,12 @@ const DB = {
   async resetPasswordAndGetTemp(email) {
     // Generar PIN de 6 dígitos
     const tempPass = Math.floor(100000 + Math.random() * 900000).toString();
+    const hashed   = await this.hashPassword(tempPass);
     const { data: user } = await this.client.from('usuarios').select('id, nombre').eq('email', email.trim().toLowerCase()).single();
     
     if (!user) return { ok: false };
 
-    const { error } = await this.client.from('usuarios').update({ password: tempPass }).eq('id', user.id);
+    const { error } = await this.client.from('usuarios').update({ password: hashed }).eq('id', user.id);
     return error ? { ok: false } : { ok: true, tempPass, userName: user.nombre };
   },
 
@@ -72,8 +84,12 @@ const DB = {
   },
 
   async addTeam(teamData, userData) {
-    // 1. Crear usuario
-    const { data: user, error: userError } = await this.client.from('usuarios').insert([userData]).select().single();
+    // 1. Hash de la contraseña del nuevo usuario
+    const hashedPass = await this.hashPassword(userData.password);
+    const securedUser = { ...userData, password: hashedPass };
+
+    // 2. Crear usuario
+    const { data: user, error: userError } = await this.client.from('usuarios').insert([securedUser]).select().single();
     if (userError) return { ok: false, error: userError.message };
 
     // 2. Crear equipo
