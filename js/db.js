@@ -238,6 +238,20 @@ const DB = {
   },
 
   // ── Estadísticas ─────────────────────────────────────────────
+  async getStats() {
+    try {
+      const [teams, matches] = await Promise.all([this.getTeams(), this.getMatches()]);
+      return {
+        teams: Array.isArray(teams) ? teams.length : 0,
+        scheduled: Array.isArray(matches) ? matches.filter(m => m.estado === 'pendiente').length : 0,
+        completed: Array.isArray(matches) ? matches.filter(m => m.estado === 'finalizado').length : 0
+      };
+    } catch (e) {
+      console.error('Error en getStats:', e);
+      return { teams: 0, scheduled: 0, completed: 0 };
+    }
+  },
+
   async getTopScorers(limit = 5) {
     const { data, error } = await this.client.from('eventos_partido')
       .select('jugador_id, cantidad, jugadores(nombre, foto, equipos(nombre))')
