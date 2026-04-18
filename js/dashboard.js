@@ -333,9 +333,22 @@ document.addEventListener('DOMContentLoaded', async () => {
       ? `<div class="match-score">${m.goles_local} – ${m.goles_visit}</div>`
       : `<div class="match-score pending">VS</div>`;
 
-    const resultBtn = session.rol === 'admin' && !completed
-      ? `<button class="btn-icon btn-icon-green btn-result" data-id="${m.id}" title="Ingresar resultado"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></button>`
-      : '';
+    // Calcular si la hora programada ya pasó o ya llegó
+    let matchTimeMs = 0;
+    if (m.fecha && m.hora) {
+      matchTimeMs = new Date(`${m.fecha}T${m.hora}`).getTime();
+    }
+    const isReadyToPlay = matchTimeMs > 0 && Date.now() >= matchTimeMs;
+
+    let resultBtn = '';
+    if (session.rol === 'admin' && !completed) {
+      if (isReadyToPlay) {
+        resultBtn = `<button class="btn-icon btn-icon-green btn-result" data-id="${m.id}" title="Ingresar resultado"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></button>`;
+      } else {
+        resultBtn = `<button class="btn-icon" disabled style="opacity: 0.4; cursor: not-allowed;" title="Aún no llega la hora del partido"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></button>`;
+      }
+    }
+
     const editBtn = session.rol === 'admin' && !completed
       ? `<button class="btn-icon btn-icon-blue btn-edit-match" data-id="${m.id}" title="Editar partido"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>`
       : '';
@@ -432,8 +445,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!date)               { matchFormError.textContent = 'Selecciona una fecha.';            return; }
     if (!time)               { matchFormError.textContent = 'Selecciona una hora.';             return; }
 
+    // Validación 1: Fecha y hora en el futuro
+    const matchDateTime = new Date(`${date}T${time}`);
+    if (matchDateTime < new Date()) {
+      matchFormError.textContent = 'No puedes programar partidos en el pasado.';
+      return;
+    }
+
     setLoading(true);
     const id = editMatchId.value;
+
     const result = id
       ? await DB.updateMatch(id, { homeTeamId: homeId, awayTeamId: awayId, date, time, fase })
       : await DB.addMatch({ homeTeamId: homeId, awayTeamId: awayId, date, time, fase });
