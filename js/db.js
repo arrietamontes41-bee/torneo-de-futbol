@@ -58,48 +58,41 @@ const DB = {
     }
     
     try {
-      console.log('Intento de login para:', email);
+      console.log('Intento de login con Supabase Auth:', email);
 
-      // Traeremos al usuario solo por email para verificar la clave manualmente
-      const { data: users, error, status } = await this.client
+      // 1. Intentar iniciar sesión con el sistema nativo de Supabase
+      const { data, error: authError } = await this.client.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password: password
+      });
+
+      if (authError) {
+        console.error('Error de Auth:', authError.message);
+        return { ok: false, error: 'Credenciales incorrectas o error de acceso.' };
+      }
+
+      // 2. Obtener el perfil del usuario de la tabla pública
+      const { data: profile, error: dbError } = await this.client
         .from('usuarios')
         .select('*')
-        .eq('email', email.trim().toLowerCase());
+        .eq('id', data.user.id)
+        .single();
 
-      if (error) {
-        console.error('Error Supabase Login:', error, 'Status:', status);
-        return { ok: false, error: 'Error de conexión con la base de datos.' };
+      if (dbError || !profile) {
+        console.error('Error al cargar perfil:', dbError);
+        // Fallback: crear sesión con los datos de auth si el perfil falla
+        const fallbackUser = {
+          id: data.user.id,
+          email: data.user.email,
+          nombre: data.user.user_metadata?.nombre || 'Usuario',
+          rol: data.user.user_metadata?.rol || 'team'
+        };
+        this.saveSession(fallbackUser);
+        return { ok: true, user: fallbackUser };
       }
 
-      if (!users || users.length === 0) return { ok: false, error: 'Credenciales incorrectas.' };
-
-      const user = users[0];
-      const hashed = await this.hashPassword(password);
-      
-      let isValidLogin = false;
-      let needsMigration = false;
-
-      // 1. Intentar validar con hash (el método correcto y seguro)
-      if (user.password === hashed) {
-        isValidLogin = true;
-      } 
-      // 2. Fallback temporal: Validar si la contraseña en BD sigue en texto plano
-      else if (user.password === password) {
-        isValidLogin = true;
-        needsMigration = true;
-      }
-
-      if (!isValidLogin) return { ok: false, error: 'Credenciales incorrectas.' };
-
-      // Si el usuario aún usaba texto plano, actualizamos silenciosamente su clave al hash seguro
-      if (needsMigration) {
-        console.log('Migrando usuario a contraseña encriptada (SHA-256)...');
-        await this.client.from('usuarios').update({ password: hashed }).eq('id', user.id);
-        user.password = hashed;
-      }
-
-      this.saveSession(user);
-      return { ok: true, user: user };
+      this.saveSession(profile);
+      return { ok: true, user: profile };
     } catch (err) {
       console.error('Error Fatal Login:', err);
       return { ok: false, error: 'Error inesperado en el sistema.' };
