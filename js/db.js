@@ -301,6 +301,38 @@ const DB = {
     return error ? { ok: false, error: error.message } : { ok: true };
   },
 
+  async getMatchEvents(matchId) {
+    const { data, error } = await this.client
+      .from('eventos_partido')
+      .select('*')
+      .eq('partido_id', matchId);
+    return error ? [] : (data || []);
+  },
+
+  async saveMatchEvents(matchId, events) {
+    try {
+      // 1. Borrar eventos previos del partido para evitar duplicados al re-guardar
+      await this.client.from('eventos_partido').delete().eq('partido_id', matchId);
+      
+      if (!events || events.length === 0) return { ok: true };
+
+      // 2. Insertar nuevos eventos
+      const toInsert = events.map(e => ({ ...e, partido_id: matchId }));
+      const { error } = await this.client.from('eventos_partido').insert(toInsert);
+      return error ? { ok: false, error: error.message } : { ok: true };
+    } catch (err) {
+      return { ok: false, error: err.message };
+    }
+  },
+
+  async markFineAsPaid(fineId) {
+    const { error } = await this.client
+      .from('eventos_partido')
+      .update({ pagada: true })
+      .eq('id', fineId);
+    return error ? { ok: false, error: error.message } : { ok: true };
+  },
+
   // ── Standings ────────────────────────────────────────────────
   async getStandings() {
     const [teams, matches] = await Promise.all([this.getTeams(), this.getMatches()]);

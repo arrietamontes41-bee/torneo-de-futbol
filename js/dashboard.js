@@ -650,19 +650,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     actaMatchId.value      = matchId;
     actaHomeName.textContent = m.equipo_local?.nombre  || 'Local';
     actaAwayName.textContent = m.equipo_visit?.nombre || 'Visitante';
-    actaMeta.textContent     = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ${m.fecha ? formatDate(m.fecha) : '—'}  ·  ⏰ ${m.hora ? m.hora.slice(0,5) : '—'}`;
+    actaMeta.innerHTML       = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ${m.fecha ? formatDate(m.fecha) : '—'}  ·  ⏰ ${m.hora ? m.hora.slice(0,5) : '—'}`;
     actaError.textContent    = '';
     actaModal.classList.remove('hidden');
     actaHomeBody.innerHTML = loadingRow();
     actaAwayBody.innerHTML = loadingRow();
 
-    const [homePlayers, awayPlayers, events] = await Promise.all([
-      DB.getPlayersByTeam(m.equipo_local_id),
-      DB.getPlayersByTeam(m.equipo_visit_id),
-      DB.getMatchEvents(matchId)
-    ]);
-    renderActaTeam(actaHomeBody, actaHomeTotal, homePlayers, events);
-    renderActaTeam(actaAwayBody, actaAwayTotal, awayPlayers, events);
+    try {
+      const [homePlayers, awayPlayers, events] = await Promise.all([
+        DB.getPlayersByTeam(m.equipo_local_id),
+        DB.getPlayersByTeam(m.equipo_visit_id),
+        DB.getMatchEvents(matchId)
+      ]);
+      renderActaTeam(actaHomeBody, actaHomeTotal, homePlayers, events);
+      renderActaTeam(actaAwayBody, actaAwayTotal, awayPlayers, events);
+    } catch (err) {
+      console.error('Error cargando acta:', err);
+      actaError.textContent = 'Error al cargar los datos de los jugadores.';
+      actaHomeBody.innerHTML = '<tr><td colspan="5" class="acta-status-cell">Error al cargar</td></tr>';
+      actaAwayBody.innerHTML = '<tr><td colspan="5" class="acta-status-cell">Error al cargar</td></tr>';
+    }
   };
 
   const loadingRow = () =>
