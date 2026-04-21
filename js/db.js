@@ -221,9 +221,9 @@ const DB = {
   },
 
   async checkDocumentoGlobal(doc) {
-    const { data } = await this.client.from('jugadores').select('nombre, equipos(nombre)').eq('documento', doc).single();
-    if (data) return { exists: true, equipo: data.equipos.nombre };
-    return { exists: false };
+    const { data, error } = await this.client.from('jugadores').select('nombre, equipos(nombre)').eq('documento', doc);
+    if (error || !data || data.length === 0) return { exists: false };
+    return { exists: true, equipo: data[0].equipos.nombre };
   },
 
   // ── Partidos ─────────────────────────────────────────────────
@@ -240,8 +240,10 @@ const DB = {
       fecha: date,
       hora: time || '18:00',
       fase: fase || 'Clasificación General'
-    }]).select().single();
-    return error ? { ok: false, error: error.message } : { ok: true, match: data };
+    }]).select();
+
+    if (error) return { ok: false, error: error.message };
+    return { ok: true, match: data ? data[0] : null };
   },
 
   async updateMatch(id, { homeTeamId, awayTeamId, date, time, fase }) {
@@ -252,8 +254,11 @@ const DB = {
       fecha: date,
       hora: time,
       fase: fase || 'Clasificación General'
-    }).eq('id', id).select().single();
-    return error ? { ok: false, error: error.message } : { ok: true, match: data };
+    }).eq('id', id).select();
+
+    if (error) return { ok: false, error: error.message };
+    if (!data || data.length === 0) return { ok: false, error: 'El partido ya no existe o fue eliminado.' };
+    return { ok: true, match: data[0] };
   },
 
   async setMatchResult(id, homeGoals, awayGoals) {
@@ -261,8 +266,11 @@ const DB = {
       goles_local: homeGoals,
       goles_visit: awayGoals,
       estado: 'finalizado'
-    }).eq('id', id).select().single();
-    return error ? { ok: false, error: error.message } : { ok: true, match: data };
+    }).eq('id', id).select();
+
+    if (error) return { ok: false, error: error.message };
+    if (!data || data.length === 0) return { ok: false, error: 'El partido ya no existe para guardar el resultado.' };
+    return { ok: true, match: data[0] };
   },
 
   async deleteMatch(id) {
