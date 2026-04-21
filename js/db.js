@@ -50,6 +50,11 @@ const DB = {
     localStorage.removeItem('torneo_session');
   },
 
+  sanitize(str) {
+    if (typeof str !== 'string') return str;
+    return str.trim().replace(/[<>]/g, '');
+  },
+
   // ── Autenticación ────────────────────────────────────────────
   async login(email, password) {
     if (!this.client) {
@@ -123,32 +128,56 @@ const DB = {
     return error ? [] : data;
   },
 
-  async addTeam(teamData, userData) {
-    // 1. Hash de la contraseña del nuevo usuario
-    const hashedPass = await this.hashPassword(userData.password);
-    const securedUser = { ...userData, password: hashedPass };
+  async addTeam(data) {
+    const { name, email, password, city, escudo } = data;
 
-    // 2. Crear usuario
-    const { data: user, error: userError } = await this.client.from('usuarios').insert([securedUser]).select().single();
-    if (userError) return { ok: false, error: userError.message };
+    try {
+      // 1. Crear usuario en Supabase Auth con metadata para el trigger
+      const { data: authData, error: authError } = await this.client.auth.signUp({
+        email: email.trim().toLowerCase(),
+        password: password,
+        options: {
+          data: {
+            nombre: name,
+            rol: 'team',
+            municipio: city || 'Montería'
+          }
+        }
+      });
 
-    // 2. Crear equipo
-    const { data: team, error: teamError } = await this.client.from('equipos').insert([{
-      ...teamData,
-      usuario_id: user.id
-    }]).select().single();
+      if (authError) {
+        console.error('Error de Signup:', authError.message);
+        return { ok: false, error: authError.message };
+      }
 
-    if (teamError) {
-      await this.client.from('usuarios').delete().eq('id', user.id);
-      return { ok: false, error: teamError.message };
+      const userId = authData.user.id;
+
+      // 2. Crear equipo vinculado al usuario
+      const { data: team, error: teamError } = await this.client.from('equipos').insert([{
+        nombre: name,
+        email: email,
+        escudo: escudo || null,
+        municipio: city || 'Montería',
+        usuario_id: userId
+      }]).select().single();
+
+      if (teamError) {
+        console.error('Error al crear equipo:', teamError);
+        return { ok: false, error: 'Usuario creado, pero hubo un error al registrar los datos del equipo.' };
+      }
+
+      return { ok: true, team };
+    } catch (err) {
+      console.error('Error Fatal addTeam:', err);
+      return { ok: false, error: 'Error inesperado al registrar.' };
     }
-    return { ok: true, team };
   },
 
   async deleteTeam(teamId) {
     const { data: team } = await this.client.from('equipos').select('usuario_id').eq('id', teamId).single();
     const { error } = await this.client.from('equipos').delete().eq('id', teamId);
     if (error) return { ok: false, error: error.message };
+    // Eliminamos solo el perfil público (Supabase Auth requiere admin para borrar de auth.users)
     if (team?.usuario_id) await this.client.from('usuarios').delete().eq('id', team.usuario_id);
     return { ok: true };
   },
