@@ -131,8 +131,14 @@ const DB = {
   async addTeam(data) {
     const { name, email, password, city, escudo } = data;
 
+    if (!this.client) {
+      return { ok: false, error: 'La base de datos no está lista. Intenta recargar la página.' };
+    }
+
     try {
-      // 1. Crear usuario en Supabase Auth con metadata para el trigger
+      console.log('Iniciando registro de equipo:', name);
+
+      // 1. Crear usuario en Auth
       const { data: authData, error: authError } = await this.client.auth.signUp({
         email: email.trim().toLowerCase(),
         password: password,
@@ -146,30 +152,35 @@ const DB = {
       });
 
       if (authError) {
-        console.error('Error de Signup:', authError.message);
-        return { ok: false, error: authError.message };
+        console.error('Error Supabase Auth:', authError);
+        return { ok: false, error: 'Error de autenticación: ' + authError.message };
+      }
+
+      if (!authData.user) {
+        return { ok: false, error: 'No se pudo crear el usuario. Revisa si el correo ya existe.' };
       }
 
       const userId = authData.user.id;
 
-      // 2. Crear equipo vinculado al usuario
-      const { data: team, error: teamError } = await this.client.from('equipos').insert([{
+      // 2. Insertar equipo en la tabla pública
+      const { error: teamError } = await this.client.from('equipos').insert([{
         nombre: name,
         email: email,
         escudo: escudo || null,
         municipio: city || 'Montería',
         usuario_id: userId
-      }]).select().single();
+      }]);
 
       if (teamError) {
-        console.error('Error al crear equipo:', teamError);
-        return { ok: false, error: 'Usuario creado, pero hubo un error al registrar los datos del equipo.' };
+        console.error('Error al insertar equipo:', teamError);
+        return { ok: false, error: 'Cuenta creada, pero hubo un error al guardar los datos del equipo: ' + teamError.message };
       }
 
-      return { ok: true, team };
+      console.log('Registro completado con éxito');
+      return { ok: true };
     } catch (err) {
-      console.error('Error Fatal addTeam:', err);
-      return { ok: false, error: 'Error inesperado al registrar.' };
+      console.error('Error crítico en addTeam:', err);
+      return { ok: false, error: 'Ocurrió un error inesperado. Revisa tu conexión.' };
     }
   },
 
