@@ -9,6 +9,8 @@ const sb = () => DB.client;
 const DB = {
   client: null,
   session: null,
+  _teamsPromise: null,
+  _matchesPromise: null,
 
   init() {
     // Configuramos Supabase para usar sessionStorage (sesión por pestaña)
@@ -131,8 +133,15 @@ const DB = {
 
   // ── Equipos ──────────────────────────────────────────────────
   async getTeams() {
-    const { data, error } = await this.client.from('equipos').select('*').order('nombre');
-    return error ? [] : data;
+    if (this._teamsPromise) return this._teamsPromise;
+    
+    this._teamsPromise = (async () => {
+      const { data, error } = await this.client.from('equipos').select('*').order('nombre');
+      this._teamsPromise = null; // Limpiar para permitir futuras recargas
+      return error ? [] : data;
+    })();
+    
+    return this._teamsPromise;
   },
 
   async addTeam(data) {
@@ -235,8 +244,15 @@ const DB = {
 
   // ── Partidos ─────────────────────────────────────────────────
   async getMatches() {
-    const { data, error } = await this.client.from('partidos').select('*, equipo_local:equipos!equipo_local_id(nombre, escudo), equipo_visit:equipos!equipo_visit_id(nombre, escudo)').order('fecha', { ascending: true });
-    return error ? [] : data;
+    if (this._matchesPromise) return this._matchesPromise;
+
+    this._matchesPromise = (async () => {
+      const { data, error } = await this.client.from('partidos').select('*, equipo_local:equipos!equipo_local_id(nombre, escudo), equipo_visit:equipos!equipo_visit_id(nombre, escudo)').order('fecha', { ascending: true });
+      this._matchesPromise = null; // Limpiar para permitir futuras recargas
+      return error ? [] : data;
+    })();
+
+    return this._matchesPromise;
   },
 
   async addMatch({ homeTeamId, awayTeamId, date, time, fase }) {
