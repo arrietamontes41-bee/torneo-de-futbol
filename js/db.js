@@ -11,7 +11,14 @@ const DB = {
   session: null,
 
   init() {
-    this.client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    // Configuramos Supabase para usar sessionStorage (sesión por pestaña)
+    this.client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+      auth: {
+        storage: window.sessionStorage,
+        autoRefreshToken: true,
+        persistSession: true
+      }
+    });
     this.loadSession();
   },
 
@@ -36,10 +43,10 @@ const DB = {
   // ── Sesión Local ─────────────────────────────────────────────
   saveSession(user) {
     this.session = user;
-    localStorage.setItem('torneo_session', JSON.stringify(user));
+    sessionStorage.setItem('torneo_session', JSON.stringify(user));
   },
   loadSession() {
-    const s = localStorage.getItem('torneo_session');
+    const s = sessionStorage.getItem('torneo_session');
     if (s) this.session = JSON.parse(s);
   },
   getSession() {
@@ -47,7 +54,7 @@ const DB = {
   },
   clearSession() {
     this.session = null;
-    localStorage.removeItem('torneo_session');
+    sessionStorage.removeItem('torneo_session');
   },
 
   sanitize(str) {
