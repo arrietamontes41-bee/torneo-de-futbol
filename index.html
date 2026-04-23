@@ -55,12 +55,13 @@
             <div class="input-wrap">
               <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
               <input type="password" id="loginPassword" name="password" placeholder="••••••••" autocomplete="current-password" required />
-              <button type="button" id="btnTogglePass" class="btn-toggle-pass" title="Mostrar/ocultar contraseña">👁</button>
+              <button type="button" id="btnTogglePass" class="btn-toggle-pass" title="Mostrar/ocultar contraseña">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
             </div>
           </div>
           <div class="form-error" id="loginError"></div>
           <button type="submit" class="btn-auth" id="btnLogin">
-            <svg viewBox="0 0 20 20" fill="currentColor" width="18"><path fill-rule="evenodd" d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/></svg>
             Iniciar sesión
           </button>
         </form>
