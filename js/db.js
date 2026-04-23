@@ -169,6 +169,10 @@ const DB = {
 
       if (authError) {
         console.error('Error Supabase Auth:', authError);
+        // Manejo amigable para usuarios ya registrados
+        if (authError.message.includes('already registered')) {
+          return { ok: false, error: 'Este correo ya tiene una cuenta activa. Por favor, intenta iniciar sesión o usa un correo diferente.' };
+        }
         return { ok: false, error: 'Error de autenticación: ' + authError.message };
       }
 
@@ -201,11 +205,19 @@ const DB = {
   },
 
   async deleteTeam(teamId) {
+    // 1. Obtener el ID del usuario vinculado antes de borrar el equipo
     const { data: team } = await this.client.from('equipos').select('usuario_id').eq('id', teamId).single();
+    
+    // 2. Borrar el equipo (esto disparará ON DELETE CASCADE en cascada para sus datos)
     const { error } = await this.client.from('equipos').delete().eq('id', teamId);
     if (error) return { ok: false, error: error.message };
-    // Eliminamos solo el perfil público (Supabase Auth requiere admin para borrar de auth.users)
-    if (team?.usuario_id) await this.client.from('usuarios').delete().eq('id', team.usuario_id);
+
+    // 3. Borrar el usuario de Auth y de la tabla pública usando la función especial
+    if (team?.usuario_id) {
+      console.log('Limpiando cuenta de autenticación para:', team.usuario_id);
+      await this.client.rpc('delete_user_auth', { target_user_id: team.usuario_id });
+    }
+    
     return { ok: true };
   },
 
