@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         defenseContainer.innerHTML = goalkeepers.map((p, i) => `
           <div class="leader-item">
             <div class="leader-rank">#${i + 1}</div>
-            <div class="leader-avatar">🧤</div>
+            <div class="leader-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></div>
             <div class="leader-info">
               <span class="leader-name">${escHtml(p.nombre)}</span>
               <span class="leader-team">${escHtml(p.equipo)}</span>
@@ -276,7 +276,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         ${deleteBtn}
         <div class="team-avatar">${avatar}</div>
         <div class="team-name">${escHtml(t.nombre)}</div>
-        <div class="team-city">📍 ${escHtml(t.municipio || 'Montería')}</div>
+        <div class="team-city"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="vertical-align:middle; margin-right:4px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${escHtml(t.municipio || 'Montería')}</div>
         <div class="team-email">${escHtml(t.email)}</div>
         ${groupBtn}
         <span class="team-badge" style="margin-top: 5px;">Inscrito</span>
@@ -687,8 +687,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       return `<tr>
         <td><span class="dors-sm">${p.dorsal}</span></td>
         <td>${escHtml(p.nombre)}</td>
-        <td><button class="card-btn ${ta?'on-yellow':''}" data-player="${p.id}" data-equipo="${p.equipo_id}" data-tipo="amarilla">🟡</button></td>
-        <td><button class="card-btn ${tr?'on-red':''}"    data-player="${p.id}" data-equipo="${p.equipo_id}" data-tipo="roja">🔴</button></td>
+        <td><button class="card-btn ${ta?'on-yellow':''}" data-player="${p.id}" data-equipo="${p.equipo_id}" data-tipo="amarilla"><svg width="12" height="16"><rect width="12" height="16" rx="2" fill="#fbbf24"/></svg></button></td>
+        <td><button class="card-btn ${tr?'on-red':''}"    data-player="${p.id}" data-equipo="${p.equipo_id}" data-tipo="roja"><svg width="12" height="16"><rect width="12" height="16" rx="2" fill="#ef4444"/></svg></button></td>
         <td><input class="goles-inp" type="number" min="0" max="20" value="${g}" data-player="${p.id}" data-equipo="${p.equipo_id}" /></td>
       </tr>`;
     }).join('');
@@ -756,7 +756,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    const posIcons = { Portero: '🧤', Defensa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>', Mediocampista: '⚙️', Delantero: '⚡' };
+    const posIcons = { 
+      Portero: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>', 
+      Defensa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>', 
+      Mediocampista: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"/><circle cx="12" cy="12" r="3"/><path d="M12 7V2"/><path d="M12 22v-5"/><path d="M17 12h5"/><path d="M2 12h5"/><path d="m4.9 4.9 3.5 3.5"/><path d="m15.6 15.6 3.5 3.5"/><path d="m4.9 19.1 3.5-3.5"/><path d="m15.6 8.4 3.5-3.5"/></svg>', 
+      Delantero: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>' 
+    };
 
     const rows = players.map(p => {
       const icon    = posIcons[p.posicion] || '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>';

@@ -105,9 +105,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!result.ok) {
       showError(result.error || 'Error al registrar el equipo.');
       btnRegister.disabled = false;
-      btnRegister.innerHTML = `
-        <svg viewBox="0 0 20 20" fill="currentColor" width="18"><path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"/></svg>
-        Registrar Equipo`;
+      btnRegister.innerHTML = `Registrar Equipo`;
       return;
     }
 
@@ -115,7 +113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const registerCard = document.getElementById('registerCard');
     const shieldImg = shieldBase64
       ? `<img src="${shieldBase64}" alt="escudo" class="photo-preview-full" />`
-      : '🏆';
+      : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="40" height="40" style="opacity:0.3;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="11" r="3"/><path d="M7 20h10"/></svg>`;
 
     registerCard.innerHTML = `
       <div class="text-center-py16">
@@ -129,7 +127,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         <p class="success-text-muted">El equipo <strong class="text-highlight">${name.replace(/</g, '&lt;')}</strong> fue inscrito correctamente.</p>
         <p class="success-text-sub">Ahora inicia sesión con tu correo y contraseña para acceder al panel.</p>
         <a href="index.html" class="btn-success-redirect">
-          <svg viewBox="0 0 20 20" fill="currentColor" width="16"><path fill-rule="evenodd" d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/></svg>
           Ir a Iniciar Sesión
         </a>
       </div>`;

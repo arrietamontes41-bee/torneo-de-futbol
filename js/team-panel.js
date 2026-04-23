@@ -375,7 +375,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Foto
     carnetPhoto.innerHTML = p.foto
       ? `<img src="${p.foto}" alt="${esc(p.nombre)}" />`
-      : '\ud83d\udc64';
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="48" height="48" style="opacity:0.2;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
 
     // Datos
     carnetDorsal.textContent = `#${p.dorsal}`;
@@ -449,8 +449,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="player-name">${esc(p.nombre)}</div>
         <div class="player-pos-pill pos-${p.posicion}">${p.posicion}</div>
         <div class="player-doc">${esc(p.documento)}${dob ? ' · ' + dob : ''}</div>
-        <button class="btn-carnet-card" data-id="${p.id}">🎫 Ver Carnet</button>
-        <button class="btn-remove-card" data-id="${p.id}" data-name="${esc(p.nombre)}">🗑 Eliminar</button>
+        <button class="btn-carnet-card" data-id="${p.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="vertical-align:middle; margin-right:4px;"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg> Ver Carnet</button>
+        <button class="btn-remove-card" data-id="${p.id}" data-name="${esc(p.nombre)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="vertical-align:middle; margin-right:4px;"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg> Eliminar</button>
       </div>`;
   }
 
@@ -494,7 +494,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const k = keepers[0];
       const foto = k.foto
         ? `<img src="${k.foto}" alt="${esc(k.nombre)}" />`
-        : '🧴';
+        : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>';
       starKeeper.innerHTML = `
         <div class="star-card-label">🧾 Valla Menos Vencida</div>
         <div class="star-player-row">
@@ -585,10 +585,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       const rowsHtml = groups[gName].map((s, i) => {
         const mine = s.team.id === myTeam?.id;
         const dg   = s.gf - s.gc;
-        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1;
+        const medal = i === 0 ? '1' : i === 1 ? '2' : i === 2 ? '3' : i + 1;
         return `<tr class="${mine ? 'my-row' : ''}">
           <td style="font-weight:700;">${medal}</td>
-          <td>${mine ? '⭐ ' : ''}${esc(s.team.nombre)}</td>
+          <td>${mine ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="vertical-align:middle; margin-right:4px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> ' : ''}${esc(s.team.nombre)}</td>
           <td>${s.pj}</td>
           <td>${s.pg}</td>
           <td>${s.pe}</td>
@@ -630,7 +630,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     playerErr.textContent = '';
     photoBase64 = null;
     photoInput.value = '';
-    photoPreview.innerHTML = '📷';
+    photoPreview.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>';
     btnSavePlayer.disabled = false;
   }
 
