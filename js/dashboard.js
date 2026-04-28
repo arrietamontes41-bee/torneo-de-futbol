@@ -280,7 +280,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="team-email">${escHtml(t.email)}</div>
         ${groupBtn}
         <span class="team-badge" style="margin-top: 5px;">Inscrito</span>
-        <div class="text-muted-xs mt-6">👆 Ver plantilla</div>
+        <div class="text-muted-xs mt-6">Ver plantilla</div>
       </div>`;
   };
 
@@ -370,7 +370,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         </div>
         <div class="match-meta">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ${dateStr} &nbsp; 🕐 ${timeStr} ${faseStr}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ${dateStr} &nbsp; <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="vertical-align:middle; margin-right:4px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ${timeStr} ${faseStr}
           &nbsp;
           <span class="match-status-badge ${completed ? 'status-completed' : 'status-pending'}">
             ${completed ? 'Finalizado' : 'Programado'}
@@ -650,7 +650,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     actaMatchId.value      = matchId;
     actaHomeName.textContent = m.equipo_local?.nombre  || 'Local';
     actaAwayName.textContent = m.equipo_visit?.nombre || 'Visitante';
-    actaMeta.innerHTML       = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ${m.fecha ? formatDate(m.fecha) : '—'}  ·  ⏰ ${m.hora ? m.hora.slice(0,5) : '—'}`;
+    actaMeta.innerHTML       = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ${m.fecha ? formatDate(m.fecha) : '—'}  ·  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="vertical-align:middle; margin-right:4px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ${m.hora ? m.hora.slice(0,5) : '—'}`;
     actaError.textContent    = '';
     actaModal.classList.remove('hidden');
     actaHomeBody.innerHTML = loadingRow();
@@ -745,7 +745,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Una vez cargados, poner el título real
     rosterModalTitle.textContent = teamName;
-    rosterModalSub.textContent   = `📍 ${teamCity}`;
+    rosterModalSub.innerHTML     = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="vertical-align:middle; margin-right:4px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${teamCity}`;
 
     if (!players.length) {
       rosterContent.innerHTML = `

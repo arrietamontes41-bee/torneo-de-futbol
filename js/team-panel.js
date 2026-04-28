@@ -339,7 +339,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     notificationsContainer.innerHTML = `
       <div class="fines-container" style="border-color: #bbf7d0; background-color: #f0fdf4;">
-        <h3 class="fines-container-title" style="color:#166534;">🔔 Tienes nuevas notificaciones</h3>
+        <h3 class="fines-container-title" style="color:#166534;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" style="vertical-align:middle; margin-right:4px;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> Tienes nuevas notificaciones</h3>
         ${html}
       </div>
     `;
@@ -496,7 +496,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         ? `<img src="${k.foto}" alt="${esc(k.nombre)}" />`
         : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>';
       starKeeper.innerHTML = `
-        <div class="star-card-label">🧾 Valla Menos Vencida</div>
+        <div class="star-card-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" style="vertical-align:middle; margin-right:4px;"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M16 8h-6"/><path d="M16 12h-6"/><path d="M10 16h-4"/></svg> Valla Menos Vencida</div>
         <div class="star-player-row">
           <div class="star-photo">${foto}</div>
           <div class="star-info">
@@ -509,7 +509,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         </div>`;
     } else {
-      starKeeper.innerHTML = `<div class="star-card-label">🧾 Valla Menos Vencida</div><div class="empty star-empty-msg"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>Sin datos aún</div>`;
+      starKeeper.innerHTML = `<div class="star-card-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" style="vertical-align:middle; margin-right:4px;"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M16 8h-6"/><path d="M16 12h-6"/><path d="M10 16h-4"/></svg> Valla Menos Vencida</div><div class="empty star-empty-msg"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>Sin datos aún</div>`;
     }
   }
 
@@ -553,7 +553,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="match-row">
         <div>
           <div class="match-row-teams">${localTag}<span class="vs">VS</span>${visitTag}</div>
-          <div class="match-row-date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ${fecha}${hora ? ' · ⏰ ' + hora : ''}</div>
+          <div class="match-row-date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ${fecha}${hora ? ' · <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="vertical-align:middle; margin-right:4px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ' + hora : ''}</div>
         </div>
         <div class="flex-center-gap10">
           ${done ? `<span class="match-result-score">${m.goles_local} – ${m.goles_visit}</span>` : ''}
