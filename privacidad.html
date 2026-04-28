@@ -6,17 +6,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tratamiento de Datos – Torneo de Fútbol Montería</title>
   <meta name="description" content="Términos y condiciones sobre el tratamiento de datos." />
-  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.emailjs.com; object-src 'none'; base-uri 'self'; form-action 'self';" />
   
-  <!-- Estilos externos (permitidos por CSP 'self') -->
-  <link rel="stylesheet" href="css/theme.css?v=1.2" />
-  <link rel="stylesheet" href="css/style.css?v=1.2" />
-  <link rel="stylesheet" href="css/privacy.css?v=1.2" />
-  
-  <link rel="icon" href="img/favicon.svg" type="image/svg+xml" />
+  <!-- Anti-Clickjacking Script (Frame Buster) -->
+  <script type="text/javascript">
+    if (self === top) {
+      var antiClickjack = document.getElementById("antiClickjack");
+      if (antiClickjack) antiClickjack.parentNode.removeChild(antiClickjack);
+    } else {
+      top.location = self.location;
+    }
+  </script>
 </head>
 
-<body class="privacy-body">
+<body class="privacy-body" style="display: none;" id="antiClickjackBody">
+  <script type="text/javascript">
+    if (self === top) {
+      document.getElementById("antiClickjackBody").style.display = "block";
+    } else {
+      top.location = self.location;
+    }
+  </script>
   <div class="privacy-container">
     <h1>Tratamiento de Datos</h1>
     
