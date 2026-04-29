@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (btnBackLogin)  btnBackLogin.addEventListener('click', showLogin);
 
   // Escuchar evento de recuperación de contraseña de Supabase
-  supabase.auth.onAuthStateChange((event, session) => {
+  DB.client.auth.onAuthStateChange((event, session) => {
     if (event === 'PASSWORD_RECOVERY') {
       showRecover();
       stepEmail.classList.add('hidden');
