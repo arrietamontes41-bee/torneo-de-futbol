@@ -113,22 +113,16 @@ const DB = {
     }
   },
 
-  async updatePassword(userId, newPassword) {
-    const hashed = await this.hashPassword(newPassword);
-    const { error } = await this.client
-      .from('usuarios')
-      .update({ password: hashed })
-      .eq('id', userId);
+  async updatePassword(newPassword) {
+    const { data, error } = await this.client.auth.updateUser({ password: newPassword });
     return error ? { ok: false, error: error.message } : { ok: true };
   },
 
-  async resetPasswordAndGetTemp(email) {
-    const tempPass = Math.floor(100000 + Math.random() * 900000).toString();
-    const hashed   = await this.hashPassword(tempPass);
-    const { data: user } = await this.client.from('usuarios').select('id, nombre').eq('email', email.trim().toLowerCase()).single();
-    if (!user) return { ok: false };
-    const { error } = await this.client.from('usuarios').update({ password: hashed }).eq('id', user.id);
-    return error ? { ok: false } : { ok: true, tempPass, userName: user.nombre };
+  async sendPasswordResetEmail(email) {
+    const { data, error } = await this.client.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
+      redirectTo: window.location.origin + window.location.pathname
+    });
+    return error ? { ok: false, error: error.message } : { ok: true };
   },
 
   // ── Equipos ──────────────────────────────────────────────────

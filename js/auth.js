@@ -61,7 +61,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (btnForgotPass) btnForgotPass.addEventListener('click', showRecover);
   if (btnBackLogin)  btnBackLogin.addEventListener('click', showLogin);
 
-  // Paso 1: Enviar PIN
+  // Escuchar evento de recuperación de contraseña de Supabase
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'PASSWORD_RECOVERY') {
+      showRecover();
+      stepEmail.classList.add('hidden');
+      if (stepPIN) stepPIN.classList.add('hidden');
+      stepPass.classList.remove('hidden');
+      recoverStepText.textContent = 'Establece tu nueva contraseña';
+    }
+  });
+
+  const btnSendPIN = document.getElementById('btnSendPIN');
+  const recoverEmailInput = document.getElementById('recoverEmailInput');
+
+  // Paso 1: Enviar correo de recuperación
   btnSendPIN.addEventListener('click', async () => {
     try {
       recoverError.textContent = '';
@@ -72,73 +86,30 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       btnSendPIN.disabled = true;
-      btnSendPIN.textContent = 'Enviando...';
+      btnSendPIN.textContent = 'Enviando enlace...';
 
-      const resetRes = await DB.resetPasswordAndGetTemp(email);
-      // Engaño de seguridad: Si no existe, decimos que lo enviamos igual.
+      const resetRes = await DB.sendPasswordResetEmail(email);
+      
       if (resetRes.ok) {
-        await emailjs.send(
-          EMAILJS_SERVICE_ID,
-          EMAILJS_TEMPLATE_ID,
-          {
-            to_email: email,
-            to_name: resetRes.userName || 'Usuario',
-            temp_password: resetRes.tempPass,
-            reply_to: "no-reply@torneofutbol.com"
-          },
-          { publicKey: EMAILJS_PUBLIC_KEY }
-        );
+        stepEmail.innerHTML = '<div class="text-center text-green-500 mb-4"><svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><p>Hemos enviado un enlace a tu correo. Por favor, revisa tu bandeja de entrada o spam para continuar.</p></div>';
+        btnSendPIN.classList.add('hidden');
+        recoverStepText.textContent = 'Correo enviado';
+      } else {
+        // Fallback genérico por seguridad
+        recoverError.textContent = 'Si el correo existe, se ha enviado un enlace.';
       }
-
-      // Avanzar al paso del PIN (siempre avanzamos para seguridad, o si fue exitoso)
-      stepEmail.classList.add('hidden');
-      stepPIN.classList.remove('hidden');
-      recoverStepText.textContent = 'Ingresa el código enviado al correo';
     } catch (err) {
       console.error('Error en recuperación:', err);
       recoverError.textContent = 'Error técnico. Verifica tu conexión.';
     } finally {
-      btnSendPIN.disabled = false;
-      btnSendPIN.textContent = 'Enviar Código';
+      if (!stepEmail.innerHTML.includes('Hemos enviado')) {
+        btnSendPIN.disabled = false;
+        btnSendPIN.textContent = 'Enviar Enlace';
+      }
     }
   });
 
-  // Paso 2: Verificar PIN
-  const btnVerifyPIN = document.getElementById('btnVerifyPIN');
-  const recoverPinInput = document.getElementById('recoverPinInput');
-  let loggedSession = null; // Guardar sesión tras login con PIN
-
-  btnVerifyPIN.addEventListener('click', async () => {
-    try {
-      recoverError.textContent = '';
-      const email = recoverEmailInput.value.trim();
-      const pin = recoverPinInput.value.replace(/\D/g, '');
-
-      if (pin.length < 6) {
-        recoverError.textContent = 'Ingresa los 6 dígitos.';
-        return;
-      }
-
-      btnVerifyPIN.disabled = true;
-      btnVerifyPIN.textContent = 'Verificando...';
-
-      const res = await DB.login(email, pin);
-      if (res.ok) {
-        loggedSession = res.user;
-        stepPIN.classList.add('hidden');
-        stepPass.classList.remove('hidden');
-        recoverStepText.textContent = 'Establece tu nueva contraseña';
-      } else {
-        recoverError.textContent = 'Código incorrecto. Reintenta.';
-      }
-    } catch (err) {
-      console.error('Error en verificación:', err);
-      recoverError.textContent = 'Error de conexión.';
-    } finally {
-      btnVerifyPIN.disabled = false;
-      btnVerifyPIN.textContent = 'Verificar Código';
-    }
-  });
+  // Paso 2 eliminado (Verificar PIN ya no es necesario)
 
   // Paso 3: Actualizar Contraseña
   const btnUpdatePass = document.getElementById('btnUpdatePass');
@@ -157,11 +128,22 @@ document.addEventListener('DOMContentLoaded', async () => {
       btnUpdatePass.disabled = true;
       btnUpdatePass.textContent = 'Guardando...';
 
-      const updateRes = await DB.updatePassword(loggedSession.id, newPass);
+      const updateRes = await DB.updatePassword(newPass);
       if (updateRes.ok) {
-        window.location.href = loggedSession.rol === 'admin' ? 'dashboard.html' : 'team-panel.html';
+        // Redirigir según rol si pudimos cargar el perfil
+        const { data: sessionData } = await DB.client.auth.getSession();
+        if (sessionData.session) {
+          const userId = sessionData.session.user.id;
+          const { data: profile } = await DB.client.from('usuarios').select('*').eq('id', userId).single();
+          if (profile) {
+            DB.saveSession(profile);
+            window.location.href = profile.rol === 'admin' ? 'dashboard.html' : 'team-panel.html';
+            return;
+          }
+        }
+        window.location.href = 'index.html'; // Fallback
       } else {
-        recoverError.textContent = 'Error al guardar.';
+        recoverError.textContent = 'Error al guardar. Puede que el enlace haya expirado.';
       }
     } catch (err) {
       console.error('Error al actualizar:', err);
