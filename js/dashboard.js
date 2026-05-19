@@ -99,6 +99,123 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (dashUserNameSide) dashUserNameSide.textContent = fullName;
   if (userInitial) userInitial.textContent = fullName.charAt(0).toUpperCase();
 
+  // ---- Multi-Tournament Selector ----
+  let selectedTorneoId = localStorage.getItem('admin_selected_torneo_id') || '';
+  const dashTournamentSelector = document.getElementById('dashTournamentSelector');
+  const btnCreateNewTournament = document.getElementById('btnCreateNewTournament');
+  const createTournamentModal  = document.getElementById('createTournamentModal');
+  const closeCreateTournamentModal = document.getElementById('closeCreateTournamentModal');
+  const btnCancelCreateTournament = document.getElementById('btnCancelCreateTournament');
+  const btnSubmitCreateTournament = document.getElementById('btnSubmitCreateTournament');
+  const createTournamentForm   = document.getElementById('createTournamentForm');
+  const newTournamentName      = document.getElementById('newTournamentName');
+  const newTournamentDesc      = document.getElementById('newTournamentDesc');
+  const newTournamentCity      = document.getElementById('newTournamentCity');
+
+  async function loadTournamentsSelector() {
+    try {
+      const tournaments = await DB.getTournamentsByAdmin(session.id);
+      if (dashTournamentSelector) {
+        dashTournamentSelector.innerHTML = '';
+        if (tournaments.length === 0) {
+          const opt = document.createElement('option');
+          opt.value = '';
+          opt.disabled = true;
+          opt.selected = true;
+          opt.textContent = 'Sin torneos';
+          dashTournamentSelector.appendChild(opt);
+          selectedTorneoId = '';
+          localStorage.removeItem('admin_selected_torneo_id');
+        } else {
+          const exists = tournaments.some(t => t.id === selectedTorneoId);
+          if (!selectedTorneoId || !exists) {
+            selectedTorneoId = tournaments[0].id;
+            localStorage.setItem('admin_selected_torneo_id', selectedTorneoId);
+          }
+          
+          tournaments.forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = t.id;
+            opt.textContent = t.nombre;
+            if (t.id === selectedTorneoId) opt.selected = true;
+            dashTournamentSelector.appendChild(opt);
+          });
+        }
+      }
+    } catch (err) {
+      console.error('Error loading tournaments list:', err);
+    }
+  }
+
+  // Setup selector change
+  if (dashTournamentSelector) {
+    dashTournamentSelector.addEventListener('change', async (e) => {
+      selectedTorneoId = e.target.value;
+      localStorage.setItem('admin_selected_torneo_id', selectedTorneoId);
+      await refresh();
+      // Force reload current tab
+      const activeBtn = document.querySelector('.sidebar-btn.active');
+      if (activeBtn) {
+        const targetTab = activeBtn.dataset.tab;
+        if (targetTab === 'standings') await renderStandings();
+        if (targetTab === 'sanciones') await renderSanciones();
+        if (targetTab === 'config') await loadConfigTab();
+      }
+    });
+  }
+
+  // Show/Hide Modal Create Tournament
+  if (btnCreateNewTournament) {
+    btnCreateNewTournament.addEventListener('click', () => {
+      createTournamentModal?.classList.remove('hidden');
+      createTournamentForm?.reset();
+    });
+  }
+
+  const hideCreateModal = () => {
+    createTournamentModal?.classList.add('hidden');
+  };
+
+  closeCreateTournamentModal?.addEventListener('click', hideCreateModal);
+  btnCancelCreateTournament?.addEventListener('click', hideCreateModal);
+
+  if (btnSubmitCreateTournament) {
+    btnSubmitCreateTournament.addEventListener('click', async () => {
+      const nombre = DB.sanitize(newTournamentName.value);
+      const descripcion = DB.sanitize(newTournamentDesc.value);
+      const municipio = DB.sanitize(newTournamentCity.value) || 'Montería';
+
+      if (!nombre) {
+        showToast('El nombre del torneo es obligatorio.', 'error');
+        newTournamentName.focus();
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const res = await DB.createTournament({ nombre, descripcion, municipio });
+        if (res.ok && res.tournament) {
+          showToast('Torneo creado exitosamente.', 'success');
+          selectedTorneoId = res.tournament.id;
+          localStorage.setItem('admin_selected_torneo_id', selectedTorneoId);
+          hideCreateModal();
+          await loadTournamentsSelector();
+          await refresh();
+          // Reset other views to general/overview
+          const overviewBtn = document.querySelector('[data-tab="overview"]');
+          if (overviewBtn) overviewBtn.click();
+        } else {
+          showToast('Error al crear torneo: ' + (res.error || 'Error desconocido'), 'error');
+        }
+      } catch (err) {
+        console.error('Error creating tournament:', err);
+        showToast('Error al crear torneo.', 'error');
+      } finally {
+        setLoading(false);
+      }
+    });
+  }
+
   // ---- Sidebar Toggle (Mobile) ----
   const toggleSidebar = () => sidebar?.classList.toggle('open');
   btnSidebarOpen?.addEventListener('click', toggleSidebar);
@@ -157,7 +274,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const refresh = async () => {
     setLoading(true);
     try {
-      const tournament = await DB.getTournament();
+      const tournament = await DB.getTournament(selectedTorneoId);
       if (tournament) {
         const sidebarBrand = document.querySelector('.sidebar-brand');
         if (sidebarBrand) {
@@ -169,7 +286,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     await Promise.all([renderStats(), renderTeams(), renderMatches()]);
     if (matchReminderHost && window.MatchReminders) {
-      const matches = await DB.getMatches();
+      const matches = await DB.getMatches(selectedTorneoId);
       window.MatchReminders.renderAdminBanner(matchReminderHost, matches);
     }
     setLoading(false);
@@ -178,9 +295,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ---- STATS ----
   const renderStats = async () => {
     const [s, scorers, goalkeepers] = await Promise.all([
-      DB.getStats(),
-      DB.getTopScorers(10),
-      DB.getBestGoalkeepers(10)
+      DB.getStats(selectedTorneoId),
+      DB.getTopScorers(10, selectedTorneoId),
+      DB.getBestGoalkeepers(10, selectedTorneoId)
     ]);
     
     // General stats
@@ -231,7 +348,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ---- TEAMS ----
   const renderTeams = async () => {
-    const teams = await DB.getTeams();
+    const teams = await DB.getTeams(selectedTorneoId);
     if (!teams.length) {
       teamsContainer.innerHTML = `
         <div class="empty-state">
@@ -330,7 +447,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ---- MATCHES ----
   const renderMatches = async () => {
-    const matches = await DB.getMatches();
+    const matches = await DB.getMatches(selectedTorneoId);
     if (!matches.length) {
       matchesContainer.innerHTML = `
         <div class="empty-state">
@@ -426,7 +543,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Nuevo partido
   btnNewMatch.addEventListener('click', async () => {
-    const teams = await DB.getTeams();
+    const teams = await DB.getTeams(selectedTorneoId);
     if (teams.length < 2) {
       showToast('Necesitas al menos 2 equipos registrados para crear un partido.', 'error');
       return;
@@ -446,7 +563,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   const filterAwayTeams = async () => {
-    const teams = await DB.getTeams(); 
+    const teams = await DB.getTeams(selectedTorneoId); 
     const homeId = homeTeamSel.value;
     const fase = matchFaseInput ? matchFaseInput.value : 'Clasificación General';
     
@@ -500,8 +617,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const id = editMatchId.value;
 
     const result = id
-      ? await DB.updateMatch(id, { homeTeamId: homeId, awayTeamId: awayId, date, time, fase })
-      : await DB.addMatch({ homeTeamId: homeId, awayTeamId: awayId, date, time, fase });
+      ? await DB.updateMatch(id, { homeTeamId: homeId, awayTeamId: awayId, date, time, fase, torneoId: selectedTorneoId })
+      : await DB.addMatch({ homeTeamId: homeId, awayTeamId: awayId, date, time, fase, torneoId: selectedTorneoId });
 
     if (result.ok) {
       matchFormWrapper.classList.add('hidden');
@@ -543,7 +660,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       else { showToast('Opción no válida.', 'error'); return; }
 
       setLoading(true);
-      const standings = await DB.getStandings();
+      const standings = await DB.getStandings(selectedTorneoId);
       if (standings.length < numToAdvance) {
         showToast(`No hay suficientes equipos (se requieren ${numToAdvance}).`, 'error');
         setLoading(false);
@@ -564,7 +681,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           awayTeamId: away.id,
           date: defaultDate,
           time: '18:00',
-          fase: phaseName
+          fase: phaseName,
+          torneoId: selectedTorneoId
         });
         generated++;
       }
@@ -577,7 +695,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ---- AUTO REPARTIR GRUPOS ----
   if (btnAutoGroups) {
     btnAutoGroups.addEventListener('click', async () => {
-      const teams = await DB.getTeams();
+      const teams = await DB.getTeams(selectedTorneoId);
       if (teams.length < 2) {
         showToast('Se necesitan al menos 2 equipos para crear grupos.', 'error');
         return;
@@ -866,7 +984,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <p>Calculando tabla...</p>
       </div>`;
 
-    const rows = await DB.getStandings();
+    const rows = await DB.getStandings(selectedTorneoId);
     _lastStandingsRows = rows; // <-- guardar para export
 
     if (!rows.length) {
@@ -954,7 +1072,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="empty-icon"><svg style="animation: spin 1s linear infinite;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></div>
         <p>Cargando sanciones pendientes...</p>
       </div>`;
-    const [fines, teams] = await Promise.all([DB.getAllPendingFines(), DB.getTeams()]);
+    const [fines, teams] = await Promise.all([DB.getAllPendingFines(selectedTorneoId), DB.getTeams(selectedTorneoId)]);
 
     if (!fines || !fines.length) {
       sancionesContainer.innerHTML = `
@@ -1027,7 +1145,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!configError) return;
     configError.textContent = '';
     try {
-      const tournament = await DB.getTournament();
+      const tournament = await DB.getTournament(selectedTorneoId);
       if (tournament) {
         if (configNameInput) configNameInput.value = tournament.nombre || '';
         if (configDescInput) configDescInput.value = tournament.descripcion || '';
@@ -1059,7 +1177,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       btnSave.textContent = 'Guardando...';
 
       try {
-        const res = await DB.saveTournament({ nombre, descripcion, municipio });
+        const res = await DB.saveTournament({ id: selectedTorneoId, nombre, descripcion, municipio });
         if (res.ok) {
           showToast('Configuración guardada correctamente.', 'success');
           // Actualizar branding en el panel

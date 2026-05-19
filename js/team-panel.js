@@ -263,9 +263,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   // CARGA INICIAL
   // ════════════════════════════════════════════════════════════
   async function loadAll() {
+    const allTeams = await DB.getTeams();
+    myTeam = allTeams.find(t => t.usuario_id === session.id) || null;
+
+    if (!myTeam) {
+      teamNameBig.textContent    = 'Equipo no encontrado';
+      headerTeamName.textContent = 'Mi Equipo';
+      homeMatchesEl.innerHTML = `<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4m0 4h.01"/></svg></div>No se encontró tu equipo. Contacta al administrador.</div>`;
+      return;
+    }
+
     // Cargar branding del torneo
     try {
-      const tournament = await DB.getTournament();
+      const tournament = await DB.getTournament(myTeam.torneo_id);
       if (tournament) {
         const teamHeaderEl = document.getElementById('teamHeaderTournamentName');
         const teamInicioEl = document.getElementById('teamInicioTournamentName');
@@ -289,16 +299,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       console.error('Error al cargar branding del torneo en panel de equipo:', err);
     }
 
-    const allTeams = await DB.getTeams();
-    myTeam = allTeams.find(t => t.usuario_id === session.id) || null;
-
-    if (!myTeam) {
-      teamNameBig.textContent    = 'Equipo no encontrado';
-      headerTeamName.textContent = 'Mi Equipo';
-      homeMatchesEl.innerHTML = `<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4m0 4h.01"/></svg></div>No se encontró tu equipo. Contacta al administrador.</div>`;
-      return;
-    }
-
     // Nombre en header
     headerTeamName.textContent = myTeam.nombre;
     teamNameBig.textContent    = myTeam.nombre;
@@ -318,8 +318,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     [players, matches, standings] = await Promise.all([
       DB.getPlayersByTeam(myTeam.id),
-      DB.getMatches(),
-      DB.getStandings()
+      DB.getMatches(myTeam.torneo_id),
+      DB.getStandings(myTeam.torneo_id)
     ]);
 
     renderStats();
@@ -560,8 +560,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!starScorer || !starKeeper) return;
 
     const [scorers, keepers] = await Promise.all([
-      DB.getTopScorers(1),
-      DB.getBestGoalkeepers(1)
+      DB.getTopScorers(1, myTeam.torneo_id),
+      DB.getBestGoalkeepers(1, myTeam.torneo_id)
     ]);
 
     // ─ Máximo goleador
@@ -623,7 +623,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ── Partidos (tab partidos) ──────────────────────────────────
   async function renderMatchList() {
-    matches = await DB.getMatches();
+    matches = await DB.getMatches(myTeam.torneo_id);
     const mine = myMatches();
     if (!mine.length) {
       matchListEl.innerHTML = `<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>No hay partidos para tu equipo.</div>`;
@@ -663,7 +663,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ── Tabla posiciones ─────────────────────────────────────────
   async function renderStandings() {
     standingsWrap.innerHTML = `<div class="empty"><div class="empty-icon"><svg style="animation: spin 1s linear infinite;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></div>Calculando...</div>`;
-    standings = await DB.getStandings();
+    standings = await DB.getStandings(myTeam.torneo_id);
     if (!standings.length) {
       standingsWrap.innerHTML = `<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></div>Aún no hay datos.</div>`;
       return;

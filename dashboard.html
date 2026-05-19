@@ -25,6 +25,18 @@
         <button class="sidebar-close-mobile" id="btnSidebarClose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
 
+      <div class="tournament-selector-wrap" style="padding: 10px 16px; border-bottom: 1px solid rgba(0,0,0,0.06); display: flex; flex-direction: column; gap: 8px;">
+        <label style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; color: var(--text-muted);">Torneo Activo</label>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <select id="dashTournamentSelector" style="flex: 1; padding: 6px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-size: 0.82rem; font-weight: 600; background: var(--bg-card); color: var(--text-main); cursor: pointer; outline: none;">
+            <option value="" disabled selected>Cargando...</option>
+          </select>
+          <button id="btnCreateNewTournament" title="Crear Nuevo Torneo" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: var(--primary-color); border: none; border-radius: var(--radius-sm); color: white; cursor: pointer; transition: all var(--transition-speed);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+
       <nav class="sidebar-nav">
         <button class="sidebar-btn active" data-tab="overview">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
@@ -420,6 +432,39 @@
       </div>
       <div class="modal-footer">
         <button class="btn-cancel-sm" id="btnCloseRoster">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CREAR NUEVO TORNEO -->
+  <div class="modal-overlay hidden" id="createTournamentModal">
+    <div class="modal-card modal-max-480">
+      <div class="modal-header">
+        <div>
+          <h3>Crear Nuevo Torneo</h3>
+          <p class="roster-sub">Crea un torneo independiente en la plataforma</p>
+        </div>
+        <button class="modal-close" id="closeCreateTournamentModal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <div class="modal-body">
+        <form id="createTournamentForm" style="display: flex; flex-direction: column; gap: 14px;">
+          <div class="form-field">
+            <label for="newTournamentName" style="font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; display: block; color: var(--text-main);">Nombre del Torneo</label>
+            <input type="text" id="newTournamentName" placeholder="Ej. Torneo Femenino 2026" required style="width: 100%; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); outline: none; background: var(--bg-card); color: var(--text-main);" />
+          </div>
+          <div class="form-field">
+            <label for="newTournamentDesc" style="font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; display: block; color: var(--text-main);">Descripción <span class="font-muted-hint">(opcional)</span></label>
+            <textarea id="newTournamentDesc" placeholder="Ej. Torneo de fin de semana categoría libre" style="width: 100%; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); outline: none; resize: vertical; min-height: 80px; background: var(--bg-card); color: var(--text-main);"></textarea>
+          </div>
+          <div class="form-field">
+            <label for="newTournamentCity" style="font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; display: block; color: var(--text-main);">Sede / Municipio</label>
+            <input type="text" id="newTournamentCity" placeholder="Ej. Montería" style="width: 100%; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); outline: none; background: var(--bg-card); color: var(--text-main);" />
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button class="btn-cancel-sm" id="btnCancelCreateTournament">Cancelar</button>
+        <button class="btn-primary-sm" id="btnSubmitCreateTournament">Crear Torneo</button>
       </div>
     </div>
   </div>

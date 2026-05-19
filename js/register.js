@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ── Referencias al DOM ────────────────────────────────────────
   const form              = document.getElementById('registerForm');
   const teamNameInput     = document.getElementById('teamName');
+  const teamTournamentSelect = document.getElementById('teamTournamentSelect');
   const adminNameInput    = document.getElementById('adminName');
   const emailInput        = document.getElementById('regEmail');
   const passInput         = document.getElementById('regPassword');
@@ -103,8 +104,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Inicializar como equipo
+  // Inicializar como equipo y cargar torneos
   switchRole('team');
+
+  try {
+    const torneos = await DB.getAllTournaments();
+    if (teamTournamentSelect) {
+      teamTournamentSelect.innerHTML = '';
+      if (torneos.length === 0) {
+        const opt = document.createElement('option');
+        opt.value = '';
+        opt.disabled = true;
+        opt.selected = true;
+        opt.textContent = 'No hay torneos disponibles';
+        teamTournamentSelect.appendChild(opt);
+      } else {
+        const optDef = document.createElement('option');
+        optDef.value = '';
+        optDef.disabled = true;
+        optDef.selected = true;
+        optDef.textContent = 'Seleccione un torneo...';
+        teamTournamentSelect.appendChild(optDef);
+        
+        torneos.forEach(t => {
+          const opt = document.createElement('option');
+          opt.value = t.id;
+          opt.textContent = `${t.nombre} (${t.municipio || 'Montería'})`;
+          teamTournamentSelect.appendChild(opt);
+        });
+      }
+    }
+  } catch (err) {
+    console.error('Error al cargar torneos en registro:', err);
+  }
 
   roleTeamCard.addEventListener('click',  () => switchRole('team'));
   roleAdminCard.addEventListener('click', () => switchRole('admin'));
@@ -129,9 +161,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ── Limpiar error al escribir ────────────────────────────────
-  [teamNameInput, adminNameInput, emailInput, passInput, passConfirm, citySelect, adminCodeInput].forEach(el => {
-    el.addEventListener('input',  clearError);
-    el.addEventListener('change', clearError);
+  [teamNameInput, adminNameInput, emailInput, passInput, passConfirm, citySelect, adminCodeInput, teamTournamentSelect].forEach(el => {
+    if (el) {
+      el.addEventListener('input',  clearError);
+      el.addEventListener('change', clearError);
+    }
   });
 
   // ── Toggle mostrar/ocultar contraseña ────────────────────────
@@ -180,13 +214,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Validaciones exclusivas de equipo
       const name = DB.sanitize(teamNameInput.value);
       const city = DB.sanitize(citySelect.value);
+      const tournamentId = teamTournamentSelect ? teamTournamentSelect.value : '';
 
       if (!name)               { showError('El nombre del equipo es obligatorio.');         teamNameInput.focus(); resetBtn(); return; }
       if (name.length < 3)     { showError('El nombre debe tener al menos 3 caracteres.');                         resetBtn(); return; }
       if (/[<>"'`]/.test(name)){ showError('El nombre contiene caracteres no permitidos.');                        resetBtn(); return; }
+      if (!tournamentId)       { showError('Selecciona un torneo para inscribirte.');        teamTournamentSelect.focus(); resetBtn(); return; }
       if (!city)               { showError('Selecciona un municipio.');                     citySelect.focus();    resetBtn(); return; }
 
-      result = await DB.addTeam({ name, email, password: pass, city, escudo: shieldBase64 || null });
+      result = await DB.addTeam({ name, email, password: pass, city, escudo: shieldBase64 || null, torneoId: tournamentId });
 
       if (result.ok) {
         showSuccessTeam(name);

@@ -28,6 +28,8 @@ const DB = {
   clearReadCache() {
     this._teamsPromise = null;
     this._matchesPromise = null;
+    this._teamsPromises = {};
+    this._matchesPromises = {};
   },
 
   // ── Helpers de Seguridad ─────────────────────────────────────
@@ -132,20 +134,26 @@ const DB = {
   },
 
   // ── Equipos ──────────────────────────────────────────────────
-  async getTeams() {
-    if (this._teamsPromise) return this._teamsPromise;
+  async getTeams(torneoId = null) {
+    const cacheKey = torneoId || 'all';
+    if (!this._teamsPromises) this._teamsPromises = {};
+    if (this._teamsPromises[cacheKey]) return this._teamsPromises[cacheKey];
     
-    this._teamsPromise = (async () => {
-      const { data, error } = await this.client.from('equipos').select('*').order('nombre');
-      this._teamsPromise = null; // Limpiar para permitir futuras recargas
+    this._teamsPromises[cacheKey] = (async () => {
+      let query = this.client.from('equipos').select('*');
+      if (torneoId) {
+        query = query.eq('torneo_id', torneoId);
+      }
+      const { data, error } = await query.order('nombre');
+      this._teamsPromises[cacheKey] = null;
       return error ? [] : data;
     })();
     
-    return this._teamsPromise;
+    return this._teamsPromises[cacheKey];
   },
 
   async addTeam(data) {
-    const { name, email, password, city, escudo } = data;
+    const { name, email, password, city, escudo, torneoId } = data;
 
     if (!this.client) {
       return { ok: false, error: 'La base de datos no está lista. Intenta recargar la página.' };
@@ -188,7 +196,8 @@ const DB = {
         email: email,
         escudo: escudo || null,
         municipio: city || 'Montería',
-        usuario_id: userId
+        usuario_id: userId,
+        torneo_id: torneoId || null
       }]);
 
       if (teamError) {
@@ -251,28 +260,17 @@ const DB = {
         return { ok: false, error: 'Cuenta creada, pero no se pudo asignar el rol de admin: ' + profileError.message };
       }
 
-      // 3. Crear o actualizar el torneo
+      // 3. Crear el torneo inicial del administrador
       if (tournamentName) {
         try {
-          const { data: existing } = await this.client.from('torneo').select('id').limit(1);
-          if (existing && existing.length > 0) {
-            await this.client
-              .from('torneo')
-              .update({
-                nombre: tournamentName,
-                descripcion: tournamentDesc || '',
-                municipio: tournamentCity || 'Montería'
-              })
-              .eq('id', existing[0].id);
-          } else {
-            await this.client
-              .from('torneo')
-              .insert([{
-                nombre: tournamentName,
-                descripcion: tournamentDesc || '',
-                municipio: tournamentCity || 'Montería'
-              }]);
-          }
+          await this.client
+            .from('torneo')
+            .insert([{
+              nombre: tournamentName,
+              descripcion: tournamentDesc || '',
+              municipio: tournamentCity || 'Montería',
+              admin_id: userId
+            }]);
         } catch (torneoErr) {
           console.error('Error al configurar torneo en registro:', torneoErr);
         }
@@ -286,16 +284,18 @@ const DB = {
     }
   },
 
-  async getTournament() {
+  async getTournament(id = null) {
     if (!this.client) return null;
     try {
-      const { data, error } = await this.client
-        .from('torneo')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(1);
+      let query = this.client.from('torneo').select('*');
+      if (id) {
+        query = query.eq('id', id);
+      } else {
+        query = query.order('created_at', { ascending: false }).limit(1);
+      }
+      const { data, error } = await query;
       if (error) {
-        console.warn('Error en getTournament (puede que no exista la tabla torneo):', error.message);
+        console.warn('Error en getTournament:', error.message);
         return null;
       }
       return data && data.length > 0 ? data[0] : null;
@@ -304,26 +304,78 @@ const DB = {
     }
   },
 
-  async saveTournament({ nombre, descripcion, municipio }) {
+  async getAllTournaments() {
+    if (!this.client) return [];
+    try {
+      const { data, error } = await this.client
+        .from('torneo')
+        .select('*')
+        .order('created_at', { ascending: false });
+      return error ? [] : data;
+    } catch (e) {
+      return [];
+    }
+  },
+
+  async getTournamentsByAdmin(adminId) {
+    if (!this.client || !adminId) return [];
+    try {
+      const { data, error } = await this.client
+        .from('torneo')
+        .select('*')
+        .eq('admin_id', adminId)
+        .order('created_at', { ascending: false });
+      return error ? [] : data;
+    } catch (e) {
+      return [];
+    }
+  },
+
+  async createTournament({ nombre, descripcion, municipio }) {
     if (!this.client) {
       return { ok: false, error: 'La base de datos no está lista. Intenta recargar la página.' };
     }
     try {
-      const { data: existing, error: getErr } = await this.client.from('torneo').select('id').limit(1);
-      if (getErr) {
-        return { ok: false, error: 'La tabla "torneo" no existe en Supabase. Por favor ejecuta el archivo actualizar_torneo.sql en el SQL Editor.' };
-      }
-      if (existing && existing.length > 0) {
+      const session = this.getSession();
+      const adminId = session ? session.id : null;
+      const { data, error } = await this.client
+        .from('torneo')
+        .insert([{ nombre, descripcion, municipio, admin_id: adminId }])
+        .select();
+      if (error) return { ok: false, error: error.message };
+      return { ok: true, tournament: data ? data[0] : null };
+    } catch (e) {
+      return { ok: false, error: e.message };
+    }
+  },
+
+  async saveTournament({ id, nombre, descripcion, municipio }) {
+    if (!this.client) {
+      return { ok: false, error: 'La base de datos no está lista. Intenta recargar la página.' };
+    }
+    try {
+      if (id) {
         const { error } = await this.client
           .from('torneo')
           .update({ nombre, descripcion, municipio })
-          .eq('id', existing[0].id);
+          .eq('id', id);
         if (error) return { ok: false, error: error.message };
       } else {
-        const { error } = await this.client
-          .from('torneo')
-          .insert([{ nombre, descripcion, municipio }]);
-        if (error) return { ok: false, error: error.message };
+        const { data: existing } = await this.client.from('torneo').select('id').limit(1);
+        if (existing && existing.length > 0) {
+          const { error } = await this.client
+            .from('torneo')
+            .update({ nombre, descripcion, municipio })
+            .eq('id', existing[0].id);
+          if (error) return { ok: false, error: error.message };
+        } else {
+          const session = this.getSession();
+          const adminId = session ? session.id : null;
+          const { error } = await this.client
+            .from('torneo')
+            .insert([{ nombre, descripcion, municipio, admin_id: adminId }]);
+          if (error) return { ok: false, error: error.message };
+        }
       }
       return { ok: true };
     } catch (e) {
@@ -387,41 +439,50 @@ const DB = {
   },
 
   // ── Partidos ─────────────────────────────────────────────────
-  async getMatches() {
-    if (this._matchesPromise) return this._matchesPromise;
+  async getMatches(torneoId = null) {
+    const cacheKey = torneoId || 'all';
+    if (!this._matchesPromises) this._matchesPromises = {};
+    if (this._matchesPromises[cacheKey]) return this._matchesPromises[cacheKey];
 
-    this._matchesPromise = (async () => {
-      const { data, error } = await this.client.from('partidos').select('*, equipo_local:equipos!equipo_local_id(nombre, escudo), equipo_visit:equipos!equipo_visit_id(nombre, escudo)').order('fecha', { ascending: true });
-      this._matchesPromise = null; // Limpiar para permitir futuras recargas
+    this._matchesPromises[cacheKey] = (async () => {
+      let query = this.client.from('partidos').select('*, equipo_local:equipos!equipo_local_id(nombre, escudo), equipo_visit:equipos!equipo_visit_id(nombre, escudo)');
+      if (torneoId) {
+        query = query.eq('torneo_id', torneoId);
+      }
+      const { data, error } = await query.order('fecha', { ascending: true });
+      this._matchesPromises[cacheKey] = null;
       return error ? [] : data;
     })();
 
-    return this._matchesPromise;
+    return this._matchesPromises[cacheKey];
   },
 
-  async addMatch({ homeTeamId, awayTeamId, date, time, fase }) {
+  async addMatch({ homeTeamId, awayTeamId, date, time, fase, torneoId }) {
     if (homeTeamId === awayTeamId) return { ok: false, error: 'Los equipos deben ser distintos.' };
     const { data, error } = await this.client.from('partidos').insert([{
       equipo_local_id: homeTeamId,
       equipo_visit_id: awayTeamId,
       fecha: date,
       hora: time || '18:00',
-      fase: fase || 'Clasificación General'
+      fase: fase || 'Clasificación General',
+      torneo_id: torneoId || null
     }]).select();
 
     if (error) return { ok: false, error: error.message };
     return { ok: true, match: data ? data[0] : null };
   },
 
-  async updateMatch(id, { homeTeamId, awayTeamId, date, time, fase }) {
+  async updateMatch(id, { homeTeamId, awayTeamId, date, time, fase, torneoId }) {
     if (homeTeamId === awayTeamId) return { ok: false, error: 'Los equipos deben ser distintos.' };
-    const { data, error } = await this.client.from('partidos').update({
+    const updateData = {
       equipo_local_id: homeTeamId,
       equipo_visit_id: awayTeamId,
       fecha: date,
       hora: time,
       fase: fase || 'Clasificación General'
-    }).eq('id', id).select();
+    };
+    if (torneoId) updateData.torneo_id = torneoId;
+    const { data, error } = await this.client.from('partidos').update(updateData).eq('id', id).select();
 
     if (error) return { ok: false, error: error.message };
     if (!data || data.length === 0) return { ok: false, error: 'El partido ya no existe o fue eliminado.' };
@@ -478,8 +539,8 @@ const DB = {
   },
 
   // ── Standings ────────────────────────────────────────────────
-  async getStandings() {
-    const [teams, matches] = await Promise.all([this.getTeams(), this.getMatches()]);
+  async getStandings(torneoId = null) {
+    const [teams, matches] = await Promise.all([this.getTeams(torneoId), this.getMatches(torneoId)]);
     // Solo contar partidos finalizados de la fase de Clasificación General o nula
     const finished = matches.filter(m => m.estado === 'finalizado' && (m.fase === 'Clasificación General' || !m.fase));
 
@@ -508,9 +569,9 @@ const DB = {
   },
 
   // ── Estadísticas ─────────────────────────────────────────────
-  async getStats() {
+  async getStats(torneoId = null) {
     try {
-      const [teams, matches] = await Promise.all([this.getTeams(), this.getMatches()]);
+      const [teams, matches] = await Promise.all([this.getTeams(torneoId), this.getMatches(torneoId)]);
       return {
         teams: Array.isArray(teams) ? teams.length : 0,
         scheduled: Array.isArray(matches) ? matches.filter(m => m.estado === 'pendiente').length : 0,
@@ -522,9 +583,9 @@ const DB = {
     }
   },
 
-  async getTopScorers(limit = 5) {
+  async getTopScorers(limit = 5, torneoId = null) {
     const { data, error } = await this.client.from('eventos_partido')
-      .select('jugador_id, cantidad, jugadores(nombre, foto, equipos(nombre))')
+      .select('jugador_id, cantidad, jugadores(nombre, foto, equipos(nombre, torneo_id))')
       .eq('tipo', 'gol');
 
     if (error || !data) return [];
@@ -533,6 +594,7 @@ const DB = {
     data.forEach(e => {
       const p = e.jugadores;
       if (!p) return;
+      if (torneoId && p.equipos?.torneo_id !== torneoId) return;
       if (!map[e.jugador_id]) {
         map[e.jugador_id] = { nombre: p.nombre, foto: p.foto, equipo: p.equipos?.nombre, goles: 0 };
       }
@@ -542,9 +604,9 @@ const DB = {
     return Object.values(map).sort((a,b) => b.goles - a.goles).slice(0, limit);
   },
 
-  async getBestGoalkeepers(limit = 5) {
+  async getBestGoalkeepers(limit = 5, torneoId = null) {
     // Lógica simplificada: equipos con menos goles en contra
-    const standings = await this.getStandings();
+    const standings = await this.getStandings(torneoId);
     return standings.sort((a,b) => a.gc - b.gc).slice(0, limit).map(s => ({
       nombre: 'Portero de ' + s.team.nombre,
       equipo: s.team.nombre,
@@ -571,20 +633,23 @@ const DB = {
     return data || [];
   },
 
-  async getAllPendingFines() {
+  async getAllPendingFines(torneoId = null) {
     // Todas las tarjetas pendientes de pago (para el dashboard de admin)
     try {
       const { data, error } = await this.client
         .from('eventos_partido')
-        .select('*, jugadores(nombre, dorsal), partidos(fecha)')
+        .select('*, jugadores(nombre, dorsal, equipos(torneo_id)), partidos(fecha)')
         .in('tipo', ['amarilla', 'roja'])
         .eq('pagada', false);
       if (error) {
-        // Si la columna 'pagada' no existe, devolver vacío silenciosamente
         console.warn('getAllPendingFines error (puede que la columna pagada no exista):', error.message);
         return [];
       }
-      return data || [];
+      if (!data) return [];
+      if (torneoId) {
+        return data.filter(e => e.jugadores?.equipos?.torneo_id === torneoId);
+      }
+      return data;
     } catch (e) {
       return [];
     }

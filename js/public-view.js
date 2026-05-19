@@ -33,17 +33,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (statusEl) statusEl.hidden = true;
   }
 
-  try {
-    DB.clearReadCache();
-    DB.init();
+  let selectedTorneoId = localStorage.getItem('public_selected_torneo_id') || '';
+  const publicTournamentSelect = document.getElementById('publicTournamentSelect');
+
+  async function loadData() {
+    fixtureEl.innerHTML = '<p>Cargando partidos...</p>';
+    standingsEl.innerHTML = '<p>Calculando posiciones...</p>';
 
     // Cargar branding del torneo
     try {
-      const tournament = await DB.getTournament();
+      const tournament = await DB.getTournament(selectedTorneoId);
       if (tournament) {
-        const publicNameEl = document.getElementById('publicTournamentName');
         const publicDescEl = document.getElementById('publicTournamentDesc');
-        if (publicNameEl) publicNameEl.textContent = tournament.nombre;
         if (publicDescEl) {
           publicDescEl.textContent = tournament.descripcion || 'Vista pública para compartir: partidos y posiciones.';
         }
@@ -52,18 +53,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       console.error('Error al cargar branding público:', err);
     }
 
-    const [teams, matches] = await Promise.all([DB.getTeams(), DB.getMatches()]);
+    const [teams, matches] = await Promise.all([DB.getTeams(selectedTorneoId), DB.getMatches(selectedTorneoId)]);
 
     if ((!teams || teams.length === 0) && (!matches || matches.length === 0)) {
       setStatus(
-        'No se pudieron cargar los datos. Si acabas de publicar el sitio, revisa en Supabase que el rol anónimo tenga permiso de lectura (SELECT) en las tablas equipos y partidos. Ver README.',
+        'No hay datos para mostrar en este torneo.',
         false
       );
     } else {
       clearStatus();
     }
 
-    const rows = await DB.getStandings();
+    const rows = await DB.getStandings(selectedTorneoId);
 
     if (matches && matches.length) {
       const sorted = [...matches].sort((a, b) => {
@@ -191,6 +192,50 @@ document.addEventListener('DOMContentLoaded', async () => {
         html +
         '<p class="text-muted-sm mt-10" style="color:var(--gray-400);font-size:0.82rem;">Criterios: puntos · diferencia de goles · goles a favor. Solo lectura.</p>';
     }
+  }
+
+  // ---- Inicialización ----
+  try {
+    DB.clearReadCache();
+    DB.init();
+
+    // Cargar torneos en el selector
+    const tournaments = await DB.getAllTournaments();
+    if (publicTournamentSelect) {
+      publicTournamentSelect.innerHTML = '';
+      if (tournaments.length === 0) {
+        const opt = document.createElement('option');
+        opt.value = '';
+        opt.disabled = true;
+        opt.selected = true;
+        opt.textContent = 'Sin torneos';
+        publicTournamentSelect.appendChild(opt);
+        selectedTorneoId = '';
+        localStorage.removeItem('public_selected_torneo_id');
+      } else {
+        const exists = tournaments.some(t => t.id === selectedTorneoId);
+        if (!selectedTorneoId || !exists) {
+          selectedTorneoId = tournaments[0].id;
+          localStorage.setItem('public_selected_torneo_id', selectedTorneoId);
+        }
+        
+        tournaments.forEach(t => {
+          const opt = document.createElement('option');
+          opt.value = t.id;
+          opt.textContent = t.nombre;
+          if (t.id === selectedTorneoId) opt.selected = true;
+          publicTournamentSelect.appendChild(opt);
+        });
+
+        publicTournamentSelect.addEventListener('change', async (e) => {
+          selectedTorneoId = e.target.value;
+          localStorage.setItem('public_selected_torneo_id', selectedTorneoId);
+          await loadData();
+        });
+      }
+    }
+
+    await loadData();
   } catch (e) {
     console.error(e);
     setStatus('Error al cargar el torneo. Revisa la consola o la configuración de Supabase.', false);
