@@ -274,22 +274,29 @@ document.addEventListener('DOMContentLoaded', async () => {
   const refresh = async () => {
     setLoading(true);
     try {
-      const tournament = await DB.getTournament(selectedTorneoId);
-      if (tournament) {
-        const sidebarBrand = document.querySelector('.sidebar-brand');
-        if (sidebarBrand) {
-          sidebarBrand.textContent = tournament.nombre + ' Admin';
+      try {
+        const tournament = await DB.getTournament(selectedTorneoId);
+        if (tournament) {
+          const sidebarBrand = document.querySelector('.sidebar-brand');
+          if (sidebarBrand) {
+            sidebarBrand.textContent = tournament.nombre + ' Admin';
+          }
         }
+      } catch (err) {
+        console.error('Error al cargar branding del torneo:', err);
       }
-    } catch (err) {
-      console.error('Error al cargar branding del torneo:', err);
+      
+      await Promise.all([renderStats(), renderTeams(), renderMatches()]);
+      
+      if (matchReminderHost && window.MatchReminders) {
+        const matches = await DB.getMatches(selectedTorneoId);
+        window.MatchReminders.renderAdminBanner(matchReminderHost, matches);
+      }
+    } catch (globalErr) {
+      console.error('Error in refresh sequence:', globalErr);
+    } finally {
+      setLoading(false);
     }
-    await Promise.all([renderStats(), renderTeams(), renderMatches()]);
-    if (matchReminderHost && window.MatchReminders) {
-      const matches = await DB.getMatches(selectedTorneoId);
-      window.MatchReminders.renderAdminBanner(matchReminderHost, matches);
-    }
-    setLoading(false);
   };
 
   // ---- STATS ----
