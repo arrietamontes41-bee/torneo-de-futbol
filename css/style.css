@@ -16,35 +16,35 @@ body {
 
 /* ---------- VARIABLES ---------- */
 :root {
-  --green:       #10b981;
-  --green-dark:  #34d399; /* In dark mode, 'dark' is physically lighter for contrast */
-  --green-light: rgba(16, 185, 129, 0.15);
-  --blue:        #3b82f6;
-  --blue-light:  rgba(59, 130, 246, 0.15);
-  --red:         #ef4444;
-  --red-light:   rgba(239, 68, 68, 0.15);
-  --purple:      #8b5cf6;
-  --purple-light:rgba(139, 92, 246, 0.15);
+  --green:       #15803d; /* soccer grass green */
+  --green-dark:  #166534;
+  --green-light: rgba(22, 163, 74, 0.1);
+  --blue:        #2563eb;
+  --blue-light:  rgba(37, 99, 235, 0.1);
+  --red:         #dc2626;
+  --red-light:   rgba(220, 38, 38, 0.1);
+  --purple:      #7c3aed;
+  --purple-light:rgba(124, 58, 237, 0.1);
   
-  /* Inverted Gray Scale for Dark Theme */
-  --gray-50:     #0f172a; /* Main dark background */
-  --gray-100:    #1e293b; /* Cards background */
-  --gray-200:    #334155; /* Borders */
-  --gray-300:    #475569;
-  --gray-400:    #64748b;
-  --gray-500:    #94a3b8; /* Subtext */
-  --gray-600:    #cbd5e1;
-  --gray-700:    #e2e8f0;
-  --gray-800:    #f1f5f9;
-  --gray-900:    #f8fafc; /* Title text */
+  /* Light Gray/Green Scale for Soccer Theme */
+  --gray-50:     #f3f8f5; /* Page background (soft mint) */
+  --gray-100:    #ffffff; /* Cards background */
+  --gray-200:    #e2ebe5; /* Soft divider border */
+  --gray-300:    #cbdcd1;
+  --gray-400:    #9bb2a3;
+  --gray-500:    #708d7a; /* Subtext */
+  --gray-600:    #4b6854;
+  --gray-700:    #2d4334;
+  --gray-800:    #1c2d22;
+  --gray-900:    #0a130e; /* Title text */
 
-  --glass-bg:    rgba(30, 41, 59, 0.45);
-  --glass-border:rgba(255, 255, 255, 0.08);
+  --glass-bg:    rgba(255, 255, 255, 0.85);
+  --glass-border:rgba(21, 128, 61, 0.08);
 
-  --shadow-sm:   0 2px 4px rgba(0,0,0,.3);
-  --shadow-md:   0 8px 32px rgba(0,0,0,.35), 0 2px 8px rgba(0,0,0,.2);
-  --shadow-lg:   0 16px 48px rgba(0,0,0,.45), 0 4px 16px rgba(0,0,0,.3);
-  --glow-green:  0 0 16px rgba(16, 185, 129, 0.35);
+  --shadow-sm:   0 2px 8px rgba(0,0,0,0.05);
+  --shadow-md:   0 8px 32px rgba(21, 128, 61, 0.06), 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-lg:   0 16px 48px rgba(21, 128, 61, 0.08), 0 4px 16px rgba(0,0,0,0.04);
+  --glow-green:  0 0 16px rgba(21, 128, 61, 0.15);
   --radius:      16px;
   --radius-sm:   10px;
   --radius-lg:   24px;
@@ -105,7 +105,7 @@ button.font-auth-link {
 .auth-body {
   margin: 0;
   min-height: 100vh;
-  background: #020617; /* Cyberpunk deep space */
+  background: var(--gray-50);
   overflow-x: hidden;
 }
 
@@ -142,7 +142,7 @@ button.font-auth-link {
 .auth-split-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to right, #020617 0%, transparent 40%, rgba(2,6,23,0.3) 100%);
+  background: linear-gradient(to right, var(--gray-50) 0%, transparent 40%, rgba(243,248,245,0.3) 100%);
   pointer-events: none;
 }
 
@@ -166,7 +166,7 @@ button.font-auth-link {
   }
   
   .auth-split-overlay {
-    background: rgba(2, 6, 23, 0.7); /* Capa oscura más fuerte para que se lea el texto del formulario */
+    background: rgba(243, 248, 245, 0.85); /* Capa clara más fuerte para que se lea el texto del formulario */
   }
 }
 
@@ -310,8 +310,8 @@ button.font-auth-link {
 .input-wrap select {
   width: 100%;
   padding: 12px 14px 12px 42px;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1.5px solid var(--gray-200);
+  background: var(--gray-100);
+  border: 1.5px solid var(--gray-300);
   border-radius: var(--radius-sm);
   font-size: 0.95rem;
   font-family: inherit;
@@ -325,7 +325,7 @@ button.font-auth-link {
 .input-wrap input:focus,
 .input-wrap select:focus {
   border-color: var(--green);
-  background: rgba(15, 23, 42, 0.9);
+  background: var(--gray-100);
   box-shadow: var(--glow-green);
 }
 
@@ -354,7 +354,7 @@ button.font-auth-link {
   width: 100%;
   padding: 13px;
   margin-top: 6px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
   color: white;
   border: none;
   border-radius: 50px;
@@ -362,13 +362,13 @@ button.font-auth-link {
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(16,185,129,.35);
+  box-shadow: 0 4px 16px rgba(21,128,61,.2);
   transition: transform var(--transition), box-shadow var(--transition), filter var(--transition);
 }
 
 .btn-auth:hover {
   transform: translateY(-1px);
-  box-shadow: 0 8px 24px rgba(16,185,129,.45);
+  box-shadow: 0 8px 24px rgba(21,128,61,.3);
   filter: brightness(1.05);
 }
 

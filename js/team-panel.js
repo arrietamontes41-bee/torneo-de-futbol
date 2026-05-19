@@ -263,6 +263,32 @@ document.addEventListener('DOMContentLoaded', async () => {
   // CARGA INICIAL
   // ════════════════════════════════════════════════════════════
   async function loadAll() {
+    // Cargar branding del torneo
+    try {
+      const tournament = await DB.getTournament();
+      if (tournament) {
+        const teamHeaderEl = document.getElementById('teamHeaderTournamentName');
+        const teamInicioEl = document.getElementById('teamInicioTournamentName');
+        const carnetEl = document.getElementById('carnetTournamentName');
+        
+        if (teamHeaderEl) teamHeaderEl.textContent = tournament.nombre;
+        if (teamInicioEl) {
+          teamInicioEl.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" style="margin-right:8px; vertical-align:middle;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+            ${tournament.nombre}
+          `;
+        }
+        if (carnetEl) {
+          carnetEl.innerHTML = `
+            ${tournament.nombre.split('–')[0].split('-')[0].trim()}
+            <strong>${tournament.municipio || 'Montería'}</strong>
+          `;
+        }
+      }
+    } catch (err) {
+      console.error('Error al cargar branding del torneo en panel de equipo:', err);
+    }
+
     const allTeams = await DB.getTeams();
     myTeam = allTeams.find(t => t.usuario_id === session.id) || null;
 

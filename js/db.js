@@ -204,7 +204,7 @@ const DB = {
     }
   },
 
-  async addAdmin({ name, email, password }) {
+  async addAdmin({ name, email, password, tournamentName, tournamentDesc, tournamentCity }) {
     if (!this.client) {
       return { ok: false, error: 'La base de datos no está lista. Intenta recargar la página.' };
     }
@@ -251,11 +251,83 @@ const DB = {
         return { ok: false, error: 'Cuenta creada, pero no se pudo asignar el rol de admin: ' + profileError.message };
       }
 
+      // 3. Crear o actualizar el torneo
+      if (tournamentName) {
+        try {
+          const { data: existing } = await this.client.from('torneo').select('id').limit(1);
+          if (existing && existing.length > 0) {
+            await this.client
+              .from('torneo')
+              .update({
+                nombre: tournamentName,
+                descripcion: tournamentDesc || '',
+                municipio: tournamentCity || 'Montería'
+              })
+              .eq('id', existing[0].id);
+          } else {
+            await this.client
+              .from('torneo')
+              .insert([{
+                nombre: tournamentName,
+                descripcion: tournamentDesc || '',
+                municipio: tournamentCity || 'Montería'
+              }]);
+          }
+        } catch (torneoErr) {
+          console.error('Error al configurar torneo en registro:', torneoErr);
+        }
+      }
+
       console.log('Administrador registrado con éxito');
       return { ok: true };
     } catch (err) {
       console.error('Error crítico en addAdmin:', err);
       return { ok: false, error: 'Ocurrió un error inesperado. Revisa tu conexión.' };
+    }
+  },
+
+  async getTournament() {
+    if (!this.client) return null;
+    try {
+      const { data, error } = await this.client
+        .from('torneo')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(1);
+      if (error) {
+        console.warn('Error en getTournament (puede que no exista la tabla torneo):', error.message);
+        return null;
+      }
+      return data && data.length > 0 ? data[0] : null;
+    } catch (e) {
+      return null;
+    }
+  },
+
+  async saveTournament({ nombre, descripcion, municipio }) {
+    if (!this.client) {
+      return { ok: false, error: 'La base de datos no está lista. Intenta recargar la página.' };
+    }
+    try {
+      const { data: existing, error: getErr } = await this.client.from('torneo').select('id').limit(1);
+      if (getErr) {
+        return { ok: false, error: 'La tabla "torneo" no existe en Supabase. Por favor ejecuta el archivo actualizar_torneo.sql en el SQL Editor.' };
+      }
+      if (existing && existing.length > 0) {
+        const { error } = await this.client
+          .from('torneo')
+          .update({ nombre, descripcion, municipio })
+          .eq('id', existing[0].id);
+        if (error) return { ok: false, error: error.message };
+      } else {
+        const { error } = await this.client
+          .from('torneo')
+          .insert([{ nombre, descripcion, municipio }]);
+        if (error) return { ok: false, error: error.message };
+      }
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: e.message };
     }
   },
 

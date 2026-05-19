@@ -5,37 +5,37 @@
 
 :root {
   /* Palette */
-  --color-primary: #10b981; /* emerald */
-  --color-primary-dark: #34d399;
-  --color-primary-light: rgba(16,185,129,0.15);
-  --color-blue: #3b82f6;
-  --color-blue-light: rgba(59,130,246,0.15);
-  --color-red: #ef4444;
-  --color-red-light: rgba(239,68,68,0.15);
-  --color-purple: #8b5cf6;
-  --color-purple-light: rgba(139,92,246,0.15);
+  --color-primary: #15803d; /* soccer grass green */
+  --color-primary-dark: #166534;
+  --color-primary-light: rgba(22,163,74,0.1);
+  --color-blue: #2563eb;
+  --color-blue-light: rgba(37,99,235,0.1);
+  --color-red: #dc2626;
+  --color-red-light: rgba(220,38,38,0.1);
+  --color-purple: #7c3aed;
+  --color-purple-light: rgba(124,58,237,0.1);
 
-  /* Dark gray scale */
-  --gray-50: #0f172a;
-  --gray-100: #1e293b;
-  --gray-200: #334155;
-  --gray-300: #475569;
-  --gray-400: #64748b;
-  --gray-500: #94a3b8;
-  --gray-600: #cbd5e1;
-  --gray-700: #e2e8f0;
-  --gray-800: #f1f5f9;
-  --gray-900: #f8fafc;
+  /* Light green/gray scale */
+  --gray-50: #f3f8f5;   /* Page background (soft mint) */
+  --gray-100: #ffffff;  /* Card background */
+  --gray-200: #e2ebe5;  /* Soft divider border */
+  --gray-300: #cbdcd1;  /* Border color */
+  --gray-400: #9bb2a3;  /* Input border/Placeholder */
+  --gray-500: #708d7a;  /* Subtext */
+  --gray-600: #4b6854;  /* Muted text */
+  --gray-700: #2d4334;  /* Body text */
+  --gray-800: #1c2d22;  /* Headings */
+  --gray-900: #0a130e;  /* High contrast text */
 
   /* Glassmorphism */
-  --glass-bg: rgba(30,41,59,0.45);
-  --glass-border: rgba(255,255,255,0.08);
+  --glass-bg: rgba(255,255,255,0.85);
+  --glass-border: rgba(21,128,61,0.08);
 
   /* Shadows & radius */
-  --shadow-sm: 0 2px 4px rgba(0,0,0,.3);
-  --shadow-md: 0 8px 32px rgba(0,0,0,.35), 0 2px 8px rgba(0,0,0,.2);
-  --shadow-lg: 0 16px 48px rgba(0,0,0,.45), 0 4px 16px rgba(0,0,0,.3);
-  --glow-primary: 0 0 16px rgba(16,185,129,0.35);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
+  --shadow-md: 0 8px 32px rgba(21,128,61,0.06), 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-lg: 0 16px 48px rgba(21,128,61,0.08), 0 4px 16px rgba(0,0,0,0.04);
+  --glow-primary: 0 0 16px rgba(21,128,61,0.15);
   --radius: 16px;
   --radius-sm: 10px;
   --radius-lg: 24px;

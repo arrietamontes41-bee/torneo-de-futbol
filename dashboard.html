@@ -46,6 +46,10 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           Sanciones
         </button>
+        <button class="sidebar-btn" data-tab="config">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Configuración
+        </button>
       </nav>
 
       <div class="sidebar-footer">
@@ -254,6 +258,53 @@
         </div>
         <div id="sancionesContainer">
           <div class="empty-state"><div class="empty-icon"><svg style="animation: spin 1s linear infinite;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></div><p>Cargando sanciones...</p></div>
+        </div>
+      </div>
+
+      <!-- TAB: CONFIGURACIÓN -->
+      <div class="tab-content" id="tabContentConfig">
+        <div class="tab-content-header">
+          <h2 class="tab-content-title">Configuración del Torneo</h2>
+          <p class="hint-click-team">Configura los detalles generales del torneo que verán los usuarios y delegados.</p>
+        </div>
+        <div class="leaderboard-card" style="padding: 28px; height: auto; max-width: 600px;">
+          <form id="configForm" class="auth-form" novalidate style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="form-field" style="display: flex; flex-direction: column; gap: 6px;">
+              <label for="configTournamentName" style="font-weight: 600; color: var(--gray-700);">Nombre del Torneo</label>
+              <div class="input-wrap">
+                <input type="text" id="configTournamentName" placeholder="Ej. Copa Hazel 2026" required maxlength="100" />
+              </div>
+            </div>
+            <div class="form-field" style="display: flex; flex-direction: column; gap: 6px;">
+              <label for="configTournamentDesc" style="font-weight: 600; color: var(--gray-700);">Descripción del Torneo</label>
+              <div class="input-wrap">
+                <input type="text" id="configTournamentDesc" placeholder="Ej. Categoría Libre delegados" maxlength="200" />
+              </div>
+            </div>
+            <div class="form-field" style="display: flex; flex-direction: column; gap: 6px;">
+              <label for="configTournamentCity" style="font-weight: 600; color: var(--gray-700);">Municipio Sede</label>
+              <div class="input-wrap input-wrap-select">
+                <select id="configTournamentCity">
+                  <option value="Montería">Montería</option>
+                  <option value="Cereté">Cereté</option>
+                  <option value="Sahagún">Sahagún</option>
+                  <option value="Lorica">Lorica</option>
+                  <option value="Chinú">Chinú</option>
+                  <option value="Montelíbano">Montelíbano</option>
+                  <option value="Planeta Rica">Planeta Rica</option>
+                  <option value="Pueblo Nuevo">Pueblo Nuevo</option>
+                  <option value="Otro">Otro</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-error" id="configError" role="alert" aria-live="assertive" aria-atomic="true"></div>
+            <div style="margin-top: 10px;">
+              <button type="submit" class="btn-primary-sm" id="btnSaveConfig">
+                <svg viewBox="0 0 20 20" fill="currentColor" width="16" style="margin-right:4px; vertical-align:middle;"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                Guardar Configuración
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </main> <!-- .content -->

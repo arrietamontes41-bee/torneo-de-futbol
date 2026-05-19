@@ -136,6 +136,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (targetTab === 'standings') await renderStandings();
       if (targetTab === 'sanciones') await renderSanciones();
       if (targetTab === 'overview') await renderStats();
+      if (targetTab === 'config') await loadConfigTab();
     });
   });
 
@@ -155,6 +156,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const refresh = async () => {
     setLoading(true);
+    try {
+      const tournament = await DB.getTournament();
+      if (tournament) {
+        const sidebarBrand = document.querySelector('.sidebar-brand');
+        if (sidebarBrand) {
+          sidebarBrand.textContent = tournament.nombre + ' Admin';
+        }
+      }
+    } catch (err) {
+      console.error('Error al cargar branding del torneo:', err);
+    }
     await Promise.all([renderStats(), renderTeams(), renderMatches()]);
     if (matchReminderHost && window.MatchReminders) {
       const matches = await DB.getMatches();
@@ -1004,6 +1016,69 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     });
   };
+  // ---- CONFIGURACIÓN DEL TORNEO ----
+  const configForm = document.getElementById('configForm');
+  const configNameInput = document.getElementById('configTournamentName');
+  const configDescInput = document.getElementById('configTournamentDesc');
+  const configCitySelect = document.getElementById('configTournamentCity');
+  const configError = document.getElementById('configError');
+
+  const loadConfigTab = async () => {
+    if (!configError) return;
+    configError.textContent = '';
+    try {
+      const tournament = await DB.getTournament();
+      if (tournament) {
+        if (configNameInput) configNameInput.value = tournament.nombre || '';
+        if (configDescInput) configDescInput.value = tournament.descripcion || '';
+        if (configCitySelect) configCitySelect.value = tournament.municipio || 'Montería';
+      }
+    } catch (err) {
+      console.error('Error al cargar config:', err);
+      configError.textContent = 'Error al cargar la configuración del torneo.';
+    }
+  };
+
+  if (configForm) {
+    configForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      configError.textContent = '';
+      const nombre = DB.sanitize(configNameInput.value);
+      const descripcion = DB.sanitize(configDescInput.value);
+      const municipio = configCitySelect.value;
+
+      if (!nombre) {
+        configError.textContent = 'El nombre del torneo es obligatorio.';
+        configNameInput.focus();
+        return;
+      }
+
+      const btnSave = document.getElementById('btnSaveConfig');
+      const originalText = btnSave.innerHTML;
+      btnSave.disabled = true;
+      btnSave.textContent = 'Guardando...';
+
+      try {
+        const res = await DB.saveTournament({ nombre, descripcion, municipio });
+        if (res.ok) {
+          showToast('Configuración guardada correctamente.', 'success');
+          // Actualizar branding en el panel
+          const sidebarBrand = document.querySelector('.sidebar-brand');
+          if (sidebarBrand) {
+            sidebarBrand.textContent = nombre + ' Admin';
+          }
+        } else {
+          configError.textContent = res.error || 'Error al guardar la configuración.';
+        }
+      } catch (err) {
+        console.error('Error al guardar config:', err);
+        configError.textContent = 'Ocurrió un error inesperado al guardar.';
+      } finally {
+        btnSave.disabled = false;
+        btnSave.innerHTML = originalText;
+      }
+    });
+  }
 
   // ---- Utils ----
   const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1);

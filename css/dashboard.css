@@ -14,8 +14,8 @@
 }
 .acta-overlay.hidden { display: none; }
 .acta-box {
-  background: #0f172a;
-  border: 1px solid rgba(255,255,255,.12);
+  background: var(--gray-100);
+  border: 1px solid var(--gray-300);
   border-radius: 20px;
   width: 100%; max-width: 900px;
   margin: auto;
@@ -150,13 +150,13 @@
 .app-layout {
   display: flex;
   min-height: 100vh;
-  background: #020617;
+  background: var(--gray-50);
 }
 
 /* --- SIDEBAR --- */
 .sidebar {
   width: 280px;
-  background: #0f172a;
+  background: #0f291b; /* dark forest green */
   border-right: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   flex-direction: column;
@@ -225,17 +225,17 @@
 }
 
 .sidebar-btn:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.06);
   color: #fff;
 }
 
 .sidebar-btn.active {
-  background: rgba(16, 185, 129, 0.1);
-  color: #10b981;
+  background: rgba(22, 163, 74, 0.2);
+  color: #a7f3d0;
 }
 
 .sidebar-btn.active svg {
-  color: #10b981;
+  color: #a7f3d0;
   opacity: 1;
 }
 
@@ -324,9 +324,9 @@
   display: flex;
   align-items: center;
   gap: 20px;
-  background: rgba(2, 6, 23, 0.7);
+  background: var(--glass-bg);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--gray-200);
   position: sticky;
   top: 0;
   z-index: 90;
@@ -336,7 +336,7 @@
   display: none;
   background: none;
   border: none;
-  color: #fff;
+  color: var(--gray-800);
   cursor: pointer;
   padding: 8px;
   margin-left: -8px;
@@ -359,15 +359,15 @@
 }
 
 .breadcrumb-item {
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--gray-500);
 }
 
 .breadcrumb-sep {
-  color: rgba(255, 255, 255, 0.2);
+  color: var(--gray-300);
 }
 
 .breadcrumb-item.active {
-  color: #fff;
+  color: var(--gray-900);
 }
 
 .content {
@@ -435,8 +435,8 @@
 }
 
 .leaderboard-card {
-  background: #0f172a;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--gray-100);
+  border: 1px solid var(--gray-300);
   border-radius: 20px;
   overflow: hidden;
   transition: transform 0.2s;

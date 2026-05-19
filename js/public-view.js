@@ -37,6 +37,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     DB.clearReadCache();
     DB.init();
 
+    // Cargar branding del torneo
+    try {
+      const tournament = await DB.getTournament();
+      if (tournament) {
+        const publicNameEl = document.getElementById('publicTournamentName');
+        const publicDescEl = document.getElementById('publicTournamentDesc');
+        if (publicNameEl) publicNameEl.textContent = tournament.nombre;
+        if (publicDescEl) {
+          publicDescEl.textContent = tournament.descripcion || 'Vista pública para compartir: partidos y posiciones.';
+        }
+      }
+    } catch (err) {
+      console.error('Error al cargar branding público:', err);
+    }
+
     const [teams, matches] = await Promise.all([DB.getTeams(), DB.getMatches()]);
 
     if ((!teams || teams.length === 0) && (!matches || matches.length === 0)) {

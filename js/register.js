@@ -40,6 +40,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const citySection       = document.getElementById('citySection');
   const adminNameSection  = document.getElementById('adminNameSection');
   const adminCodeSection  = document.getElementById('adminCodeSection');
+  const adminTournamentSection = document.getElementById('adminTournamentSection');
+  const adminTournamentNameInput = document.getElementById('adminTournamentName');
+  const adminTournamentDescInput = document.getElementById('adminTournamentDesc');
+  const adminTournamentCitySelect = document.getElementById('adminTournamentCity');
   const registerTitle     = document.getElementById('registerTitle');
   const registerSubtitle  = document.getElementById('registerSubtitle');
 
@@ -63,16 +67,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       citySection.classList.remove('hidden-section');
       adminNameSection.classList.remove('visible');
       adminCodeSection.classList.remove('visible');
+      if (adminTournamentSection) adminTournamentSection.classList.remove('visible');
 
       // Quitar required de campos de admin, poner en los de equipo
       teamNameInput.required = true;
       citySelect.required    = true;
       adminNameInput.required= false;
       adminCodeInput.required= false;
+      if (adminTournamentNameInput) adminTournamentNameInput.required = false;
 
-      registerTitle.textContent    = 'Registrar Equipo';
-      registerSubtitle.textContent = 'Únete al torneo de Montería';
-      btnRegister.textContent      = 'Registrar Equipo';
+      registerTitle.textContent    = 'Registrarte como delegado o como equipo';
+      registerSubtitle.textContent = 'Únete al torneo';
+      btnRegister.textContent      = 'Registrarte como delegado o como equipo';
 
     } else {
       roleAdminCard.classList.add('active');
@@ -82,12 +88,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       citySection.classList.add('hidden-section');
       adminNameSection.classList.add('visible');
       adminCodeSection.classList.add('visible');
+      if (adminTournamentSection) adminTournamentSection.classList.add('visible');
 
       // Quitar required de campos de equipo, poner en los de admin
       teamNameInput.required = false;
       citySelect.required    = false;
       adminNameInput.required= true;
       adminCodeInput.required= true;
+      if (adminTournamentNameInput) adminTournamentNameInput.required = true;
 
       registerTitle.textContent    = 'Registro de Administrador';
       registerSubtitle.textContent = 'Acceso restringido al organizador';
@@ -189,9 +197,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Validaciones exclusivas de admin
       const adminName = DB.sanitize(adminNameInput.value);
       const code      = adminCodeInput.value.trim();
+      
+      const tournamentName = adminTournamentNameInput ? DB.sanitize(adminTournamentNameInput.value) : '';
+      const tournamentDesc = adminTournamentDescInput ? DB.sanitize(adminTournamentDescInput.value) : '';
+      const tournamentCity = adminTournamentCitySelect ? adminTournamentCitySelect.value : 'Montería';
 
       if (!adminName)              { showError('Tu nombre completo es obligatorio.');    adminNameInput.focus(); resetBtn(); return; }
       if (adminName.length < 3)   { showError('El nombre debe tener al menos 3 caracteres.');                   resetBtn(); return; }
+      if (!tournamentName)         { showError('El nombre del torneo es obligatorio.');  adminTournamentNameInput.focus(); resetBtn(); return; }
       if (!code)                   { showError('El código de acceso es obligatorio.');   adminCodeInput.focus(); resetBtn(); return; }
       if (code !== ADMIN_SECRET_CODE) {
         showError('Código de acceso incorrecto. Contacta al organizador del torneo.');
@@ -201,7 +214,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      result = await DB.addAdmin({ name: adminName, email, password: pass });
+      result = await DB.addAdmin({
+        name: adminName,
+        email,
+        password: pass,
+        tournamentName,
+        tournamentDesc,
+        tournamentCity
+      });
 
       if (result.ok) {
         showSuccessAdmin(adminName);
