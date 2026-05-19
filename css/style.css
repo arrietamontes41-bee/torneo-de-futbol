@@ -130,6 +130,8 @@ button.font-auth-link {
   flex: 1.2;
   position: relative;
   display: flex;
+  border-left: none;
+  box-shadow: -8px 0 24px rgba(255,255,255,0.25) inset;
 }
 
 .auth-split-right img {
@@ -137,13 +139,19 @@ button.font-auth-link {
   height: 100%;
   object-fit: cover;
   object-position: center;
+  filter: saturate(0.5) hue-rotate(75deg) brightness(0.7) contrast(1.1);
 }
 
 .auth-split-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(27, 94, 32, 0.08); /* overlay suave verde semitransparente sobre la imagen */
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(27, 94, 32, 0.50) 100%
+  );
   pointer-events: none;
+  z-index: 1;
 }
 
 @media (max-width: 1024px) {
