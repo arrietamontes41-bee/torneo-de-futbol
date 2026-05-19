@@ -105,7 +105,8 @@ button.font-auth-link {
 .auth-body {
   margin: 0;
   min-height: 100vh;
-  background: var(--gray-50);
+  /* A vibrant but smooth soccer green gradient instead of glaring white/mint */
+  background: linear-gradient(135deg, #166534 0%, #15803d 100%);
   overflow-x: hidden;
 }
 
@@ -142,7 +143,7 @@ button.font-auth-link {
 .auth-split-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to right, var(--gray-50) 0%, transparent 40%, rgba(243,248,245,0.3) 100%);
+  background: linear-gradient(to right, #166534 0%, rgba(22, 101, 52, 0.6) 40%, transparent 100%);
   pointer-events: none;
 }
 
