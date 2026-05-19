@@ -1,6 +1,6 @@
 /* ============================================================
    register.css — Estilos del formulario de registro (wizard)
-   Torneo de Fútbol Montería
+   Torneo de Fútbol Montería – Paleta verde esmeralda
    ============================================================ */
 
 /* ── Wizard steps ── */
@@ -21,35 +21,35 @@
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   font-size: .8rem; font-weight: 700;
-  border: 2px solid rgba(255,255,255,.2);
-  color: rgba(255,255,255,.4);
+  border: 2px solid #a5d6a7;
+  color: #a5d6a7;
   background: transparent;
   flex-shrink: 0;
   transition: all .3s;
 }
 .step-circle.active {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: #1b5e20;
+  border-color: #1b5e20;
   color: #fff;
-  box-shadow: 0 0 0 4px rgba(99,102,241,.25);
+  box-shadow: 0 0 0 4px rgba(76,175,80,.25);
 }
 .step-circle.done {
-  background: var(--success, #22c55e);
-  border-color: var(--success, #22c55e);
+  background: #4caf50;
+  border-color: #4caf50;
   color: #fff;
 }
 .step-label {
   font-size: .75rem;
   font-weight: 500;
-  color: rgba(255,255,255,.4);
+  color: #9e9e9e;
   white-space: nowrap;
   transition: color .3s;
 }
-.wizard-step.active .step-label { color: rgba(255,255,255,.9); }
-.wizard-step.done  .step-label { color: rgba(255,255,255,.6); }
+.wizard-step.active .step-label { color: #1b5e20; font-weight: 700; }
+.wizard-step.done  .step-label { color: #4caf50; }
 .step-line {
   flex: 1; height: 2px;
-  background: rgba(255,255,255,.1);
+  background: #a5d6a7;
   margin: 0 8px;
   border-radius: 2px;
 }
@@ -68,20 +68,21 @@
 .players-header h3 {
   font-size: .9rem;
   font-weight: 600;
-  color: rgba(255,255,255,.85);
+  color: #1b5e20;
   margin: 0;
 }
 .players-count-badge {
   font-size: .72rem;
-  background: rgba(99,102,241,.2);
-  color: var(--primary-light, #a5b4fc);
+  background: rgba(76,175,80,.15);
+  color: #2e7d32;
   border-radius: 20px;
   padding: 3px 10px;
   font-weight: 600;
+  border: 1px solid #a5d6a7;
 }
 .player-row {
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.08);
+  background: #f1f8f1;
+  border: 1px solid #a5d6a7;
   border-radius: 12px;
   padding: 14px;
   margin-bottom: 10px;
@@ -95,16 +96,16 @@
 .player-row-title {
   font-size: .78rem;
   font-weight: 700;
-  color: var(--primary-light, #a5b4fc);
+  color: #2e7d32;
   margin-bottom: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 .btn-remove-player {
-  background: rgba(239,68,68,.15);
+  background: rgba(239,68,68,.12);
   border: none;
-  color: #f87171;
+  color: #dc2626;
   width: 24px; height: 24px;
   border-radius: 6px;
   cursor: pointer;
@@ -112,7 +113,7 @@
   display: flex; align-items: center; justify-content: center;
   transition: background .2s;
 }
-.btn-remove-player:hover { background: rgba(239,68,68,.3); }
+.btn-remove-player:hover { background: rgba(239,68,68,.25); }
 
 .player-grid {
   display: grid;
@@ -124,7 +125,7 @@
   font-size: .72rem;
   margin-bottom: 4px;
   display: block;
-  color: rgba(255,255,255,.55);
+  color: #555;
 }
 .player-grid input,
 .player-grid select {
@@ -137,10 +138,10 @@
 .btn-add-player {
   width: 100%;
   padding: 11px;
-  background: rgba(99,102,241,.1);
-  border: 1.5px dashed rgba(99,102,241,.4);
+  background: rgba(76,175,80,.08);
+  border: 1.5px dashed #4caf50;
   border-radius: 10px;
-  color: var(--primary-light, #a5b4fc);
+  color: #2e7d32;
   font-size: .83rem;
   font-weight: 600;
   cursor: pointer;
@@ -148,14 +149,14 @@
   margin-top: 4px;
 }
 .btn-add-player:hover {
-  background: rgba(99,102,241,.18);
-  border-color: rgba(99,102,241,.7);
+  background: rgba(76,175,80,.18);
+  border-color: #2e7d32;
 }
 
 .players-empty {
   text-align: center;
   padding: 20px;
-  color: rgba(255,255,255,.3);
+  color: #9e9e9e;
   font-size: .82rem;
 }
 
@@ -167,16 +168,16 @@
 .btn-back {
   flex: 0 0 auto;
   padding: 13px 20px;
-  background: rgba(255,255,255,.07);
-  border: 1px solid rgba(255,255,255,.12);
+  background: #f1f8f1;
+  border: 1px solid #a5d6a7;
   border-radius: 12px;
-  color: rgba(255,255,255,.7);
+  color: #2e7d32;
   font-size: .9rem;
   font-weight: 600;
   cursor: pointer;
   transition: background .2s;
 }
-.btn-back:hover { background: rgba(255,255,255,.12); }
+.btn-back:hover { background: #e8f5e9; }
 
 .register-card-wide {
   max-width: 580px;
@@ -190,14 +191,14 @@
 }
 .players-list::-webkit-scrollbar { width:4px; }
 .players-list::-webkit-scrollbar-track { background: transparent; }
-.players-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius:2px; }
+.players-list::-webkit-scrollbar-thumb { background: #a5d6a7; border-radius:2px; }
 
 /* ── Responsive Registro ── */
 @media (max-width: 768px) {
   .register-card-wide { max-width: 100%; }
 
   .wizard-steps { gap: 0; overflow-x: auto; }
-  .step-label   { display: none; }   /* ocultar labels en móvil, solo círculos */
+  .step-label   { display: none; }
   .step-line    { min-width: 20px; }
 
   .player-grid  { grid-template-columns: 1fr; }
@@ -215,40 +216,40 @@
   .btn-add-player { font-size: .8rem; padding: 10px; }
 }
 
-/* ── Security & Layout Utilities (for CSP) ── */
-.font-muted-hint { color: rgba(255,255,255,.35); font-weight: 400; }
-.font-small-hint { color: #888; font-size: 0.75rem; margin-top: 4px; display: block; }
-.terms-label { display: flex; align-items: flex-start; gap: 8px; cursor: pointer; font-size: 0.85rem; color: #ccc; }
-.terms-check { margin-top: 2px; }
-.terms-link { color: #00e5ff; text-decoration: underline; }
+/* ── Security & Layout Utilities ── */
+.font-muted-hint { color: #9e9e9e; font-weight: 400; }
+.font-small-hint { color: #9e9e9e; font-size: 0.75rem; margin-top: 4px; display: block; }
+.terms-label { display: flex; align-items: flex-start; gap: 8px; cursor: pointer; font-size: 0.85rem; color: #555; }
+.terms-check { margin-top: 2px; accent-color: #2e7d32; }
+.terms-link { color: #2e7d32; text-decoration: underline; }
 .terms-link:hover { opacity: 0.8; }
 
-/* Success Screen Utility Classes */
+/* Success Screen */
 .text-center-py16 { text-align: center; padding: 16px 0; }
 .success-shield-wrap {
   width: 80px; height: 80px; border-radius: 50%;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: linear-gradient(135deg, #1b5e20, #4caf50);
   display: flex; align-items: center; justify-content: center;
   margin: 0 auto 18px; font-size: 2rem; overflow: hidden;
-  border: 3px solid rgba(99,102,241,.5);
+  border: 3px solid rgba(76,175,80,.5);
 }
 .success-check-badge {
   display: inline-flex; align-items: center; justify-content: center;
   width: 40px; height: 40px; border-radius: 50%;
-  background: rgba(34,197,94, .15); border: 2px solid rgba(34,197,94, .4);
+  background: rgba(76,175,80,.15); border: 2px solid rgba(76,175,80,.4);
   margin-bottom: 14px;
 }
-.success-title { font-size: 1.3rem; font-weight: 800; color: #fff; margin: 0 0 8px; }
-.success-text-muted { color: rgba(255,255,255, .55); font-size: .88rem; margin: 0 0 6px; }
-.success-text-sub { color: rgba(255,255,255, .4); font-size: .8rem; margin: 0 0 28px; }
+.success-title { font-size: 1.3rem; font-weight: 800; color: #1b5e20; margin: 0 0 8px; }
+.success-text-muted { color: #555; font-size: .88rem; margin: 0 0 6px; }
+.success-text-sub { color: #9e9e9e; font-size: .8rem; margin: 0 0 28px; }
 .btn-success-redirect {
   display: inline-flex; align-items: center; gap: 8px;
-  padding: 13px 32px; background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  border-radius: 12px; color: #fff; font-size: .9rem; font-weight: 700;
-  text-decoration: none; transition: opacity .2s;
+  padding: 13px 32px; background: #1b5e20;
+  border-radius: 8px; color: #fff; font-size: .9rem; font-weight: 700;
+  text-decoration: none; transition: background .2s;
 }
-.btn-success-redirect:hover { opacity: 0.9; }
-.text-highlight { color: #a5b4fc; }
+.btn-success-redirect:hover { background: #2e7d32; }
+.text-highlight { color: #2e7d32; font-weight: 600; }
 .photo-preview-full { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 
 /* ── Escudo del equipo (upload opcional) ── */
@@ -257,18 +258,18 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  background: rgba(255,255,255,.03);
-  border: 1.5px dashed rgba(99,102,241,.3);
+  background: #f1f8f1;
+  border: 1.5px dashed #4caf50;
   border-radius: 14px;
   padding: 14px 16px;
   transition: border-color .2s;
 }
-.shield-upload-row:hover { border-color: rgba(99,102,241,.55); }
+.shield-upload-row:hover { border-color: #2e7d32; }
 .shield-preview {
   width: 64px; height: 64px;
   border-radius: 50%;
-  border: 3px solid rgba(99,102,241,.4);
-  background: rgba(99,102,241,.1);
+  border: 3px solid #4caf50;
+  background: rgba(76,175,80,.1);
   display: flex; align-items: center; justify-content: center;
   font-size: 1.6rem;
   flex-shrink: 0;
@@ -280,15 +281,52 @@
   align-items: center;
   gap: 6px;
   padding: 7px 16px;
-  background: rgba(99,102,241,.15);
-  border: 1px solid rgba(99,102,241,.3);
+  background: rgba(76,175,80,.12);
+  border: 1px solid #4caf50;
   border-radius: 10px;
-  color: #a5b4fc;
+  color: #2e7d32;
   font-size: .8rem;
   font-weight: 600;
   cursor: pointer;
   transition: all .2s;
 }
-.shield-upload-btn:hover { background: rgba(99,102,241,.28); color: #fff; }
+.shield-upload-btn:hover { background: rgba(76,175,80,.25); color: #1b5e20; }
 #shieldInput { display: none; }
-.shield-hint { font-size: .68rem; color: rgba(255,255,255,.3); }
+.shield-hint { font-size: .68rem; color: #9e9e9e; }
+
+/* ── Selector de Rol (cards cuadradas) ── */
+.role-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.role-card {
+  border: 2px solid #a5d6a7;
+  border-radius: 12px;
+  padding: 16px 12px;
+  text-align: center;
+  cursor: pointer;
+  background: #ffffff;
+  transition: all .2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.role-card:hover {
+  border-color: #4caf50;
+  background: #f1f8f1;
+}
+.role-card.active {
+  border-color: #1b5e20;
+  background: #e8f5e9;
+  box-shadow: 0 0 0 3px rgba(76,175,80,.2);
+}
+.role-card .role-icon { font-size: 1.5rem; }
+.role-card .role-label {
+  font-size: .82rem;
+  font-weight: 600;
+  color: #555;
+}
+.role-card.active .role-label { color: #1b5e20; }
