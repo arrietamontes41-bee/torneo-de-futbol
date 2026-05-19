@@ -1573,9 +1573,11 @@ button.font-auth-link {
 }
 
 /* h1 y h2 en verde oscuro, peso 700 */
-h1, h2 {
-  font-weight: 700;
-  color: #1b5e20;
+h1, h2, .auth-title {
+  font-weight: 700 !important;
+  color: #1b5e20 !important;
+  font-size: 28px !important;
+  letter-spacing: 0.2px;
 }
 
 /* Selects con flecha verde via background-image */
@@ -1584,4 +1586,89 @@ select {
   background-repeat: no-repeat;
   background-position: right 12px center;
   padding-right: 36px !important;
+}
+
+/* ============================================================
+   A11Y OVERRIDES – Accesibilidad y legibilidad (Aplicado globalmente)
+   ============================================================ */
+
+/* Texto general y fondos blancos */
+body {
+  font-size: 16px !important;
+  line-height: 1.7 !important;
+  letter-spacing: 0.2px;
+  color: #1b2a1b; /* Para texto sobre fondo blanco u oscuro se sobrescribe abajo si es necesario */
+}
+.auth-card, .wizard-panel, .auth-split-left {
+  color: #1b2a1b;
+}
+
+/* Subtítulos generales y labels */
+.auth-subtitle, label, .form-label, .wizard-step .step-label {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: #1b5e20 !important;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px !important;
+  line-height: 1.7;
+}
+
+/* Subtítulo específico 'Solo fin de semana' (demo hint o similar) */
+.demo-hint, .auth-subtitle {
+  color: #444 !important;
+  font-size: 15px !important;
+  font-weight: 400 !important;
+}
+
+/* Inputs más legibles */
+input, select, textarea, .form-control {
+  font-size: 16px !important;
+  color: #1a1a1a !important;
+  min-height: 48px !important;
+  padding: 12px 16px !important;
+  line-height: 1.7;
+}
+
+/* Placeholders */
+::placeholder {
+  color: #6d6d6d !important;
+  opacity: 1 !important;
+  font-size: 16px !important;
+}
+::-webkit-input-placeholder {
+  color: #6d6d6d !important;
+  font-size: 16px !important;
+}
+:-ms-input-placeholder {
+  color: #6d6d6d !important;
+  font-size: 16px !important;
+}
+
+/* Botones principales */
+button, .btn, .btn-primary, .btn-submit, .btn-public-access, .btn-success-redirect {
+  font-size: 17px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.3px !important;
+}
+/* Forzar texto blanco en botones verdes */
+.btn-primary, .btn-submit, .btn-success-redirect {
+  color: #ffffff !important;
+}
+
+/* Textos secundarios y links de auth */
+.auth-switch, .font-auth-link, .btn-toggle-pass, .terms-label, .public-access-hint {
+  font-size: 15px !important;
+}
+
+/* Links visibles ("Regístrate aquí", "¿La olvidaste?", "Política de Privacidad") */
+a, .font-auth-link, .auth-switch a, .terms-link {
+  color: #1b5e20 !important;
+  font-weight: 600 !important;
+  text-decoration: underline !important;
+  font-size: 15px !important;
+}
+
+/* Excepción específica para "Política de Privacidad" (y otros terms) */
+.terms-link {
+  font-size: 14px !important;
 }
