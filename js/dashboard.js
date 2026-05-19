@@ -114,10 +114,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function loadTournamentsSelector() {
     try {
+      console.log('[loadTournamentsSelector] session.id =', session.id);
       const tournaments = await DB.getTournamentsByAdmin(session.id);
+      console.log('[loadTournamentsSelector] Torneos recibidos:', tournaments?.length, tournaments);
       if (dashTournamentSelector) {
         dashTournamentSelector.innerHTML = '';
-        if (tournaments.length === 0) {
+        if (!tournaments || tournaments.length === 0) {
           const opt = document.createElement('option');
           opt.value = '';
           opt.disabled = true;
@@ -140,10 +142,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (t.id === selectedTorneoId) opt.selected = true;
             dashTournamentSelector.appendChild(opt);
           });
+          console.log('[loadTournamentsSelector] Selector poblado con', tournaments.length, 'opciones. Seleccionado:', selectedTorneoId);
         }
+      } else {
+        console.warn('[loadTournamentsSelector] dashTournamentSelector NO encontrado en el DOM');
       }
     } catch (err) {
-      console.error('Error loading tournaments list:', err);
+      console.error('[loadTournamentsSelector] Error:', err);
     }
   }
 

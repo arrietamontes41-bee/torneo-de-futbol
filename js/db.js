@@ -319,15 +319,38 @@ const DB = {
   },
 
   async getTournamentsByAdmin(adminId) {
-    if (!this.client || !adminId) return [];
+    if (!this.client || !adminId) {
+      console.warn('[getTournamentsByAdmin] No client or no adminId:', { client: !!this.client, adminId });
+      return [];
+    }
     try {
+      console.log('[getTournamentsByAdmin] Consultando torneos para admin_id:', adminId);
       const { data, error } = await this.client
         .from('torneo')
         .select('*')
         .eq('admin_id', adminId)
         .order('created_at', { ascending: false });
-      return error ? [] : data;
+      
+      if (error) {
+        console.error('[getTournamentsByAdmin] Error de Supabase:', error.message, error.code, error.hint);
+        // Si es error de RLS o permisos, intentar sin filtro
+        if (error.code === '42501' || error.message.includes('permission') || error.message.includes('policy')) {
+          console.warn('[getTournamentsByAdmin] Posible problema de RLS. Intentando consulta sin filtro...');
+          const { data: allData, error: allError } = await this.client
+            .from('torneo')
+            .select('*')
+            .order('created_at', { ascending: false });
+          if (!allError && allData) {
+            console.log('[getTournamentsByAdmin] Fallback sin filtro retornó:', allData.length, 'torneos');
+            return allData.filter(t => t.admin_id === adminId);
+          }
+        }
+        return [];
+      }
+      console.log('[getTournamentsByAdmin] Torneos encontrados:', data?.length, data);
+      return data || [];
     } catch (e) {
+      console.error('[getTournamentsByAdmin] Excepción:', e);
       return [];
     }
   },
