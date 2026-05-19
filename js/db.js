@@ -246,14 +246,15 @@ const DB = {
 
       const userId = authData.user.id;
 
-      // 2. Actualizar perfil en la tabla pública 'usuarios' (ya creado por el trigger)
+      // 2. Actualizar perfil en la tabla pública 'usuarios' (ya creado por el trigger o garantizado aquí)
       const { error: profileError } = await this.client
         .from('usuarios')
-        .update({
+        .upsert({
+          id: userId,
+          email: email.trim().toLowerCase(),
           nombre: name,
           rol: 'admin'
-        })
-        .eq('id', userId);
+        });
 
       if (profileError) {
         console.error('Error al insertar perfil admin:', profileError);
@@ -338,6 +339,17 @@ const DB = {
     try {
       const session = this.getSession();
       const adminId = session ? session.id : null;
+
+      // Garantizar que el usuario exista en la tabla pública para evitar violación de llave foránea
+      if (adminId && session.email) {
+        await this.client.from('usuarios').upsert({
+          id: adminId,
+          email: session.email,
+          nombre: session.nombre || 'Administrador',
+          rol: session.rol || 'admin'
+        });
+      }
+
       const { data, error } = await this.client
         .from('torneo')
         .insert([{ nombre, descripcion, municipio, admin_id: adminId }])
