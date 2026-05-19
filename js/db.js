@@ -237,13 +237,14 @@ const DB = {
 
       const userId = authData.user.id;
 
-      // 2. Insertar o actualizar perfil en la tabla pública 'usuarios'
-      const { error: profileError } = await this.client.from('usuarios').upsert([{
-        id: userId,
-        email: email.trim().toLowerCase(),
-        nombre: name,
-        rol: 'admin'
-      }]);
+      // 2. Actualizar perfil en la tabla pública 'usuarios' (ya creado por el trigger)
+      const { error: profileError } = await this.client
+        .from('usuarios')
+        .update({
+          nombre: name,
+          rol: 'admin'
+        })
+        .eq('id', userId);
 
       if (profileError) {
         console.error('Error al insertar perfil admin:', profileError);
