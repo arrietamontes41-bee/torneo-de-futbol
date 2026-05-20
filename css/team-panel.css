@@ -9,7 +9,7 @@ body {
   background-image: radial-gradient(circle at 1px 1px, rgba(92,141,98,0.05) 1px, transparent 0);
   background-size: 24px 24px;
   margin: 0;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   color: var(--gray-700);
 }
 
@@ -577,6 +577,7 @@ body {
 .tournament-card {
   background: var(--gray-100);
   border: 1px solid var(--gray-200);
+  border-left: 4px solid var(--color-primary, #1b5e20);
   border-radius: 16px;
   padding: 20px 24px;
   margin-bottom: 20px;
@@ -605,7 +606,7 @@ body {
 }
 .confirm-overlay.hidden { display: none; }
 .confirm-box {
-  background: #ffffff;
+  background: var(--gray-100);
   border: 1px solid #c8e6c9;
   border-radius: 18px;
   padding: 24px;
@@ -640,7 +641,7 @@ body {
   align-items: center;
   gap: 12px;
   margin-bottom: 8px;
-  background: #ffffff;
+  background: var(--gray-100);
   padding: 12px;
   border-radius: 10px;
   border: 1px solid #ffcdd2;

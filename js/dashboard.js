@@ -286,6 +286,16 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (sidebarBrand) {
             sidebarBrand.textContent = tournament.nombre + ' Admin';
           }
+          
+          // Actualizar badge en la cabecera superior
+          const activeTournamentHeaderDisplay = document.getElementById('activeTournamentHeaderDisplay');
+          const activeTournamentHeaderName = document.getElementById('activeTournamentHeaderName');
+          const activeTournamentHeaderDesc = document.getElementById('activeTournamentHeaderDesc');
+          if (activeTournamentHeaderDisplay && activeTournamentHeaderName && activeTournamentHeaderDesc) {
+            activeTournamentHeaderDisplay.style.display = 'flex';
+            activeTournamentHeaderName.textContent = tournament.nombre;
+            activeTournamentHeaderDesc.textContent = tournament.descripcion || tournament.municipio || 'Torneo Activo';
+          }
         }
       } catch (err) {
         console.error('Error al cargar branding del torneo:', err);

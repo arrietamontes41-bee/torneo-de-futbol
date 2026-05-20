@@ -4,19 +4,6 @@
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Cargar branding del torneo
-  try {
-    const tournament = await DB.getTournament();
-    if (tournament) {
-      const loginTitle = document.getElementById('loginTournamentTitle');
-      const loginSubtitle = document.getElementById('loginTournamentSubtitle');
-      if (loginTitle) loginTitle.textContent = tournament.nombre;
-      if (loginSubtitle) loginSubtitle.textContent = tournament.descripcion || 'Inicia sesión para continuar';
-    }
-  } catch (err) {
-    console.error('Error al cargar branding:', err);
-  }
-
   // Si ya hay sesión activa, redirigir según el rol
   const session = DB.getSession();
   if (session) {
