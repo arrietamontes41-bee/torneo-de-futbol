@@ -19,32 +19,32 @@ body {
   --green:       #15803d; /* soccer grass green */
   --green-dark:  #166534;
   --green-light: rgba(22, 163, 74, 0.1);
-  --blue:        #2563eb;
-  --blue-light:  rgba(37, 99, 235, 0.1);
-  --red:         #dc2626;
-  --red-light:   rgba(220, 38, 38, 0.1);
-  --purple:      #7c3aed;
-  --purple-light:rgba(124, 58, 237, 0.1);
+  --blue:        #235227;
+  --blue-light:  rgba(35, 82, 39, 0.1);
+  --red:         #c62828;
+  --red-light:   rgba(198, 40, 40, 0.1);
+  --purple:      #3e2723;
+  --purple-light:rgba(62, 39, 35, 0.1);
   
-  /* Light Gray/Green Scale for Soccer Theme */
-  --gray-50:     #f3f8f5; /* Page background (soft mint) */
-  --gray-100:    #ffffff; /* Cards background */
-  --gray-200:    #e2ebe5; /* Soft divider border */
-  --gray-300:    #cbdcd1;
-  --gray-400:    #9bb2a3;
-  --gray-500:    #708d7a; /* Subtext */
-  --gray-600:    #4b6854;
-  --gray-700:    #2d4334;
-  --gray-800:    #1c2d22;
-  --gray-900:    #0a130e; /* Title text */
+  /* Warm sage/ivory scale */
+  --gray-50:     #f1f4ee; /* Page background (light sage) */
+  --gray-100:    #fafbf6; /* Cards background (warm hueso/ivory) */
+  --gray-200:    #dce6dd; /* Soft divider border */
+  --gray-300:    #b8c8ba;
+  --gray-400:    #88968a;
+  --gray-500:    #616e63; /* Subtext */
+  --gray-600:    #4b584d;
+  --gray-700:    #2d362e;
+  --gray-800:    #1b5e20;
+  --gray-900:    #0f1611; /* Title text */
 
-  --glass-bg:    rgba(255, 255, 255, 0.85);
-  --glass-border:rgba(21, 128, 61, 0.08);
+  --glass-bg:    rgba(250, 251, 246, 0.85);
+  --glass-border:rgba(92, 141, 98, 0.1);
 
-  --shadow-sm:   0 2px 8px rgba(0,0,0,0.05);
-  --shadow-md:   0 8px 32px rgba(21, 128, 61, 0.06), 0 2px 8px rgba(0,0,0,0.04);
-  --shadow-lg:   0 16px 48px rgba(21, 128, 61, 0.08), 0 4px 16px rgba(0,0,0,0.04);
-  --glow-green:  0 0 16px rgba(21, 128, 61, 0.15);
+  --shadow-sm:   0 2px 8px rgba(27,94,32,0.04);
+  --shadow-md:   0 4px 18px rgba(27,94,32,0.08);
+  --shadow-lg:   0 16px 48px rgba(27, 94, 32, 0.06), 0 4px 16px rgba(0,0,0,0.03);
+  --glow-green:  0 0 16px rgba(92, 141, 98, 0.15);
   --radius:      16px;
   --radius-sm:   10px;
   --radius-lg:   24px;
@@ -105,7 +105,7 @@ button.font-auth-link {
 .auth-body {
   margin: 0;
   min-height: 100vh;
-  background: #ffffff; /* lado izquierdo blanco puro */
+  background: var(--gray-100); /* lado izquierdo blanco warm */
   overflow-x: hidden;
 }
 
@@ -221,7 +221,7 @@ button.font-auth-link {
 .auth-card {
   position: relative;
   z-index: 1;
-  background: #ffffff;
+  background: var(--gray-100);
   border: 1px solid var(--gray-200);
   border-left: 4px solid var(--color-accent);
   border-radius: 16px;
@@ -344,7 +344,7 @@ button.font-auth-link {
 .input-wrap input:focus,
 .input-wrap select:focus {
   border-color: var(--color-link);
-  background: #ffffff;
+  background: var(--gray-100);
   box-shadow: var(--glow-primary);
 }
 
@@ -1571,9 +1571,9 @@ button.font-auth-link {
    AUTH OVERRIDES – Poppins + paleta verde (aplicado al final para mayor especificidad)
    ============================================================ */
 
-/* Fondo del lado izquierdo: blanco puro */
+/* Fondo del lado izquierdo: blanco warm */
 .auth-split-left {
-  background: #ffffff;
+  background: var(--gray-100);
 }
 
 /* Padding generoso: 32px desktop, 20px mobile */
@@ -1766,9 +1766,9 @@ h1, h2, .auth-title {
    AUTH OVERRIDES – Poppins + paleta verde (aplicado al final para mayor especificidad)
    ============================================================ */
 
-/* Fondo del lado izquierdo: blanco puro */
+/* Fondo del lado izquierdo: blanco warm */
 .auth-split-left {
-  background: #ffffff;
+  background: var(--gray-100);
 }
 
 /* Padding generoso: 32px desktop, 20px mobile */
