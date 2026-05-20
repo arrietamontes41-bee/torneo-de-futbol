@@ -1197,6 +1197,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (sidebarBrand) {
             sidebarBrand.textContent = nombre + ' Admin';
           }
+          await loadTournamentsSelector();
         } else {
           configError.textContent = res.error || 'Error al guardar la configuración.';
         }
@@ -1224,5 +1225,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   // ---- Init ----
+  await loadTournamentsSelector();
   await refresh();
 });

@@ -292,6 +292,10 @@ const DB = {
       if (id) {
         query = query.eq('id', id);
       } else {
+        const session = this.getSession();
+        if (session && session.id) {
+          query = query.eq('admin_id', session.id);
+        }
         query = query.order('created_at', { ascending: false }).limit(1);
       }
       const { data, error } = await query;
@@ -389,6 +393,9 @@ const DB = {
       return { ok: false, error: 'La base de datos no está lista. Intenta recargar la página.' };
     }
     try {
+      const session = this.getSession();
+      const adminId = session ? session.id : null;
+
       if (id) {
         const { error } = await this.client
           .from('torneo')
@@ -396,7 +403,12 @@ const DB = {
           .eq('id', id);
         if (error) return { ok: false, error: error.message };
       } else {
-        const { data: existing } = await this.client.from('torneo').select('id').limit(1);
+        let query = this.client.from('torneo').select('id');
+        if (adminId) {
+          query = query.eq('admin_id', adminId);
+        }
+        const { data: existing } = await query.order('created_at', { ascending: false }).limit(1);
+
         if (existing && existing.length > 0) {
           const { error } = await this.client
             .from('torneo')
@@ -404,8 +416,6 @@ const DB = {
             .eq('id', existing[0].id);
           if (error) return { ok: false, error: error.message };
         } else {
-          const session = this.getSession();
-          const adminId = session ? session.id : null;
           const { error } = await this.client
             .from('torneo')
             .insert([{ nombre, descripcion, municipio, admin_id: adminId }]);
