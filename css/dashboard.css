@@ -14,7 +14,7 @@
 
 .sidebar {
   width: 260px;
-  background: #0f2d1a;
+  background: linear-gradient(160deg, #0a2013 0%, #0f2d1a 60%, #122b1c 100%);
   border-right: 1px solid rgba(255,255,255,0.06);
   display: flex;
   flex-direction: column;
@@ -23,14 +23,25 @@
   height: 100vh;
   z-index: 100;
   transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: 4px 0 24px rgba(0,0,0,0.25);
 }
 
 .sidebar-header {
-  padding: 20px 18px;
+  padding: 22px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid rgba(255,255,255,0.07);
+  background: rgba(0,0,0,0.15);
+  position: relative;
+}
+/* Barra de acento decorativa en la parte superior del sidebar */
+.sidebar-header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #4caf50, #81c784, #4caf50);
 }
 
 .sidebar-brand {
@@ -123,10 +134,11 @@
 }
 
 .sidebar-btn.active {
-  background: #2e7d32;
+  background: linear-gradient(90deg, #2e7d32 0%, #388e3c 100%);
   color: #ffffff;
   font-weight: 600;
   border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(46,125,50,0.4);
 }
 
 .sidebar-btn.active svg {
@@ -223,10 +235,11 @@
   align-items: center;
   gap: 16px;
   background: #ffffff;
-  border-bottom: 1px solid #e8f5e9;
+  border-bottom: 2px solid #e8f5e9;
   position: sticky;
   top: 0;
   z-index: 90;
+  box-shadow: 0 2px 8px rgba(27,94,32,0.06);
 }
 
 .btn-menu-mobile {
@@ -1026,3 +1039,211 @@
   .goles-inp { width: 36px; font-size: 12px; }
   .acta-total-val { font-size: 1.2rem; }
 }
+
+/* ============================================================
+   PREMIUM ENHANCEMENTS – Detalles visuales de alto impacto
+   ============================================================ */
+
+/* ── Stat Cards mejoradas ── */
+.stat-card {
+  background: #ffffff !important;
+  border: 1px solid #e8f5e9 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 2px 12px rgba(27,94,32,0.07) !important;
+  position: relative;
+  overflow: hidden;
+}
+/* Borde superior coloreado en stat cards */
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #4caf50, #1b5e20);
+  border-radius: 16px 16px 0 0;
+}
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 28px rgba(27,94,32,0.15) !important;
+  border-color: #a5d6a7 !important;
+}
+
+/* Iconos de stat cards con colores diferentes */
+.icon-blue {
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb) !important;
+  color: #1565c0 !important;
+  border-radius: 12px;
+}
+.icon-green {
+  background: linear-gradient(135deg, #e8f5e9, #c8e6c9) !important;
+  color: #1b5e20 !important;
+  border-radius: 12px;
+}
+.icon-purple {
+  background: linear-gradient(135deg, #f3e5f5, #e1bee7) !important;
+  color: #6a1b9a !important;
+  border-radius: 12px;
+}
+
+.stat-label {
+  font-size: 12px !important;
+  color: #888 !important;
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.stat-value {
+  font-size: 2rem !important;
+  font-weight: 800 !important;
+  color: #1b2a1b !important;
+  line-height: 1.1;
+  background: linear-gradient(135deg, #1b5e20, #4caf50);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Tab Panel premium ── */
+.tab-panel {
+  background: #ffffff !important;
+  border: 1px solid #c8e6c9 !important;
+  border-radius: 18px !important;
+  box-shadow: 0 4px 24px rgba(27,94,32,0.08) !important;
+  overflow: hidden;
+}
+
+.tab-nav {
+  background: #f7faf7;
+  border-bottom: 2px solid #e8f5e9;
+  padding: 0 8px;
+}
+.tab-btn {
+  padding: 16px 24px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #888;
+  position: relative;
+}
+.tab-btn.active { color: #1b5e20 !important; }
+.tab-btn::after {
+  height: 3px;
+  background: linear-gradient(90deg, #4caf50, #1b5e20) !important;
+  border-radius: 3px 3px 0 0;
+}
+.tab-btn:hover:not(.active) { color: #333; background: rgba(76,175,80,0.05); border-radius: 8px 8px 0 0; }
+
+/* ── Team card con gradiente en avatar ── */
+.team-avatar {
+  background: linear-gradient(135deg, #4caf50 0%, #1b5e20 100%) !important;
+  box-shadow: 0 6px 16px rgba(27,94,32,0.3) !important;
+}
+
+/* ── Match card con borde izquierdo de acento ── */
+.match-card {
+  border-left: 4px solid #4caf50 !important;
+}
+.match-card.completed {
+  border-left-color: #1b5e20 !important;
+}
+.match-card:hover {
+  border-left-color: #2e7d32 !important;
+  transform: translateX(2px);
+}
+
+/* ── Tabla de posiciones: fila #1 destacada ── */
+.standings-table tbody tr:first-child {
+  background: linear-gradient(to right, rgba(76,175,80,0.07), transparent);
+}
+.standings-table tbody tr:first-child .pos-num {
+  color: #f57f17 !important; /* Oro para el primero */
+}
+.standings-table tbody tr:nth-child(2) .pos-num {
+  color: #546e7a !important; /* Plata para el segundo */
+}
+.standings-table tbody tr:nth-child(3) .pos-num {
+  color: #8d6e63 !important; /* Bronce para el tercero */
+}
+
+/* ── Leaderboard premium ── */
+.leader-item:first-child .leader-rank {
+  color: #f57f17 !important;
+  font-size: 15px;
+}
+.leader-item:nth-child(2) .leader-rank {
+  color: #546e7a !important;
+  font-size: 14px;
+}
+.leader-item:nth-child(3) .leader-rank {
+  color: #8d6e63 !important;
+  font-size: 14px;
+}
+
+/* ── Animación de entrada de las cards ── */
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.stat-card {
+  animation: slideUpFade 0.4s cubic-bezier(0.16,1,0.3,1) both;
+}
+.stat-card:nth-child(1) { animation-delay: 0.05s; }
+.stat-card:nth-child(2) { animation-delay: 0.10s; }
+.stat-card:nth-child(3) { animation-delay: 0.15s; }
+
+.team-card {
+  animation: slideUpFade 0.4s cubic-bezier(0.16,1,0.3,1) both;
+}
+.team-card:nth-child(1) { animation-delay: 0.05s; }
+.team-card:nth-child(2) { animation-delay: 0.10s; }
+.team-card:nth-child(3) { animation-delay: 0.15s; }
+.team-card:nth-child(4) { animation-delay: 0.20s; }
+.team-card:nth-child(5) { animation-delay: 0.25s; }
+.team-card:nth-child(6) { animation-delay: 0.30s; }
+
+/* ── Botones de acción con gradiente ── */
+.btn-primary-sm {
+  background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%) !important;
+  box-shadow: 0 2px 10px rgba(27,94,32,0.3);
+  transition: box-shadow 0.2s, transform 0.15s !important;
+}
+.btn-primary-sm:hover {
+  box-shadow: 0 6px 18px rgba(27,94,32,0.4) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* ── Decoración del encabezado de sección ── */
+.tab-content-title::after,
+.section-title::after {
+  content: '';
+  display: block;
+  width: 36px;
+  height: 3px;
+  background: linear-gradient(90deg, #4caf50, #1b5e20);
+  border-radius: 2px;
+  margin-top: 6px;
+}
+
+/* ── Badge "INSCRITO" con mejor sombra ── */
+.team-badge {
+  box-shadow: 0 1px 4px rgba(27,94,32,0.15);
+}
+
+/* ── Scrollbar personalizado para el contenido ── */
+.content::-webkit-scrollbar,
+.standings-wrap::-webkit-scrollbar,
+.matches-list::-webkit-scrollbar {
+  width: 5px;
+}
+.content::-webkit-scrollbar-track { background: #f7faf7; }
+.content::-webkit-scrollbar-thumb { background: #a5d6a7; border-radius: 10px; }
+.content::-webkit-scrollbar-thumb:hover { background: #4caf50; }
+
+/* ── Fondo del contenido con patrón sutil ── */
+.main-wrapper {
+  background: #f7faf7;
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(76,175,80,0.06) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
