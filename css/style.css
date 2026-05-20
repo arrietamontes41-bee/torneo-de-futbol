@@ -1401,28 +1401,30 @@ button.font-auth-link {
 .match-reminder-host:empty { display: none; }
 .match-reminder-banner {
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(251, 191, 36, 0.45);
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.12), rgba(15, 23, 42, 0.6));
+  border: 1px solid rgba(245, 127, 23, 0.3);
+  border-left: 4px solid #f57f17;
+  background: rgba(251, 191, 36, 0.08);
   padding: 14px 18px;
-  margin-bottom: 4px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
 }
 .match-reminder-inner { max-width: 720px; }
 .match-reminder-title {
   font-weight: 800;
   font-size: 0.95rem;
-  color: #fde68a;
+  color: #b25e00;
   margin-bottom: 6px;
 }
 .match-reminder-p {
   font-size: 0.86rem;
-  color: var(--gray-300);
+  color: var(--gray-700);
   margin: 0 0 10px;
   line-height: 1.45;
 }
 .match-reminder-list {
   margin: 0 0 12px 18px;
   padding: 0;
-  color: #fff;
+  color: var(--gray-800);
   font-size: 0.88rem;
   line-height: 1.55;
 }
@@ -1430,17 +1432,18 @@ button.font-auth-link {
   font: inherit;
   font-size: 0.82rem;
   font-weight: 600;
-  padding: 10px 16px;
-  min-height: 44px;
+  padding: 8px 16px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--gray-300);
-  background: rgba(15, 23, 42, 0.5);
-  color: var(--gray-200);
+  background: var(--gray-100);
+  color: var(--gray-700);
   cursor: pointer;
+  transition: all var(--transition, 0.25s);
 }
 .btn-reminder-dismiss:hover {
-  border-color: var(--green);
-  color: #fff;
+  background: var(--gray-200);
+  color: var(--gray-900);
+  border-color: var(--gray-400);
 }
 
 /* ── Scroll horizontal cómodo en móvil (tablas / listas) ── */
@@ -1596,28 +1599,30 @@ h1, h2, .auth-title {
 .match-reminder-host:empty { display: none; }
 .match-reminder-banner {
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(251, 191, 36, 0.45);
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.12), rgba(15, 23, 42, 0.6));
+  border: 1px solid rgba(245, 127, 23, 0.3);
+  border-left: 4px solid #f57f17;
+  background: rgba(251, 191, 36, 0.08);
   padding: 14px 18px;
-  margin-bottom: 4px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
 }
 .match-reminder-inner { max-width: 720px; }
 .match-reminder-title {
   font-weight: 800;
   font-size: 0.95rem;
-  color: #fde68a;
+  color: #b25e00;
   margin-bottom: 6px;
 }
 .match-reminder-p {
   font-size: 0.86rem;
-  color: var(--gray-300);
+  color: var(--gray-700);
   margin: 0 0 10px;
   line-height: 1.45;
 }
 .match-reminder-list {
   margin: 0 0 12px 18px;
   padding: 0;
-  color: #fff;
+  color: var(--gray-800);
   font-size: 0.88rem;
   line-height: 1.55;
 }
@@ -1625,17 +1630,18 @@ h1, h2, .auth-title {
   font: inherit;
   font-size: 0.82rem;
   font-weight: 600;
-  padding: 10px 16px;
-  min-height: 44px;
+  padding: 8px 16px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--gray-300);
-  background: rgba(15, 23, 42, 0.5);
-  color: var(--gray-200);
+  background: var(--gray-100);
+  color: var(--gray-700);
   cursor: pointer;
+  transition: all var(--transition, 0.25s);
 }
 .btn-reminder-dismiss:hover {
-  border-color: var(--green);
-  color: #fff;
+  background: var(--gray-200);
+  color: var(--gray-900);
+  border-color: var(--gray-400);
 }
 
 /* ── Scroll horizontal cómodo en móvil (tablas / listas) ── */
