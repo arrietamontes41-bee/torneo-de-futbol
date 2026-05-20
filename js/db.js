@@ -100,6 +100,21 @@ const DB = {
         .eq('id', data.user.id)
         .single();
 
+      // Verificar si es un equipo y si aún existe su equipo en la base de datos
+      const userRole = profile ? profile.rol : (data.user.user_metadata?.rol || 'equipo');
+      if (userRole === 'equipo' || userRole === 'team') {
+        const { count } = await this.client
+          .from('equipos')
+          .select('id', { count: 'exact', head: true })
+          .eq('usuario_id', data.user.id);
+          
+        if (count === 0) {
+          // El torneo/equipo fue eliminado, rechazar login para seguridad
+          await this.client.auth.signOut();
+          return { ok: false, error: 'Correo no registrado o contraseña incorrecta.' };
+        }
+      }
+
       if (dbError || !profile) {
         console.error('Error al cargar perfil:', dbError);
         // Fallback: crear sesión con los datos de auth si el perfil falla
@@ -107,7 +122,7 @@ const DB = {
           id: data.user.id,
           email: data.user.email,
           nombre: data.user.user_metadata?.nombre || 'Usuario',
-          rol: data.user.user_metadata?.rol || 'team'
+          rol: userRole
         };
         this.saveSession(fallbackUser);
         return { ok: true, user: fallbackUser };
