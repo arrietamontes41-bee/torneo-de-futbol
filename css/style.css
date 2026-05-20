@@ -1779,14 +1779,17 @@ select {
    SWEET SPOT SIZING OVERRIDES – Equilibrio perfecto
    ============================================================ */
 
-/* Padding de auth-card ajustado a 28px (ni muy pegado, ni muy suelto) */
+/* Padding de auth-card ajustado a 32px */
 .auth-card {
-  padding: 28px !important;
+  padding: 32px !important;
+}
+@media (max-width: 600px) {
+  .auth-card { padding: 24px !important; }
 }
 
 /* Espaciado general del formulario (campos) */
 .form-group, .input-wrap {
-  margin-bottom: 16px !important;
+  margin-bottom: 20px !important;
 }
 
 /* Títulos principales */
@@ -1813,13 +1816,17 @@ label, .form-label, .wizard-step .step-label {
   line-height: normal;
 }
 
-/* Inputs */
+/* Inputs - FIX: Mantener espacio para el icono a la izquierda (42px) */
 input, select, textarea, .form-control {
   font-size: 15px !important;
   color: #1a1a1a !important;
-  height: 44px !important;
-  min-height: 44px !important;
+  height: 46px !important;
+  min-height: 46px !important;
   padding: 10px 14px !important;
+  box-sizing: border-box !important;
+}
+.input-wrap input, .input-wrap select {
+  padding-left: 42px !important; /* Espacio crítico para el ícono */
 }
 
 /* Placeholders */
