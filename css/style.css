@@ -1096,7 +1096,7 @@ button.font-auth-link {
 }
 
 
-.modal-content {
+.modal-content, .modal-card {
   background: var(--glass-bg);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
@@ -1371,6 +1371,7 @@ button.font-auth-link {
 }
 .form-error-flex { flex: 1; }
 .modal-max-640   { max-width: 640px; }
+.modal-max-480   { max-width: 480px; }
 .modal-body-pt0  { padding-top: 0; }
 .roster-sub {
   font-size: .78rem;

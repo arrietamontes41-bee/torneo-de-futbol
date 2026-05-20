@@ -1221,6 +1221,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  const btnDeleteTournament = document.getElementById('btnDeleteTournament');
+  if (btnDeleteTournament) {
+    btnDeleteTournament.addEventListener('click', async () => {
+      if (!selectedTorneoId) return;
+      const confirmMsg = '⚠️ ADVERTENCIA: Esta acción es PERMANENTE.\n\n¿Estás completamente seguro de que deseas ELIMINAR este torneo?\n\n¡Se borrarán todos los equipos, jugadores, partidos y estadísticas asociados a este torneo sin posibilidad de recuperación!';
+      if (!confirm(confirmMsg)) return;
+
+      const btnOriginalText = btnDeleteTournament.innerHTML;
+      btnDeleteTournament.disabled = true;
+      btnDeleteTournament.textContent = 'Eliminando...';
+
+      try {
+        const res = await DB.deleteTournament(selectedTorneoId);
+        if (res.ok) {
+          showToast('Torneo eliminado correctamente.', 'success');
+          // Recargar selector de torneos, lo cual auto-seleccionará otro si hay o mostrará vacío
+          await loadTournamentsSelector();
+        } else {
+          showToast(res.error || 'Error al eliminar el torneo.', 'error');
+        }
+      } catch (err) {
+        console.error('Error deleting tournament:', err);
+        showToast('Error inesperado al eliminar el torneo.', 'error');
+      } finally {
+        btnDeleteTournament.disabled = false;
+        btnDeleteTournament.innerHTML = btnOriginalText;
+      }
+    });
+  }
+
   // ---- Utils ----
   const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1);
 

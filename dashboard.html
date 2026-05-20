@@ -329,6 +329,20 @@
             </div>
           </form>
         </div>
+
+        <!-- ZONA DE PELIGRO -->
+        <div class="danger-zone-card" style="margin-top: 32px; padding: 24px; border: 1px solid rgba(198, 40, 40, 0.25); border-left: 4px solid var(--color-red, #c62828); border-radius: 16px; background: rgba(198, 40, 40, 0.03); max-width: 600px;">
+          <h3 style="margin: 0 0 8px; color: var(--color-red, #c62828); font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+            Zona de Peligro: Eliminar Torneo
+          </h3>
+          <p style="font-size: 13px; color: var(--gray-600); margin: 0 0 16px; line-height: 1.5;">
+            Esta acción es permanente. Al eliminar este torneo, se borrarán de forma definitiva todos los equipos, jugadores, partidos y estadísticas asociadas de la base de datos.
+          </p>
+          <button type="button" class="btn-cancel-sm" id="btnDeleteTournament" style="background: var(--color-red, #c62828); color: white; border: none; font-weight: 600; display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 8px 16px;">
+            Eliminar Torneo Permanentemente
+          </button>
+        </div>
       </div>
     </main> <!-- .content -->
     </div> <!-- .main-wrapper -->
@@ -460,16 +474,16 @@
       <div class="modal-body">
         <form id="createTournamentForm" style="display: flex; flex-direction: column; gap: 14px;">
           <div class="form-field">
-            <label for="newTournamentName" style="font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; display: block; color: var(--text-main);">Nombre del Torneo</label>
-            <input type="text" id="newTournamentName" placeholder="Ej. Torneo Femenino 2026" required style="width: 100%; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); outline: none; background: var(--bg-card); color: var(--text-main);" />
+            <label for="newTournamentName" style="font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; display: block; color: var(--gray-700);">Nombre del Torneo</label>
+            <input type="text" id="newTournamentName" placeholder="Ej. Torneo Femenino 2026" required style="width: 100%; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--gray-300); outline: none; background: var(--gray-50); color: var(--gray-900);" />
           </div>
           <div class="form-field">
-            <label for="newTournamentDesc" style="font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; display: block; color: var(--text-main);">Descripción <span class="font-muted-hint">(opcional)</span></label>
-            <textarea id="newTournamentDesc" placeholder="Ej. Torneo de fin de semana categoría libre" style="width: 100%; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); outline: none; resize: vertical; min-height: 80px; background: var(--bg-card); color: var(--text-main);"></textarea>
+            <label for="newTournamentDesc" style="font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; display: block; color: var(--gray-700);">Descripción <span class="font-muted-hint">(opcional)</span></label>
+            <textarea id="newTournamentDesc" placeholder="Ej. Torneo de fin de semana categoría libre" style="width: 100%; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--gray-300); outline: none; resize: vertical; min-height: 80px; background: var(--gray-50); color: var(--gray-900);"></textarea>
           </div>
           <div class="form-field">
-            <label for="newTournamentCity" style="font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; display: block; color: var(--text-main);">Sede / Municipio</label>
-            <input type="text" id="newTournamentCity" placeholder="Ej. Montería" style="width: 100%; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); outline: none; background: var(--bg-card); color: var(--text-main);" />
+            <label for="newTournamentCity" style="font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; display: block; color: var(--gray-700);">Sede / Municipio</label>
+            <input type="text" id="newTournamentCity" placeholder="Ej. Montería" style="width: 100%; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--gray-300); outline: none; background: var(--gray-50); color: var(--gray-900);" />
           </div>
         </form>
       </div>

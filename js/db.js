@@ -428,6 +428,20 @@ const DB = {
     }
   },
 
+  async deleteTournament(tournamentId) {
+    if (!this.client) return { ok: false, error: 'La base de datos no está lista.' };
+    try {
+      const { error } = await this.client
+        .from('torneo')
+        .delete()
+        .eq('id', tournamentId);
+      if (error) return { ok: false, error: error.message };
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: e.message };
+    }
+  },
+
   async deleteTeam(teamId) {
     // 1. Obtener el ID del usuario vinculado antes de borrar el equipo
     const { data: team } = await this.client.from('equipos').select('usuario_id').eq('id', teamId).single();
