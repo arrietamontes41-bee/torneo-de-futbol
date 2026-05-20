@@ -279,6 +279,31 @@ document.addEventListener('DOMContentLoaded', async () => {
   const refresh = async () => {
     setLoading(true);
     try {
+      if (!selectedTorneoId || selectedTorneoId === "") {
+        // Limpiar UI si no hay torneo seleccionado
+        const activeTournamentHeaderDisplay = document.getElementById('activeTournamentHeaderDisplay');
+        if (activeTournamentHeaderDisplay) activeTournamentHeaderDisplay.style.display = 'none';
+        const sidebarBrand = document.querySelector('.sidebar-brand');
+        if (sidebarBrand) sidebarBrand.textContent = 'Admin Panel';
+        
+        // Limpiar estadísticas
+        const statTeams = document.getElementById('statTeams');
+        if (statTeams) statTeams.textContent = '0';
+        const statScheduled = document.getElementById('statScheduled');
+        if (statScheduled) statScheduled.textContent = '0';
+        const statCompleted = document.getElementById('statCompleted');
+        if (statCompleted) statCompleted.textContent = '0';
+        
+        // Limpiar tablas
+        const tbodyTeams = document.getElementById('tbodyTeams');
+        if (tbodyTeams) tbodyTeams.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px; color: var(--gray-500);">No hay torneos creados. Crea uno para comenzar.</td></tr>';
+        
+        const matchesContainer = document.getElementById('matchesContainer');
+        if (matchesContainer) matchesContainer.innerHTML = '<div class="empty">No hay partidos para mostrar.</div>';
+        
+        return;
+      }
+
       try {
         const tournament = await DB.getTournament(selectedTorneoId);
         if (tournament) {
