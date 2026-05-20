@@ -1236,15 +1236,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         const res = await DB.deleteTournament(selectedTorneoId);
         if (res.ok) {
           showToast('Torneo eliminado correctamente.', 'success');
-          // Recargar selector de torneos, lo cual auto-seleccionará otro si hay o mostrará vacío
-          await loadTournamentsSelector();
+          // Al recargar la página limpiamos todos los estados de memoria
+          // y el dashboard auto-cargará el torneo restante (si lo hay) o mostrará estado vacío.
+          setTimeout(() => {
+            window.location.reload();
+          }, 1200);
         } else {
           showToast(res.error || 'Error al eliminar el torneo.', 'error');
+          btnDeleteTournament.disabled = false;
+          btnDeleteTournament.innerHTML = btnOriginalText;
         }
       } catch (err) {
         console.error('Error deleting tournament:', err);
         showToast('Error inesperado al eliminar el torneo.', 'error');
-      } finally {
         btnDeleteTournament.disabled = false;
         btnDeleteTournament.innerHTML = btnOriginalText;
       }
