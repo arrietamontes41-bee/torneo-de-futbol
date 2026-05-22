@@ -33,7 +33,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (statusEl) statusEl.hidden = true;
   }
 
-  let selectedTorneoId = localStorage.getItem('public_selected_torneo_id') || '';
+  // Obtener id del torneo de la URL si existe (?id=... o ?t=...), o usar el guardado en localStorage
+  const urlParams = new URLSearchParams(window.location.search);
+  let selectedTorneoId = urlParams.get('id') || urlParams.get('t') || localStorage.getItem('public_selected_torneo_id') || '';
   const publicTournamentSelect = document.getElementById('publicTournamentSelect');
 
   async function loadData() {
@@ -230,6 +232,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         publicTournamentSelect.addEventListener('change', async (e) => {
           selectedTorneoId = e.target.value;
           localStorage.setItem('public_selected_torneo_id', selectedTorneoId);
+          
+          // Actualizar la URL de forma transparente para poder compartirla directamente
+          const newUrl = `${window.location.pathname}?id=${selectedTorneoId}`;
+          window.history.replaceState({ id: selectedTorneoId }, '', newUrl);
+          
           await loadData();
         });
       }
