@@ -104,8 +104,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Inicializar como equipo y cargar torneos
-  switchRole('team');
+  // Inicializar según el hash de la URL (#admin o #team)
+  const initialRole = window.location.hash === '#admin' ? 'admin' : 'team';
+  switchRole(initialRole);
+
+  // Escuchar cambios de hash en la URL para cambiar el rol dinámicamente
+  window.addEventListener('hashchange', () => {
+    const role = window.location.hash === '#admin' ? 'admin' : 'team';
+    switchRole(role);
+  });
 
   try {
     const torneos = await DB.getAllTournaments();
