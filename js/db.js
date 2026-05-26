@@ -177,6 +177,21 @@ const DB = {
     try {
       console.log('Iniciando registro de equipo:', name);
 
+      // 0. Verificar si el nombre del equipo ya existe
+      const { data: existingTeam, error: checkError } = await this.client
+        .from('equipos')
+        .select('id')
+        .eq('nombre', name.trim())
+        .maybeSingle();
+
+      if (checkError) {
+        console.error('Error al verificar equipo existente:', checkError);
+      }
+
+      if (existingTeam) {
+        return { ok: false, error: 'Ya existe un equipo registrado con el nombre "' + name + '". Por favor, elige otro nombre.' };
+      }
+
       // 1. Crear usuario en Auth
       const { data: authData, error: authError } = await this.client.auth.signUp({
         email: email.trim().toLowerCase(),
