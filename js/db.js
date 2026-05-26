@@ -243,6 +243,55 @@ const DB = {
     }
   },
 
+  async joinAnotherTournament(data) {
+    const { name, city, escudo, torneoId } = data;
+    const session = this.getSession();
+    
+    if (!session || !session.id) {
+      return { ok: false, error: 'Debes haber iniciado sesión para unirte a otro torneo.' };
+    }
+
+    try {
+      // Verificar si el nombre del equipo ya existe en el mismo torneo
+      let checkQuery = this.client.from('equipos').select('id').eq('nombre', name.trim()).eq('torneo_id', torneoId);
+      const { data: existingTeam, error: checkError } = await checkQuery.maybeSingle();
+
+      if (checkError) {
+        console.error('Error al verificar equipo existente:', checkError);
+      }
+
+      if (existingTeam) {
+        return { ok: false, error: 'Ya existe un equipo registrado con el nombre "' + name + '" en este torneo. Por favor, elige otro nombre.' };
+      }
+
+      // Verificar si ya está en este torneo
+      const { data: myExistingTeam } = await this.client.from('equipos').select('id').eq('usuario_id', session.id).eq('torneo_id', torneoId).maybeSingle();
+      if (myExistingTeam) {
+        return { ok: false, error: 'Tu cuenta ya tiene un equipo en este torneo.' };
+      }
+
+      // Insertar equipo en la tabla
+      const { error: teamError } = await this.client.from('equipos').insert([{
+        nombre: name,
+        email: session.email,
+        escudo: escudo || null,
+        municipio: city || session.municipio || 'Montería',
+        usuario_id: session.id,
+        torneo_id: torneoId
+      }]);
+
+      if (teamError) {
+        console.error('Error al insertar equipo:', teamError);
+        return { ok: false, error: 'Hubo un error al guardar los datos del equipo: ' + teamError.message };
+      }
+
+      return { ok: true };
+    } catch (err) {
+      console.error('Error crítico en joinAnotherTournament:', err);
+      return { ok: false, error: 'Ocurrió un error inesperado. Revisa tu conexión.' };
+    }
+  },
+
   async addAdmin({ name, email, password, tournamentName, tournamentDesc, tournamentCity }) {
     if (!this.client) {
       return { ok: false, error: 'La base de datos no está lista. Intenta recargar la página.' };

@@ -264,13 +264,55 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ════════════════════════════════════════════════════════════
   async function loadAll() {
     const allTeams = await DB.getTeams();
-    myTeam = allTeams.find(t => t.usuario_id === session.id) || null;
+    const myTeams = allTeams.filter(t => t.usuario_id === session.id);
 
-    if (!myTeam) {
+    if (myTeams.length === 0) {
       teamNameBig.textContent    = 'Equipo no encontrado';
       headerTeamName.textContent = 'Mi Equipo';
       homeMatchesEl.innerHTML = `<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4m0 4h.01"/></svg></div>No se encontró tu equipo. Contacta al administrador.</div>`;
       return;
+    }
+
+    const savedTeamId = localStorage.getItem('selectedTeamId');
+    myTeam = myTeams.find(t => t.id === savedTeamId) || myTeams[0];
+    localStorage.setItem('selectedTeamId', myTeam.id);
+
+    const selector = $('teamTournamentSelector');
+    const badge = $('teamHeaderTournamentName');
+    
+    if (myTeams.length > 1) {
+      selector.classList.remove('display-none');
+      badge.classList.add('display-none');
+      selector.innerHTML = '';
+      
+      // Intentar obtener los nombres de los torneos para el selector
+      try {
+        const allTournaments = await DB.getAllTournaments();
+        myTeams.forEach(t => {
+          const tor = allTournaments.find(tr => tr.id === t.torneo_id);
+          const opt = document.createElement('option');
+          opt.value = t.id;
+          opt.textContent = tor ? `${t.nombre} - ${tor.nombre}` : t.nombre;
+          if (t.id === myTeam.id) opt.selected = true;
+          selector.appendChild(opt);
+        });
+      } catch (err) {
+        myTeams.forEach(t => {
+          const opt = document.createElement('option');
+          opt.value = t.id;
+          opt.textContent = t.nombre;
+          if (t.id === myTeam.id) opt.selected = true;
+          selector.appendChild(opt);
+        });
+      }
+
+      selector.onchange = (e) => {
+        localStorage.setItem('selectedTeamId', e.target.value);
+        window.location.reload();
+      };
+    } else {
+      selector.classList.add('display-none');
+      badge.classList.remove('display-none');
     }
 
     // Cargar branding del torneo
@@ -789,6 +831,92 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
       showToast('Tabla exportada correctamente.', 'success');
+    });
+  }
+
+  // ── Unirse a otro torneo ──────────────────────────────────────
+  const btnOpenJoinTournamentModal = $('btnOpenJoinTournamentModal');
+  const joinTournamentModal = $('joinTournamentModal');
+  const btnCancelJoinTournament = $('btnCancelJoinTournament');
+  const btnConfirmJoinTournament = $('btnConfirmJoinTournament');
+  const joinNewTournamentId = $('joinNewTournamentId');
+  const joinNewTeamName = $('joinNewTeamName');
+  const joinNewTeamCity = $('joinNewTeamCity');
+  const joinTournamentErr = $('joinTournamentErr');
+
+  if (btnOpenJoinTournamentModal) {
+    btnOpenJoinTournamentModal.addEventListener('click', async () => {
+      joinTournamentErr.textContent = '';
+      if (myTeam) {
+        joinNewTeamName.value = myTeam.nombre;
+        joinNewTeamCity.value = myTeam.municipio || '';
+      }
+      joinTournamentModal.classList.remove('hidden');
+
+      // Cargar torneos en el select
+      const allTournaments = await DB.getAllTournaments();
+      joinNewTournamentId.innerHTML = '<option value="">Selecciona un torneo...</option>';
+      allTournaments.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t.id;
+        opt.textContent = t.nombre;
+        joinNewTournamentId.appendChild(opt);
+      });
+    });
+  }
+
+  if (btnCancelJoinTournament) {
+    btnCancelJoinTournament.addEventListener('click', () => {
+      joinTournamentModal.classList.add('hidden');
+    });
+  }
+
+  if (joinTournamentModal) {
+    joinTournamentModal.addEventListener('click', (e) => {
+      if (e.target === joinTournamentModal) joinTournamentModal.classList.add('hidden');
+    });
+  }
+
+  if (btnConfirmJoinTournament) {
+    btnConfirmJoinTournament.addEventListener('click', async () => {
+      joinTournamentErr.textContent = '';
+      const torneoId = joinNewTournamentId.value;
+      const name = joinNewTeamName.value.trim();
+      const city = joinNewTeamCity.value.trim();
+
+      if (!torneoId) {
+        joinTournamentErr.textContent = 'Selecciona un torneo destino.';
+        return;
+      }
+      if (!name) {
+        joinTournamentErr.textContent = 'Ingresa el nombre del equipo.';
+        return;
+      }
+
+      btnConfirmJoinTournament.disabled = true;
+      btnConfirmJoinTournament.textContent = 'Uniendo...';
+
+      const res = await DB.joinAnotherTournament({
+        name,
+        city,
+        escudo: myTeam ? myTeam.escudo : null,
+        torneoId
+      });
+
+      if (!res.ok) {
+        btnConfirmJoinTournament.disabled = false;
+        btnConfirmJoinTournament.textContent = 'Unirme';
+        joinTournamentErr.textContent = res.error;
+        return;
+      }
+
+      showToast('¡Te has unido exitosamente al nuevo torneo!', 'success');
+      // Set localstorage to load the new team by default
+      // We don't have the new team ID here easily, but reload will show the dropdown
+      // Actually, let's just reload the page and let them select it
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     });
   }
 
