@@ -194,7 +194,87 @@ document.addEventListener('DOMContentLoaded', async () => {
         html +
         '<p class="text-muted-sm mt-10" style="color:var(--gray-400);font-size:0.82rem;">Criterios: puntos · diferencia de goles · goles a favor. Solo lectura.</p>';
     }
+
+    // Cargar Goleadores
+    const scorersEl = document.getElementById('publicScorers');
+    if (scorersEl) {
+      try {
+        const scorers = await DB.getTopScorers(20, selectedTorneoId);
+        if (scorers && scorers.length > 0) {
+          scorersEl.innerHTML = scorers.map((s, i) => `
+            <div class="star-card">
+              <div class="star-card-label" style="font-size: 0.85rem; color: var(--gray-500); margin-bottom: 8px;">#${i + 1}</div>
+              <div class="star-player-row" style="display: flex; align-items: center; gap: 12px;">
+                <div class="star-photo">
+                  ${s.foto ? `<img src="${esc(s.foto)}" alt="${esc(s.nombre)}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;" />` 
+                           : `<div style="width:48px;height:48px;border-radius:50%;background:var(--gray-200);display:flex;align-items:center;justify-content:center;color:var(--gray-500);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>`}
+                </div>
+                <div class="star-info" style="flex: 1;">
+                  <div class="star-name" style="font-weight: 600; font-size: 1.05rem;">${esc(s.nombre)}</div>
+                  <div class="star-team" style="font-size: 0.85rem; color: var(--gray-500);">${esc(s.equipo)}</div>
+                </div>
+                <div class="star-badge" style="background: var(--color-primary-light); color: var(--color-primary); padding: 4px 10px; border-radius: 20px; text-align: center;">
+                  <span class="star-badge-num" style="font-weight: 800; font-size: 1.1rem; display: block;">${s.goles}</span>
+                  <span class="star-badge-lbl" style="font-size: 0.7rem; text-transform: uppercase;">goles</span>
+                </div>
+              </div>
+            </div>
+          `).join('');
+        } else {
+          scorersEl.innerHTML = '<div class="empty-state"><p>No hay goles registrados en este torneo.</p></div>';
+        }
+      } catch (err) {
+        scorersEl.innerHTML = '<div class="empty-state"><p>No se pudieron cargar los goleadores.</p></div>';
+      }
+    }
+
+    // Cargar Valla Menos Vencida
+    const keepersEl = document.getElementById('publicGoalkeepers');
+    if (keepersEl) {
+      try {
+        const keepers = await DB.getBestGoalkeepers(20, selectedTorneoId);
+        if (keepers && keepers.length > 0) {
+          keepersEl.innerHTML = keepers.map((k, i) => `
+            <div class="star-card">
+              <div class="star-card-label" style="font-size: 0.85rem; color: var(--gray-500); margin-bottom: 8px;">#${i + 1}</div>
+              <div class="star-player-row" style="display: flex; align-items: center; gap: 12px;">
+                <div class="star-photo">
+                  ${k.foto ? `<img src="${esc(k.foto)}" alt="${esc(k.nombre)}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;" />` 
+                           : `<div style="width:48px;height:48px;border-radius:50%;background:var(--gray-200);display:flex;align-items:center;justify-content:center;color:var(--gray-500);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></div>`}
+                </div>
+                <div class="star-info" style="flex: 1;">
+                  <div class="star-name" style="font-weight: 600; font-size: 1.05rem;">${esc(k.nombre)}</div>
+                  <div class="star-team" style="font-size: 0.85rem; color: var(--gray-500);">${esc(k.equipo)}</div>
+                </div>
+                <div class="star-badge star-badge-alt" style="background: rgba(220,38,38,0.1); color: #dc2626; padding: 4px 10px; border-radius: 20px; text-align: center;">
+                  <span class="star-badge-num" style="font-weight: 800; font-size: 1.1rem; display: block;">${k.gc}</span>
+                  <span class="star-badge-lbl" style="font-size: 0.7rem; text-transform: uppercase;">en contra</span>
+                </div>
+              </div>
+            </div>
+          `).join('');
+        } else {
+          keepersEl.innerHTML = '<div class="empty-state"><p>No hay datos de porteros registrados.</p></div>';
+        }
+      } catch (err) {
+        keepersEl.innerHTML = '<div class="empty-state"><p>No se pudieron cargar los porteros.</p></div>';
+      }
+    }
   }
+
+  // ---- Manejo de Tabs ----
+  const tabs = document.querySelectorAll('.public-tab');
+  const sections = document.querySelectorAll('.public-section');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      sections.forEach(s => s.classList.remove('active'));
+      tab.classList.add('active');
+      const secId = 'sec-' + tab.dataset.sec;
+      const targetSec = document.getElementById(secId);
+      if (targetSec) targetSec.classList.add('active');
+    });
+  });
 
   // ---- Inicialización ----
   try {

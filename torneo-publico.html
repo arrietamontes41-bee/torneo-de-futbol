@@ -33,15 +33,28 @@
 
     <div id="publicStatus" class="public-status-msg" role="alert" aria-live="polite" hidden></div>
 
-    <section class="public-section" aria-labelledby="fixtureHeading">
-      <h2 id="fixtureHeading">Fixture</h2>
-      <div id="publicFixture"></div>
-    </section>
+    <div class="public-tabs">
+      <button class="public-tab active" data-sec="posiciones">Posiciones</button>
+      <button class="public-tab" data-sec="fixture">Fixture</button>
+      <button class="public-tab" data-sec="goleadores">Goleadores</button>
+      <button class="public-tab" data-sec="valla">Valla Menos Vencida</button>
+    </div>
 
-    <section class="public-section" aria-labelledby="standingsHeading">
-      <h2 id="standingsHeading">Tabla de posiciones</h2>
+    <div class="public-section active" id="sec-posiciones">
       <div id="publicStandings"></div>
-    </section>
+    </div>
+
+    <div class="public-section" id="sec-fixture">
+      <div id="publicFixture"></div>
+    </div>
+
+    <div class="public-section" id="sec-goleadores">
+      <div id="publicScorers" class="public-stars-grid"></div>
+    </div>
+
+    <div class="public-section" id="sec-valla">
+      <div id="publicGoalkeepers" class="public-stars-grid"></div>
+    </div>
   </main>
 
   <script src="js/vendor/supabase.min.js"></script>

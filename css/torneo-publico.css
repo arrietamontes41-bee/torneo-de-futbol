@@ -90,3 +90,57 @@
   border-color: rgba(37, 99, 235, 0.25);
   color: #1e40af;
 }
+
+/* Tabs */
+.public-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  border-bottom: 2px solid var(--gray-200);
+  margin-bottom: 24px;
+  padding-bottom: 8px;
+}
+
+.public-tab {
+  background: transparent;
+  border: none;
+  color: var(--gray-500);
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.public-tab:hover {
+  background: var(--gray-100);
+  color: var(--gray-800);
+}
+
+.public-tab.active {
+  background: var(--color-primary);
+  color: white;
+}
+
+.public-section {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.public-section.active {
+  display: block;
+}
+
+/* Goleadores / Valla grid */
+.public-stars-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
