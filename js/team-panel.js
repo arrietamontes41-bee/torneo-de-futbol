@@ -177,10 +177,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (players.some(p => Number(p.dorsal) === dorsal))
       return showErr(`El dorsal ${dorsal} ya está en uso por otro jugador del equipo.`);
 
-    // Verificar documento duplicado a nivel GLOBAL (todos los equipos del torneo)
-    const docCheck = await DB.checkDocumentoGlobal(doc);
+    // Verificar documento duplicado a nivel de TORNEO (el jugador no puede estar en dos equipos del mismo torneo)
+    const docCheck = await DB.checkDocumentoGlobal(doc, myTeam.torneo_id);
     if (docCheck.exists)
-      return showErr(`La cédula ${doc} ya está registrada en el equipo "${docCheck.equipo}". Un jugador no puede pertenecer a dos equipos.`);
+      return showErr(`La cédula ${doc} ya está registrada en el equipo "${docCheck.equipo}" de este torneo. Un jugador no puede pertenecer a dos equipos en el mismo torneo.`);
 
     btnSavePlayer.disabled = true;
     btnSavePlayer.textContent = 'Guardando...';

@@ -177,12 +177,12 @@ const DB = {
     try {
       console.log('Iniciando registro de equipo:', name);
 
-      // 0. Verificar si el nombre del equipo ya existe
-      const { data: existingTeam, error: checkError } = await this.client
-        .from('equipos')
-        .select('id')
-        .eq('nombre', name.trim())
-        .maybeSingle();
+      // 0. Verificar si el nombre del equipo ya existe en el mismo torneo
+      let checkQuery = this.client.from('equipos').select('id').eq('nombre', name.trim());
+      if (torneoId) {
+        checkQuery = checkQuery.eq('torneo_id', torneoId);
+      }
+      const { data: existingTeam, error: checkError } = await checkQuery.maybeSingle();
 
       if (checkError) {
         console.error('Error al verificar equipo existente:', checkError);
@@ -520,10 +520,25 @@ const DB = {
     return error ? { ok: false, error: error.message } : { ok: true };
   },
 
-  async checkDocumentoGlobal(doc) {
-    const { data, error } = await this.client.from('jugadores').select('nombre, equipos(nombre)').eq('documento', doc);
+  async checkDocumentoGlobal(doc, torneoId = null) {
+    const { data, error } = await this.client
+      .from('jugadores')
+      .select('nombre, equipos(nombre, torneo_id)')
+      .eq('documento', doc);
+
     if (error || !data || data.length === 0) return { exists: false };
-    return { exists: true, equipo: data[0].equipos.nombre };
+
+    // Si se especifica torneoId, validar unicidad solo dentro del mismo torneo
+    if (torneoId) {
+      const match = data.find(j => j.equipos && j.equipos.torneo_id === torneoId);
+      if (match) {
+        return { exists: true, equipo: match.equipos.nombre };
+      }
+      return { exists: false };
+    }
+
+    // Fallback de compatibilidad (verificación global)
+    return { exists: true, equipo: data[0].equipos ? data[0].equipos.nombre : 'Otro equipo' };
   },
 
   // ── Partidos ─────────────────────────────────────────────────
