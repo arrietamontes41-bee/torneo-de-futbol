@@ -140,6 +140,23 @@
   gap: 16px;
 }
 
+.star-card {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  transition: border-color .2s, transform .2s, box-shadow .2s;
+}
+
+.star-card:hover {
+  border-color: var(--color-primary, #4caf50);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(27,94,32,0.1);
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(5px); }
   to { opacity: 1; transform: translateY(0); }
