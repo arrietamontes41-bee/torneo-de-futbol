@@ -1007,8 +1007,8 @@ button.font-auth-link {
 }
 
 .standings-table thead {
-  background: var(--gray-100);
-  color: white;
+  background: #166534;
+  color: #fff;
 }
 
 .standings-table thead th {
@@ -1034,7 +1034,7 @@ button.font-auth-link {
 .standings-table td {
   padding: 14px 14px;
   text-align: center;
-  color: #fff;
+  color: var(--gray-700);
   font-weight: 500;
 }
 
@@ -1053,7 +1053,7 @@ button.font-auth-link {
 .pts-cell {
   font-weight: 800;
   font-size: 1rem;
-  color: var(--green-dark);
+  color: var(--color-primary);
 }
 
 .team-name-cell {
