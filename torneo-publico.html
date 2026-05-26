@@ -13,31 +13,46 @@
 <body class="public-torneo-page frame-bust-pending" id="antiClickjackBody">
   <script src="js/frame-bust.js"></script>
 
-  <header class="public-torneo-header">
-    <div class="public-torneo-brand">
-      <span aria-hidden="true">⚽</span>
-      <select id="publicTournamentSelect" aria-label="Seleccionar Torneo" style="appearance: auto; -webkit-appearance: auto; background: var(--bg-card, #ffffff); border: 1px solid var(--gray-300); border-radius: 6px; font-size: 1rem; font-weight: 600; font-family: 'Inter', system-ui, sans-serif; color: var(--gray-900); cursor: pointer; outline: none; margin-left: 8px; padding: 6px 12px; min-width: 200px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
-        <option value="" disabled selected>Cargando Torneos...</option>
-      </select>
+  <!-- ════ HERO HEADER ════ -->
+  <header class="pub-hero">
+    <div class="pub-hero__bg-blob"></div>
+
+    <div class="pub-hero__top">
+      <div class="pub-hero__brand">
+        <span class="pub-hero__icon" aria-hidden="true">⚽</span>
+        <span class="pub-hero__site-name">FutbolApp</span>
+      </div>
+      <nav class="pub-hero__nav" aria-label="Accesos">
+        <a href="index.html" class="pub-btn pub-btn--ghost">Iniciar sesión</a>
+        <a href="register.html" class="pub-btn pub-btn--primary">Regístrate</a>
+      </nav>
     </div>
-    <nav class="public-torneo-actions" aria-label="Accesos">
-      <a href="index.html">Iniciar sesión</a>
-      <a href="register.html">Regístrate</a>
-    </nav>
+
+    <div class="pub-hero__center">
+      <p class="pub-hero__label">Estás viendo el torneo</p>
+      <div class="pub-hero__select-wrap">
+        <span class="pub-hero__select-icon" aria-hidden="true">🏆</span>
+        <select id="publicTournamentSelect" class="pub-hero__select" aria-label="Seleccionar Torneo">
+          <option value="" disabled selected>Cargando torneos…</option>
+        </select>
+        <span class="pub-hero__chevron" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </div>
+      <p id="publicTournamentDesc" class="pub-hero__desc">Vista pública · partidos y posiciones en tiempo real</p>
+    </div>
   </header>
 
   <main class="public-torneo-main">
-    <p class="public-torneo-intro" id="publicTournamentDesc">
-      Vista pública para compartir: partidos y posiciones. Los datos dependen de lo que publique la organización en la plataforma.
-    </p>
-
     <div id="publicStatus" class="public-status-msg" role="alert" aria-live="polite" hidden></div>
 
     <div class="public-tabs">
-      <button class="public-tab active" data-sec="posiciones">Posiciones</button>
-      <button class="public-tab" data-sec="fixture">Fixture</button>
-      <button class="public-tab" data-sec="goleadores">Goleadores</button>
-      <button class="public-tab" data-sec="valla">Valla Menos Vencida</button>
+      <button class="public-tab active" data-sec="posiciones">📊 Posiciones</button>
+      <button class="public-tab" data-sec="fixture">📅 Fixture</button>
+      <button class="public-tab" data-sec="goleadores">⚽ Goleadores</button>
+      <button class="public-tab" data-sec="valla">🧤 Valla Menos Vencida</button>
     </div>
 
     <div class="public-section active" id="sec-posiciones">
