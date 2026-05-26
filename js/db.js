@@ -264,12 +264,12 @@ const DB = {
       // 2. Actualizar perfil en la tabla pública 'usuarios' (ya creado por el trigger o garantizado aquí)
       const { error: profileError } = await this.client
         .from('usuarios')
-        .upsert({
-          id: userId,
+        .update({
           email: email.trim().toLowerCase(),
           nombre: name,
           rol: 'admin'
-        });
+        })
+        .eq('id', userId);
 
       if (profileError) {
         console.error('Error al insertar perfil admin:', profileError);
@@ -384,12 +384,11 @@ const DB = {
 
       // Garantizar que el usuario exista en la tabla pública para evitar violación de llave foránea
       if (adminId && session.email) {
-        await this.client.from('usuarios').upsert({
-          id: adminId,
+        await this.client.from('usuarios').update({
           email: session.email,
           nombre: session.nombre || 'Administrador',
           rol: session.rol || 'admin'
-        });
+        }).eq('id', adminId);
       }
 
       const { data, error } = await this.client
