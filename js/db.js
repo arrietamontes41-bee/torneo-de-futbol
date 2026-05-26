@@ -561,7 +561,32 @@ const DB = {
   async addPlayers(teamId, playersArray) {
     const toInsert = playersArray.map(p => ({ ...p, equipo_id: teamId }));
     const { data, error } = await this.client.from('jugadores').insert(toInsert).select();
-    return error ? { ok: false, error: error.message } : { ok: true, data };
+    if (error) {
+      console.error('Error al registrar jugador:', error);
+      let friendlyError = error.message || 'Error al guardar.';
+      
+      // Intercept SQLSTATE 23505 (unique constraint violation) or generic duplicate key messages
+      if (error.code === '23505' || 
+          friendlyError.toLowerCase().includes('duplicate key') || 
+          friendlyError.toLowerCase().includes('doc_unico_global') || 
+          friendlyError.toLowerCase().includes('violates unique constraint')) {
+        
+        if (friendlyError.toLowerCase().includes('doc_unico_global') || 
+            friendlyError.toLowerCase().includes('documento') || 
+            friendlyError.toLowerCase().includes('doc_unico') ||
+            friendlyError.toLowerCase().includes('cedula') ||
+            friendlyError.toLowerCase().includes('cédula')) {
+          friendlyError = 'Este número de documento (cédula) ya está registrado en el sistema por otro jugador.';
+        } else if (friendlyError.toLowerCase().includes('dorsal')) {
+          friendlyError = 'El dorsal ingresado ya está en uso por otro jugador del equipo.';
+        } else {
+          // General fallback for unique violation, usually documento
+          friendlyError = 'Este número de documento (cédula) ya está registrado en el sistema.';
+        }
+      }
+      return { ok: false, error: friendlyError };
+    }
+    return { ok: true, data };
   },
 
   async deletePlayer(id) {
