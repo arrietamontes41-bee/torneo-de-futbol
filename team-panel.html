@@ -23,7 +23,7 @@
     <div class="team-header-info">
       <p class="team-header-name" id="headerTeamName">Mi Equipo</p>
       <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
-        <select id="teamTournamentSelector" class="form-input display-none" style="padding: 2px 24px 2px 8px; font-size: 13px; height: 28px; border-radius: 6px; background-color: var(--bg-card, #ffffff); color: var(--text-color, #1e293b); border: 1px solid var(--border-color, #e2e8f0); width: auto; max-width: 220px; cursor: pointer; font-weight: 500; appearance: auto;">
+        <select id="teamTournamentSelector" class="form-input display-none" style="padding: 2px 24px 2px 8px; font-size: 13px; height: 28px; border-radius: 6px; background-color: var(--bg-card, #ffffff); color: var(--text-color, #1e293b); border: 1px solid var(--border-color, #e2e8f0); width: auto; max-width: 220px; cursor: pointer; font-weight: 500; appearance: none; -webkit-appearance: none; -moz-appearance: none;">
         </select>
         <div class="team-header-badge" id="teamHeaderTournamentName">Torneo de Fútbol Montería</div>
         <button id="btnOpenJoinTournamentModal" class="btn-primary" style="padding: 2px 10px; font-size: 12px; height: 28px; border-radius: 6px; display: flex; align-items: center; gap: 4px; background-color: var(--primary-light, #e0e7ff); color: var(--primary-color, #4f46e5); border: 1px solid var(--primary-light, #e0e7ff); font-weight: 600; box-shadow: none;">
@@ -368,34 +368,39 @@
     </div>
   </div>
   <!-- Modal: Inscribirse en otro torneo -->
-  <div class="modal-overlay hidden" id="joinTournamentModal">
-    <div class="modal-content" style="max-width: 450px;">
-      <div class="modal-header">
-        <h3>Inscribirme en otro Torneo</h3>
+  <div class="modal-overlay hidden" id="joinTournamentModal" style="display: flex !important; align-items: center; justify-content: center;">
+    <div class="modal-content" style="max-width: 440px; background: #ffffff; border-radius: 16px; border: 1px solid #c8e6c9; padding: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); transform: none; transition: none;">
+      <div class="modal-header" style="border-bottom: 1px solid #e8f5e9; padding: 0 0 12px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
+        <h3 style="font-size: 18px; color: #1b5e20; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20" style="color: #4caf50;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="11" r="3"/><path d="M7 20h10"/></svg>
+          Inscribirme en otro Torneo
+        </h3>
       </div>
-      <div class="modal-body">
-        <p style="color:#94a3b8; font-size:14px; margin-bottom:16px;">
-          Selecciona un nuevo torneo al que deseas unirte con la misma cuenta.
+      <div class="modal-body" style="padding: 0;">
+        <p style="color: #4b5563; font-size: 13.5px; margin: 0 0 18px; line-height: 1.5; font-weight: 500;">
+          Selecciona un nuevo torneo al que deseas unirte con la misma cuenta. Se creará un nuevo registro de equipo para dicho torneo.
         </p>
-        <div class="form-group">
-          <label>Torneo Destino <span class="text-red">*</span></label>
-          <select id="joinNewTournamentId" class="form-input">
-            <option value="">Selecciona un torneo...</option>
-          </select>
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div class="input-wrap" style="display: flex; flex-direction: column; gap: 6px;">
+            <label style="font-size: 12.5px; color: #1b5e20; font-weight: 700; margin-bottom: 2px; text-align: left; display: block;">Torneo Destino <span class="text-red">*</span></label>
+            <select id="joinNewTournamentId" style="appearance: none; -webkit-appearance: none; -moz-appearance: none; padding-right: 36px !important; cursor: pointer;">
+              <option value="">Selecciona un torneo...</option>
+            </select>
+          </div>
+          <div class="input-wrap" style="display: flex; flex-direction: column; gap: 6px;">
+            <label style="font-size: 12.5px; color: #1b5e20; font-weight: 700; margin-bottom: 2px; text-align: left; display: block;">Nombre del Equipo <span class="text-red">*</span></label>
+            <input type="text" id="joinNewTeamName" placeholder="Nombre de tu equipo" style="box-sizing: border-box;" />
+          </div>
+          <div class="input-wrap" style="display: flex; flex-direction: column; gap: 6px;">
+            <label style="font-size: 12.5px; color: #1b5e20; font-weight: 700; margin-bottom: 2px; text-align: left; display: block;">Municipio</label>
+            <input type="text" id="joinNewTeamCity" placeholder="Ej: Montería" style="box-sizing: border-box;" />
+          </div>
         </div>
-        <div class="form-group">
-          <label>Nombre del Equipo <span class="text-red">*</span></label>
-          <input type="text" id="joinNewTeamName" class="form-input" placeholder="Nombre de tu equipo" />
-        </div>
-        <div class="form-group">
-          <label>Municipio</label>
-          <input type="text" id="joinNewTeamCity" class="form-input" placeholder="Opcional" />
-        </div>
-        <p id="joinTournamentErr" class="text-red" style="margin-top:10px; font-size:14px;"></p>
+        <p id="joinTournamentErr" class="text-red" style="margin-top: 12px; font-size: 13px; font-weight: 600; min-height: 18px; margin-bottom: 0;"></p>
       </div>
-      <div class="modal-actions">
-        <button class="btn-secondary" id="btnCancelJoinTournament">Cancelar</button>
-        <button class="btn-primary" id="btnConfirmJoinTournament">Unirme</button>
+      <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; border-top: 1px solid #e8f5e9; padding-top: 16px;">
+        <button class="btn-cancel-sm" id="btnCancelJoinTournament" style="padding: 8px 16px; font-size: 13px;">Cancelar</button>
+        <button class="btn-primary-sm" id="btnConfirmJoinTournament" style="padding: 8px 20px; font-size: 13px;">Unirme</button>
       </div>
     </div>
   </div>
